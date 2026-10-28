@@ -1174,6 +1174,7 @@ impl Engine for MockEngine {
                 throughput: Rat::int(1_000_000).to_rational(),
                 in_transit_lot_ids: vec![],
             }).collect(),
+            lots: self.physical_state().lots,
         }
     }
 

@@ -11,6 +11,7 @@
  */
 export { createEngine, restoreEngine, drainEvents, LdEngineError, type LdEngine } from "./engine.js";
 export { InProcessTransport, type Transport, type JsonHandler } from "./transport.js";
+export { HttpTransport } from "./http-transport.js";
 export { WorkerTransport, type WorkerTransportOptions } from "./worker-transport.js";
 export type { MockWasmBindings } from "./wasm.js";
 export type * from "@lunardig/ld-interfaces";
