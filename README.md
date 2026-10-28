@@ -100,7 +100,7 @@ The mock implements I-1 exactly and the physics loosely (LD-PEC-002 §6). It exi
 
 `.github/workflows/ci.yml` runs clippy, the Rust tests, a fixture regeneration diff, the Python checks and the TS tests on the native mock. It then builds the wasm and requires the wasm-vs-native comparison to run without skipping.
 
-`vendor/ld-interfaces` is private, so CI needs a repository secret `LD_INTERFACES_TOKEN`: a fine-grained token with read access to `lunardig/ld-interfaces` contents. If ld-sdk goes public, ld-interfaces has to go public with it, or the schemas must be vendored as files rather than as a submodule.
+`vendor/ld-interfaces` is private. CI checks out ld-sdk with the default workflow token and fetches the submodule with a repository secret `LD_INTERFACES_TOKEN`: a fine-grained token owned by lunardig with Contents: read on `lunardig/ld-interfaces` only.
 
 ## License
 

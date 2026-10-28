@@ -5,9 +5,10 @@ on:
     branches: [main]
   pull_request:
 
-# vendor/ld-interfaces is a private submodule. The default GITHUB_TOKEN cannot read
-# another private repository, so set LD_INTERFACES_TOKEN to a fine-grained token with
-# read access to lunardig/ld-interfaces (contents: read).
+# vendor/ld-interfaces is a private submodule. The default GITHUB_TOKEN checks out this
+# repository; it cannot read another private one, so the submodule is fetched with
+# LD_INTERFACES_TOKEN: a fine-grained token owned by lunardig with Contents: read on
+# lunardig/ld-interfaces only.
 env:
   CARGO_TERM_COLOR: always
   WASM_BINDGEN_VERSION: "0.2.100"
@@ -32,8 +33,13 @@ jobs:
           [ "$code" = 200 ] && [ "$contents" = 200 ] || { echo "::error::token cannot read lunardig/ld-interfaces (metadata $code, contents $contents)"; exit 1; }
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
-          token: ${{ secrets.LD_INTERFACES_TOKEN || github.token }}
+          persist-credentials: false
+      - name: Fetch vendor/ld-interfaces with LD_INTERFACES_TOKEN
+        env:
+          T: ${{ secrets.LD_INTERFACES_TOKEN }}
+        run: |
+          git config --global url."https://x-access-token:${T}@github.com/lunardig/ld-interfaces".insteadOf "https://github.com/lunardig/ld-interfaces"
+          git submodule update --init --recursive
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
@@ -68,8 +74,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
-          token: ${{ secrets.LD_INTERFACES_TOKEN || github.token }}
+          persist-credentials: false
+      - name: Fetch vendor/ld-interfaces with LD_INTERFACES_TOKEN
+        env:
+          T: ${{ secrets.LD_INTERFACES_TOKEN }}
+        run: |
+          git config --global url."https://x-access-token:${T}@github.com/lunardig/ld-interfaces".insteadOf "https://github.com/lunardig/ld-interfaces"
+          git submodule update --init --recursive
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
