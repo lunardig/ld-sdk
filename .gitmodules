@@ -1,0 +1,3 @@
+[submodule "vendor/ld-interfaces"]
+	path = vendor/ld-interfaces
+	url = https://github.com/lunardig/ld-interfaces

@@ -1,0 +1,13 @@
+{
+  "name": "blocked-output",
+  "description": "The hydrogen tank is tiny and fills in 5 s; the electrolyzer blocks on its h2 output.",
+  "final_time_us": "60000000",
+  "expect": {
+    "jobs": {
+      "job-electrolysis": [
+        "BLOCKED",
+        "BLOCKED_OUTPUT"
+      ]
+    }
+  }
+}

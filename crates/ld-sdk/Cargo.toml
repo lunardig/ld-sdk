@@ -1,0 +1,13 @@
+[package]
+name = "ld-sdk"
+description = "Lunar Dig SDK core: the Engine trait (LD-PEC-002 §5.1), the I-1 protocol host, canonical hashing."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+ld-interfaces-types.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true

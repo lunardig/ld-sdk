@@ -1,0 +1,91 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# vendor/ld-interfaces is a private submodule. The default GITHUB_TOKEN cannot read
+# another private repository, so set LD_INTERFACES_TOKEN to a fine-grained token with
+# read access to lunardig/ld-interfaces (contents: read).
+env:
+  CARGO_TERM_COLOR: always
+  WASM_BINDGEN_VERSION: "0.2.100"
+
+jobs:
+  native:
+    name: Rust, fixtures and TS client (native mock)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.LD_INTERFACES_TOKEN || github.token }}
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -r vendor/ld-interfaces/requirements.txt
+      - name: Fixtures are current
+        run: python fixtures/build.py && git diff --exit-code -- fixtures
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace
+      - run: cargo build --release --bin ld-mock-cli
+      - name: Schema, determinism, subdivision and restore checks
+        run: python tools/check_fixtures.py
+      - run: npm ci
+        working-directory: ts
+      - run: npm test
+        working-directory: ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ld-mock-cli
+          path: target/release/ld-mock-cli
+
+  wasm:
+    name: WebAssembly build agrees with native
+    needs: native
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.LD_INTERFACES_TOKEN || github.token }}
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: Cache wasm-bindgen-cli
+        id: bindgen
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/wasm-bindgen
+          key: wasm-bindgen-cli-${{ env.WASM_BINDGEN_VERSION }}-${{ runner.os }}
+      - if: steps.bindgen.outputs.cache-hit != 'true'
+        run: cargo install wasm-bindgen-cli --version ${{ env.WASM_BINDGEN_VERSION }} --locked
+      - run: ./tools/build-wasm.sh
+      - uses: actions/download-artifact@v4
+        with:
+          name: ld-mock-cli
+          path: target/release
+      - run: chmod +x target/release/ld-mock-cli
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci
+        working-directory: ts
+      - name: Wasm test must run, not skip
+        working-directory: ts
+        run: |
+          npm test 2>&1 | tee test.log
+          ! grep -q "# SKIP" test.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ld-mock-wasm
+          path: ts/wasm

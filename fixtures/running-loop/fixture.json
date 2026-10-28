@@ -1,0 +1,17 @@
+{
+  "name": "running-loop",
+  "description": "Solar power feeding an electrolyzer that splits water into hydrogen and oxygen tanks.",
+  "final_time_us": "60000000",
+  "expect": {
+    "jobs": {
+      "job-solar": [
+        "RUNNING",
+        null
+      ],
+      "job-electrolysis": [
+        "RUNNING",
+        null
+      ]
+    }
+  }
+}

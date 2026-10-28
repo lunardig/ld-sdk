@@ -1,0 +1,16 @@
+[package]
+name = "ld-mock"
+description = "Deterministic mock engine implementing I-1 with simplified physics (LD-PEC-002 §6)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+ld-sdk = { path = "../ld-sdk" }
+serde.workspace = true
+serde_json.workspace = true
+
+[[bin]]
+name = "ld-mock-cli"
+path = "src/bin/ld-mock-cli.rs"

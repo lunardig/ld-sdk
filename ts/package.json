@@ -1,0 +1,25 @@
+{
+  "name": "@lunardig/ld-sdk",
+  "version": "0.1.0",
+  "description": "Client SDK for Lunar Dig engines over I-1 (LD-PEC-002 §5), with transports for a Web Worker, in-process WebAssembly, and a native child process.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": { "types": "./dist/src/index.d.ts", "default": "./dist/src/index.js" },
+    "./node": { "types": "./dist/src/node.d.ts", "default": "./dist/src/node.js" },
+    "./worker": { "types": "./dist/src/worker.d.ts", "default": "./dist/src/worker.js" }
+  },
+  "files": ["dist/src", "wasm"],
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "tsc -p . && node --test dist/test/*.test.js"
+  },
+  "dependencies": {
+    "@lunardig/ld-interfaces": "file:../vendor/ld-interfaces/packages/ts"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.3",
+    "typescript": "5.9.3"
+  }
+}

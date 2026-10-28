@@ -1,0 +1,17 @@
+{
+  "name": "lunar-night",
+  "description": "The plant starts 10 s before lunar dusk. At nightfall solar output stops and the electrolyzer loses power.",
+  "final_time_us": "1275781438500",
+  "expect": {
+    "jobs": {
+      "job-solar": [
+        "STARVED",
+        "STARVED_REQUIRE"
+      ],
+      "job-electrolysis": [
+        "STARVED",
+        "STARVED_POWER"
+      ]
+    }
+  }
+}

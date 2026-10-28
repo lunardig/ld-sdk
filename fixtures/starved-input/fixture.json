@@ -1,0 +1,16 @@
+{
+  "name": "starved-input",
+  "description": "The water tank runs dry after 25 s. The job first reports STARVED_INPUT, then waits below its restart threshold.",
+  "final_time_us": "120000000",
+  "expect": {
+    "jobs": {
+      "job-electrolysis": [
+        "STARVED",
+        "BELOW_RESTART_THRESHOLD"
+      ]
+    },
+    "events": [
+      "STARVED_INPUT"
+    ]
+  }
+}

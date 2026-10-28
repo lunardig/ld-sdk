@@ -1,0 +1,8 @@
+{
+  "product_id": "fragile-electrolyzer-kit",
+  "embodied": {},
+  "installs_as": {
+    "kind": "MACHINE",
+    "template": "electrolyzer-fragile"
+  }
+}

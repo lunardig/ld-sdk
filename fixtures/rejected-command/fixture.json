@@ -1,0 +1,10 @@
+{
+  "name": "rejected-command",
+  "description": "A job is created for a machine that does not exist; the command is rejected and nothing changes.",
+  "final_time_us": "0",
+  "expect": {
+    "admissions": {
+      "cmd-0009": "REJECTED_STATE"
+    }
+  }
+}

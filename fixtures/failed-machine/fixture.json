@@ -1,0 +1,16 @@
+{
+  "name": "failed-machine",
+  "description": "A fragile electrolyzer wears out after 100 s of work and fails; the job reports FAILED.",
+  "final_time_us": "120000000",
+  "expect": {
+    "jobs": {
+      "job-electrolysis": [
+        "FAILED",
+        "FAILED"
+      ]
+    },
+    "machines": {
+      "electrolyzer-1": "FAILED"
+    }
+  }
+}

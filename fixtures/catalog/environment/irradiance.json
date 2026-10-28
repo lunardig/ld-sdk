@@ -1,0 +1,21 @@
+{
+  "function_id": "irradiance",
+  "unit": "w-m2",
+  "period_us": "2551442877000",
+  "segments": [
+    {
+      "start_us": "0",
+      "value": {
+        "n": "1361",
+        "d": "1"
+      }
+    },
+    {
+      "start_us": "1275721438500",
+      "value": {
+        "n": "0",
+        "d": "1"
+      }
+    }
+  ]
+}
