@@ -17,6 +17,19 @@ jobs:
     name: Rust, fixtures and TS client (native mock)
     runs-on: ubuntu-latest
     steps:
+      - name: Check LD_INTERFACES_TOKEN can read lunardig/ld-interfaces
+        env:
+          T: ${{ secrets.LD_INTERFACES_TOKEN }}
+        run: |
+          if [ -z "$T" ]; then
+            echo "::error::LD_INTERFACES_TOKEN is empty in this job. It must be an Actions repository secret on ld-sdk (or an org secret granted to ld-sdk), not a Dependabot, Codespaces or environment secret."
+            exit 1
+          fi
+          code=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $T" https://api.github.com/repos/lunardig/ld-interfaces)
+          contents=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $T" https://api.github.com/repos/lunardig/ld-interfaces/contents/README.md)
+          user=$(curl -s -H "Authorization: Bearer $T" https://api.github.com/user | python3 -c 'import sys,json; print(json.load(sys.stdin).get("login","?"))')
+          echo "::notice::token belongs to $user; repo metadata HTTP $code; contents HTTP $contents"
+          [ "$code" = 200 ] && [ "$contents" = 200 ] || { echo "::error::token cannot read lunardig/ld-interfaces (metadata $code, contents $contents)"; exit 1; }
       - uses: actions/checkout@v4
         with:
           submodules: recursive
