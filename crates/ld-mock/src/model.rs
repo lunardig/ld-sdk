@@ -1152,6 +1152,7 @@ impl Engine for MockEngine {
                 process: id(&j.process),
                 machine_id: id(&j.machine),
                 status: j.status,
+                priority: int(j.priority),
                 reason: j.reason.clone(),
                 completed_work: uint(j.done_work),
                 required_work: uint(j.required_work),
