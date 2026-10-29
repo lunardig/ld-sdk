@@ -48,13 +48,14 @@ export class ProcessTransport implements Transport {
 }
 
 /**
- * Loads the `--target web` wasm build from a directory in Node and returns an
+ * Loads a `--target web` wasm build (`<name>.js` and `<name>_bg.wasm`, default the mock;
+ * `ld_engine_wasm` for ld-engine) from a directory in Node and returns an
  * in-process transport over a fresh engine. A trap answers ENGINE_FAULT; the
  * instance is then discarded, so create a new transport to continue.
  */
-export async function loadWasmTransport(wasmDir: string): Promise<Transport & { engineVersion: string }> {
-  const bindings = (await import(pathToFileURL(`${wasmDir}/ld_mock_wasm.js`).href)) as MockWasmBindings;
-  bindings.initSync({ module: readFileSync(`${wasmDir}/ld_mock_wasm_bg.wasm`) });
+export async function loadWasmTransport(wasmDir: string, name = "ld_mock_wasm"): Promise<Transport & { engineVersion: string }> {
+  const bindings = (await import(pathToFileURL(`${wasmDir}/${name}.js`).href)) as MockWasmBindings;
+  bindings.initSync({ module: readFileSync(`${wasmDir}/${name}_bg.wasm`) });
   let host: { handle(r: string): string; free(): void } | null = new bindings.MockHost();
   const inner = new InProcessTransport({
     handle(request) {

@@ -7,7 +7,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createEngine, restoreEngine, drainEvents, type LdEngine, type Transport } from "../src/index.js";
 import { ProcessTransport, loadWasmTransport } from "../src/node.js";
-import { CLI, WASM_DIR, fixtures, haveCli, haveWasm, type Fixture } from "./helpers.js";
+import { CLI, WASM_DIR, WASM_NAME, fixtures, haveCli, haveWasm, type Fixture } from "./helpers.js";
 
 async function replay(f: Fixture, transport: Transport): Promise<LdEngine> {
   const [create, ...rest] = f.requests;
@@ -59,12 +59,12 @@ test("wasm and native agree on every response", { skip: !(haveCli && haveWasm) &
   for (const f of fixtures()) {
     await t.test(f.name, async () => {
       const native = new ProcessTransport(CLI);
-      const wasm = await loadWasmTransport(WASM_DIR);
+      const wasm = await loadWasmTransport(WASM_DIR, WASM_NAME);
       for (const r of f.requests) {
         const line = JSON.stringify(r);
         assert.equal(await wasm.send(line), await native.send(line), `${f.name}: response ${r.id} differs`);
       }
-      const wasmEngine = await replay(f, await loadWasmTransport(WASM_DIR));
+      const wasmEngine = await replay(f, await loadWasmTransport(WASM_DIR, WASM_NAME));
       await checkExpectations(f, wasmEngine);
       native.close();
       wasm.close();

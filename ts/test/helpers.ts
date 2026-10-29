@@ -6,7 +6,8 @@ export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..")
 export const CLI = process.env.LD_MOCK_CLI ?? join(ROOT, "target/release/ld-mock-cli");
 export const WASM_DIR = process.env.LD_WASM_DIR ?? join(ROOT, "ts/wasm");
 export const haveCli = existsSync(CLI);
-export const haveWasm = existsSync(join(WASM_DIR, "ld_mock_wasm_bg.wasm"));
+export const WASM_NAME = process.env.LD_WASM_NAME ?? "ld_mock_wasm";
+export const haveWasm = existsSync(join(WASM_DIR, `${WASM_NAME}_bg.wasm`));
 
 export interface Fixture {
   name: string;
