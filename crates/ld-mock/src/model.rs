@@ -279,10 +279,10 @@ impl MockEngine {
         self.buffers[b].contents.values().sum()
     }
 
+    /// Environment functions are evaluated at world time (LD-PEC-002 §2, Q-10 notes).
     fn update_environment(&mut self, t: i64) {
-        let rel = self.rel(t);
         for f in self.environment.clone() {
-            let v = env_value(&self.cat.environment[&f], rel);
+            let v = env_value(&self.cat.environment[&f], t);
             if self.env_last.get(&f) != Some(&v) {
                 self.env_last.insert(f.clone(), v);
                 let (fid, value) = (id(&f), v.to_rational());
@@ -533,7 +533,7 @@ impl MockEngine {
         self.environment
             .iter()
             .map(|f| {
-                let change = self.start_us + env_next_change(&self.cat.environment[f], self.rel(t));
+                let change = env_next_change(&self.cat.environment[f], t);
                 // first grid tick at or after the change
                 self.start_us + (self.rel(change) + TICK_US - 1).div_euclid(TICK_US) * TICK_US
             })
@@ -873,6 +873,7 @@ impl MockEngine {
                 machine_id: id(&j.machine),
                 status: j.status,
                 started: j.started,
+                reason: j.reason.clone(),
                 priority: int(j.priority),
                 target_extent: uint(j.target),
                 completed_extent: uint(j.done_extent),
