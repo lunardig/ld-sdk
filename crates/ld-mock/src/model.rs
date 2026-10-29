@@ -407,7 +407,9 @@ impl MockEngine {
                         Some(b) => {
                             let avail = self.buffers[&b].contents.get(species).copied().unwrap_or(0);
                             if let Some(th) = process.restart_thresholds.get(&id(&port)) {
-                                if job.restart_wait.contains(&port) && avail < to_u128(&th.restart_at) {
+                                // Below one unit the job is simply starved; between one unit and the
+                                // threshold it waits for the threshold (LD-PEC-004 §5).
+                                if job.restart_wait.contains(&port) && avail >= (-coeff) as u128 && avail < to_u128(&th.restart_at) {
                                     limit(&mut extent, 0, (JobStatus::Starved, Reason::BelowRestartThreshold { port: id(&port) }));
                                 }
                             }
@@ -740,6 +742,9 @@ impl MockEngine {
             }
             Command::TransferLocal { args, .. } => {
                 let c = self.conns.get(&*args.connection_id).ok_or_else(|| state_err("unknown-connection", args.connection_id.to_string()))?.clone();
+                if c.kind != ConnectionInstanceKind::Conveyor {
+                    return Err(state_err("not-a-conveyor", "TRANSFER_LOCAL moves material over a CONVEYOR"));
+                }
                 let (Some(src), Some(dst)) = (c.from.strip_suffix(".io"), c.to.strip_suffix(".io")) else {
                     return Err(state_err("not-buffer-to-buffer", "transfers run between two buffers"));
                 };

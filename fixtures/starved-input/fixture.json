@@ -1,6 +1,6 @@
 {
   "name": "starved-input",
-  "description": "The water tank runs dry after 25 s. The job first reports STARVED_INPUT, then waits below its restart threshold.",
+  "description": "The water tank runs dry after 25 s and the job reports STARVED_INPUT. At 60 s a conveyor brings 2 mol from a reserve tank, which is less than the 5 mol restart threshold, so the job waits below it.",
   "final_time_us": "120000000",
   "expect": {
     "jobs": {

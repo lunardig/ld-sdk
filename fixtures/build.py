@@ -102,7 +102,7 @@ def build_catalog() -> None:
 class Script:
     """Accumulates I-1 requests; commands always take effect at the current time."""
 
-    def __init__(self, water_mmol: int):
+    def __init__(self, water_mmol: int, reserve_mmol: int = 0):
         self.requests: list[dict] = []
         self.now = 0
         self.seq = 0
@@ -114,7 +114,8 @@ class Script:
                 {"lot_id": "starter-kit", "location": "inventory", "state": "AVAILABLE", "composition": {},
                  "products": {"electrolyzer-kit": "2", "fragile-electrolyzer-kit": "1", "solar-kit": "1", "tank-kit": "4", "tiny-tank-kit": "1"}},
                 {"lot_id": "water-1", "location": "water-tank", "state": "AVAILABLE", "composition": {"h2o-l": str(water_mmol)}, "products": {}},
-            ]}
+            ] + ([{"lot_id": "water-2", "location": "reserve-tank", "state": "AVAILABLE", "composition": {"h2o-l": str(reserve_mmol)}, "products": {}}]
+                 if reserve_mmol else [])}
         self.req("create", {"genesis": genesis, "catalog": ld.bundle_for(CAT)})
 
     def req(self, method: str, params: dict) -> None:
@@ -165,8 +166,12 @@ def scenarios() -> dict[str, tuple[str, Script, dict]]:
     out["running-loop"] = ("Solar power feeding an electrolyzer that splits water into hydrogen and oxygen tanks.", s,
                            {"jobs": {"job-solar": ["RUNNING", None], "job-electrolysis": ["RUNNING", None]}})
 
-    s = Script(water_mmol=50_000); s.plant(); s.jobs(); s.advance(120 * S); s.finish()
-    out["starved-input"] = ("The water tank runs dry after 25 s. The job first reports STARVED_INPUT, then waits below its restart threshold.", s,
+    s = Script(water_mmol=50_000, reserve_mmol=2_000); s.plant(); s.install("tank-kit", "reserve-tank"); s.jobs(); s.advance(60 * S)
+    s.cmd("CONNECT", template="conveyor", connection_id="c-reserve", from_port="reserve-tank.io", to_port="water-tank.io")
+    s.cmd("TRANSFER_LOCAL", connection_id="c-reserve", species="h2o-l", amount=2_000)
+    s.advance(120 * S); s.finish()
+    out["starved-input"] = ("The water tank runs dry after 25 s and the job reports STARVED_INPUT. At 60 s a conveyor brings 2 mol from a "
+                            "reserve tank, which is less than the 5 mol restart threshold, so the job waits below it.", s,
                             {"jobs": {"job-electrolysis": ["STARVED", "BELOW_RESTART_THRESHOLD"]}, "events": ["STARVED_INPUT"]})
 
     s = Script(water_mmol=500_000); s.plant(h2_tank_kit="tiny-tank-kit"); s.jobs(); s.advance(60 * S); s.finish()
