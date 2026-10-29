@@ -14,6 +14,16 @@
       "hash": "1e710f0c7d09c51aba00b68c092b355eb1df23d5ce4b2351a92b8df3934abbd9"
     },
     {
+      "kind": "connection",
+      "id": "conveyor",
+      "hash": "feed715b735b563eecfc446954fb7eeb8fb6eb74d9fca4ed5612dcc307ef4dbb"
+    },
+    {
+      "kind": "connection",
+      "id": "pipe",
+      "hash": "a464683ae430e63b2dabffdc7f973fa8bfe1a950519842fc248d5e190567a6e1"
+    },
+    {
       "kind": "element",
       "id": "h",
       "hash": "88a7ad999caa2d53b4298f0e58c9649a0de69ecf84262bd42172cec053210f09"

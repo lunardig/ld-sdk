@@ -86,6 +86,9 @@ def build_catalog() -> None:
 
     for tid, cap in [("tank-small", "1000000"), ("tank-tiny", "10000")]:
         write(CAT / f"buffers/{tid}.json", {"template_id": tid, "accepts": ["h2o-l", "h2-g", "o2-g"], "capacity": {"amount": cap, "unit": "mmol"}})
+    # A pipe couples a machine port to a tank; a conveyor carries shipments between tanks.
+    write(CAT / "connections/pipe.json", {"template_id": "pipe", "kind": "FEED", "throughput": R(1, 100), "unit": "mmol", "delay_us": "0"})
+    write(CAT / "connections/conveyor.json", {"template_id": "conveyor", "kind": "CONVEYOR", "throughput": R(1, 1000), "unit": "mmol", "delay_us": "2000000"})
     for pid, kind, tpl in [("electrolyzer-kit", "MACHINE", "electrolyzer"), ("fragile-electrolyzer-kit", "MACHINE", "electrolyzer-fragile"),
                            ("solar-kit", "MACHINE", "solar-array"), ("tank-kit", "BUFFER", "tank-small"), ("tiny-tank-kit", "BUFFER", "tank-tiny")]:
         write(CAT / f"products/{pid}.json", {"product_id": pid, "embodied": {}, "installs_as": {"kind": kind, "template": tpl}})
@@ -138,9 +141,9 @@ class Script:
         self.install("tank-kit", "water-tank")
         self.install(h2_tank_kit, "h2-tank")
         self.install("tank-kit", "o2-tank")
-        self.cmd("CONNECT", connection_id="c-water", from_port="water-tank.io", to_port="electrolyzer-1.water")
-        self.cmd("CONNECT", connection_id="c-h2", from_port="electrolyzer-1.h2", to_port="h2-tank.io")
-        self.cmd("CONNECT", connection_id="c-o2", from_port="electrolyzer-1.o2", to_port="o2-tank.io")
+        self.cmd("CONNECT", template="pipe", connection_id="c-water", from_port="water-tank.io", to_port="electrolyzer-1.water")
+        self.cmd("CONNECT", template="pipe", connection_id="c-h2", from_port="electrolyzer-1.h2", to_port="h2-tank.io")
+        self.cmd("CONNECT", template="pipe", connection_id="c-o2", from_port="electrolyzer-1.o2", to_port="o2-tank.io")
 
     def jobs(self) -> None:
         self.cmd("CREATE_JOB", job_id="job-solar", process="generate-solar", machine_id="solar-1", target_extent=10**12, priority=100)

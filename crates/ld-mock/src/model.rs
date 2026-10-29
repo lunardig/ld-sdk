@@ -30,6 +30,8 @@ struct Buffer {
 
 #[derive(Clone)]
 struct Conn {
+    template: String,
+    kind: ConnectionInstanceKind,
     from: String,
     to: String,
 }
@@ -182,17 +184,6 @@ fn output_port(p: &Process, species: &str) -> Option<String> {
     p.ports.out.iter().find(|pt| pt.accepts.iter().any(|a| **a == species)).map(|pt| pt.port.to_string())
 }
 
-fn describe(p: &Predicate) -> String {
-    match p {
-        Predicate::Capability { capability } => format!("capability:{}", **capability),
-        Predicate::Tool { tool } => format!("tool:{}", **tool),
-        Predicate::Environment { function_id, min, max } => {
-            let (lo, hi) = (Rat::from(min), Rat::from(max));
-            format!("environment:{} in [{}/{}, {}/{}]", **function_id, lo.numer(), lo.denom(), hi.numer(), hi.denom())
-        }
-    }
-}
-
 /// A job's stall reason, flattened into a mock pending event `(kind, subject)` so it
 /// survives snapshot/restore. Without it a restored engine would re-announce the
 /// same stall and its event sequence would drift from an uninterrupted run (V-09).
@@ -206,7 +197,8 @@ fn reason_marker(job_id: &str, reason: &Reason, info: &ProcInfo) -> (String, Str
         Reason::Dwelling => ("dwelling", job_id.to_string()),
         Reason::Maintenance => ("maintenance", job_id.to_string()),
         Reason::StarvedRequire { predicate } => {
-            let i = info.require.iter().position(|p| describe(p) == *predicate).unwrap_or(0);
+            let want = serde_json::to_value(predicate).unwrap();
+            let i = info.require.iter().position(|p| serde_json::to_value(p).unwrap() == want).unwrap_or(0);
             ("starved-require", format!("require.{i}"))
         }
     };
@@ -224,7 +216,7 @@ fn reason_from_marker(kind: &str, subject: &str, info: &ProcInfo) -> Option<Reas
         "maintenance" => Reason::Maintenance,
         "starved-require" => {
             let i: usize = subject.strip_prefix("require.")?.parse().ok()?;
-            Reason::StarvedRequire { predicate: describe(info.require.get(i)?) }
+            Reason::StarvedRequire { predicate: info.require.get(i)?.clone() }
         }
         _ => return None,
     })
@@ -379,7 +371,7 @@ impl MockEngine {
                 }
             };
             if !ok {
-                return stall(self, JobStatus::Starved, Some(Reason::StarvedRequire { predicate: describe(pred) }));
+                return stall(self, JobStatus::Starved, Some(Reason::StarvedRequire { predicate: pred.clone() }));
             }
         }
 
@@ -652,7 +644,14 @@ impl MockEngine {
                 if from.split('.').next() == to.split('.').next() {
                     return Err(state_err("self-connection", "ports belong to the same equipment"));
                 }
-                self.conns.insert(args.connection_id.to_string(), Conn { from, to });
+                let Some(tpl) = self.cat.connections.get(&*args.template) else {
+                    return Err(state_err("unknown-template", format!("no connection template {}", *args.template)));
+                };
+                let kind = match tpl.kind {
+                    ConnectionTemplateKind::Feed => ConnectionInstanceKind::Feed,
+                    ConnectionTemplateKind::Conveyor => ConnectionInstanceKind::Conveyor,
+                };
+                self.conns.insert(args.connection_id.to_string(), Conn { template: args.template.to_string(), kind, from, to });
                 Ok(())
             }
             Command::Disconnect { args, .. } => {
@@ -813,9 +812,6 @@ impl MockEngine {
         lots.sort_by(|a, b| a.lot_id.cmp(&b.lot_id));
         let mut pending = Vec::new();
         for (jid, j) in &self.jobs {
-            if j.started && j.status == JobStatus::Queued {
-                pending.push(PendingEvent { event_id: id(&format!("{jid}.started")), kind: id("started"), subject: id(jid), time_us: time(self.time) });
-            }
             if let Some(r) = &j.reason {
                 let (kind, subject) = reason_marker(jid, r, &proc_info(&self.cat.processes[&j.process]));
                 pending.push(PendingEvent { event_id: id(&format!("{jid}.why")), kind: id(&kind), subject: id(&subject), time_us: time(self.time) });
@@ -824,12 +820,9 @@ impl MockEngine {
                 pending.push(PendingEvent { event_id: id(&format!("{jid}.{port}")), kind: id("restart-wait"), subject: id(jid), time_us: time(self.time) });
             }
         }
-        // Claim constants the mock needs on restore (grid origin, active environment
-        // functions), recorded as pending events of the mock's own kinds.
+        // The tick grid's origin is a mock-only claim constant, kept as a pending event of
+        // the mock's own kind.
         pending.push(PendingEvent { event_id: id("genesis-start"), kind: id("genesis-start"), subject: id(&self.claim_id), time_us: time(self.start_us) });
-        for f in &self.environment {
-            pending.push(PendingEvent { event_id: id(&format!("env.{f}")), kind: id("environment"), subject: id(f), time_us: time(self.start_us) });
-        }
         pending.sort_by(|a, b| a.event_id.cmp(&b.event_id));
         let mut counters = BTreeMap::new();
         counters.insert(id("event-seq"), uint(self.next_seq as u128));
@@ -840,6 +833,7 @@ impl MockEngine {
             claim_id: id(&self.claim_id),
             time_us: time(self.time),
             catalog_hash: self.cat.hash.clone(),
+            environment: self.environment.iter().map(|f| id(f)).collect(),
             deposits: self.deposits.clone(),
             lots,
             buffers: self.buffers.iter().map(|(b, buf)| BufferInstance {
@@ -858,13 +852,18 @@ impl MockEngine {
                 rate_setpoint: m.setpoint.unwrap_or_else(|| Rat::from(&self.cat.machines[&m.blueprint].rated_work)).to_rational(),
                 assigned_job_ids: self.assigned(k),
             }).collect(),
-            connections: self.conns.iter().map(|(k, c)| ConnectionInstance {
-                connection_id: id(k),
-                from_port: id(&c.from),
-                to_port: id(&c.to),
-                throughput: Rat::int(1_000_000).to_rational(),
-                delay_us: "1".parse().unwrap(),
-                active: true,
+            connections: self.conns.iter().map(|(k, c)| {
+                let tpl = &self.cat.connections[&c.template];
+                ConnectionInstance {
+                    connection_id: id(k),
+                    template: id(&c.template),
+                    kind: c.kind,
+                    from_port: id(&c.from),
+                    to_port: id(&c.to),
+                    throughput: tpl.throughput.clone(),
+                    delay_us: tpl.delay_us.clone(),
+                    active: true,
+                }
             }).collect(),
             energy_stores: vec![],
             jobs: self.jobs.iter().map(|(k, j)| JobInstance {
@@ -873,6 +872,7 @@ impl MockEngine {
                 process_hash: self.cat.process_hashes[&j.process].clone(),
                 machine_id: id(&j.machine),
                 status: j.status,
+                started: j.started,
                 priority: int(j.priority),
                 target_extent: uint(j.target),
                 completed_extent: uint(j.done_extent),
@@ -921,7 +921,6 @@ impl MockEngine {
             composition: map_u(&l.composition.0),
             products: map_u(&l.products),
         })).collect();
-        let started: BTreeSet<String> = s.pending_events.iter().filter(|e| *e.kind == "started").map(|e| e.subject.to_string()).collect();
         let mut jobs = BTreeMap::new();
         for j in &s.jobs {
             let jid = j.job_id.to_string();
@@ -937,7 +936,7 @@ impl MockEngine {
                 status: j.status,
                 reason,
                 priority: to_i128(&j.priority),
-                started: started.contains(&jid) || matches!(j.status, JobStatus::Running | JobStatus::Starved | JobStatus::Blocked),
+                started: j.started,
                 target: to_u128(&j.target_extent),
                 done_extent: to_u128(&j.completed_extent),
                 required_work: to_u128(&j.required_work),
@@ -971,7 +970,7 @@ impl MockEngine {
                 })
             }).collect(),
             buffers,
-            conns: s.connections.iter().map(|c| (c.connection_id.to_string(), Conn { from: c.from_port.to_string(), to: c.to_port.to_string() })).collect(),
+            conns: s.connections.iter().map(|c| (c.connection_id.to_string(), Conn { template: c.template.to_string(), kind: c.kind, from: c.from_port.to_string(), to: c.to_port.to_string() })).collect(),
             lots,
             jobs,
             heat_j: s.sinks.iter().map(|k| to_u128(&k.energy)).sum(),
@@ -1065,7 +1064,7 @@ impl Engine for MockEngine {
         // The grid origin and active environment functions are claim constants the
         // mock records as pending events of its own kinds (see physical_state).
         let start_us = snapshot.state.pending_events.iter().find(|e| *e.kind == "genesis-start").map(|e| to_i128(&e.time_us) as i64).unwrap_or(0);
-        let environment = snapshot.state.pending_events.iter().filter(|e| *e.kind == "environment").map(|e| e.subject.to_string()).collect();
+        let environment = snapshot.state.environment.iter().map(|f| f.to_string()).collect();
         Ok(MockEngine::from_state(cat, &snapshot.state, &snapshot.envelope, environment, start_us))
     }
 

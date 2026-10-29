@@ -15,6 +15,7 @@ pub struct Catalog {
     pub machines: BTreeMap<String, MachineBlueprint>,
     pub products: BTreeMap<String, ProductBlueprint>,
     pub buffers: BTreeMap<String, BufferTemplate>,
+    pub connections: BTreeMap<String, ConnectionTemplate>,
     pub environment: BTreeMap<String, EnvironmentFunction>,
 }
 
@@ -36,6 +37,7 @@ impl Catalog {
         bundle.machines.iter().for_each(|e| add(&mut computed, "machine", &e.blueprint_id, e));
         bundle.products.iter().for_each(|e| add(&mut computed, "product", &e.product_id, e));
         bundle.buffers.iter().for_each(|e| add(&mut computed, "buffer", &e.template_id, e));
+        bundle.connections.iter().for_each(|e| add(&mut computed, "connection", &e.template_id, e));
         bundle.environment.iter().for_each(|e| add(&mut computed, "environment", &e.function_id, e));
         computed.sort();
 
@@ -71,6 +73,7 @@ impl Catalog {
             machines: bundle.machines.iter().map(|m| (m.blueprint_id.to_string(), m.clone())).collect(),
             products: bundle.products.iter().map(|p| (p.product_id.to_string(), p.clone())).collect(),
             buffers: bundle.buffers.iter().map(|b| (b.template_id.to_string(), b.clone())).collect(),
+            connections: bundle.connections.iter().map(|c| (c.template_id.to_string(), c.clone())).collect(),
             environment: bundle.environment.iter().map(|f| (f.function_id.to_string(), f.clone())).collect(),
         })
     }
