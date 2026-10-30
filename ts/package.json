@@ -2,7 +2,7 @@
   "name": "@lunardig/ld-sdk",
   "version": "0.1.0",
   "description": "Client SDK for Lunar Dig engines over I-1 (LD-PEC-002 §5), with transports for a Web Worker, in-process WebAssembly, and a native child process.",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "private": true,
   "type": "module",
   "exports": {
