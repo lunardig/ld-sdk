@@ -108,4 +108,4 @@ The mock implements I-1 exactly and the physics loosely (LD-PEC-002 §6). It exi
 
 ## License
 
-`UNLICENSED` placeholder until the team picks one for the public SDK.
+Apache License 2.0 (LICENSE, NOTICE). The mock engine and fixtures are covered by it. ld-engine, the real engine, is proprietary and not part of this repository.
