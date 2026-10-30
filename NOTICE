@@ -1,5 +1,5 @@
 Lunar Dig — ld-sdk
-Copyright 2026 [COPYRIGHT HOLDER]
+Copyright 2026 ioMetics LC
 
 This product is the Lunar Dig SDK: the Engine trait, protocol host, mock engine and client bindings.
 It is licensed under the Apache License, Version 2.0 (see LICENSE).
