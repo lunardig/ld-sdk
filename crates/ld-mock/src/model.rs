@@ -804,6 +804,8 @@ impl MockEngine {
             state: LotState::Available,
             composition: species_amounts(&l.composition),
             products: l.products.iter().map(|(p, n)| (id(p), uint(*n))).collect(),
+            // The mock does not model worn kits (LD-PEC-004 A1-1); the real engine does.
+            wear: None,
         }).collect();
         for (b, buf) in &self.buffers {
             lots.push(Lot_ {
@@ -812,6 +814,7 @@ impl MockEngine {
                 state: LotState::Available,
                 composition: species_amounts(&buf.contents),
                 products: BTreeMap::new(),
+                wear: None,
             });
         }
         lots.sort_by(|a, b| a.lot_id.cmp(&b.lot_id));
