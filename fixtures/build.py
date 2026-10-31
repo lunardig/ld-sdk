@@ -216,10 +216,10 @@ def build_alpha() -> None:
         "elements": [e for e in m2.elements() if e["element_id"] in ("si", "fe", "ti")] + [m3b.URANIUM],
         "units": [u for u in m2c.m2c_units() if u["unit_id"] in ("kg-reg", "count")],
         # Every substance carries its energy content (LD-PEC-006 §3.2.1). Fission fuel holds
-        # 900 MJ per mmol of UO2 (about 3.3 TJ/kg), a provisional figure (Q-13).
+        # 300 MJ per mmol of UO2 (1.55 % FIMA, about 1.1 TJ/kg), after review (Q-13a).
         "substances": [x for x in m2c.m2c_substances()
                        if x["substance_id"] in ("regolith-bank", "regolith", "h2o-s", "h2o-l", "h2-g", "o2-g", "fetio3-s", "sio2-s", m2c.IRON, m2c.RUTILE)]
-        + m3b.fuel_substances(900_000_000),
+        + m3b.fuel_substances(300_000_000),
     }
     for key, items in entries.items():
         for item in items:
@@ -242,7 +242,7 @@ def build_alpha() -> None:
     electrolyze["failure_disposition"] = {"split": "RELEASE"}
     # The fuel cell sells 286 J of the 571.66 J a mmol of reaction releases; fission sells
     # 25 % of its fuel's energy (Stirling or Brayton conversion). Both follow load.
-    fuel_cell, fission = m3b.fuel_cell(286), m3b.fission(225_000_000)
+    fuel_cell, fission = m3b.fuel_cell(286), m3b.fission(75_000_000)
     for proc in (excavate, beneficiate, melt, reduce, fabricate, electrolyze, fuel_cell, fission):
         write(cat / f"processes/{proc['process_id']}.json", proc)
     power = {"port": "power", "type": "ELECTRICAL", "direction": "IN"}
@@ -261,16 +261,17 @@ def build_alpha() -> None:
         # Ten minutes per hopper: 200 MJ at about 333 kW (LD-PEC-006 §2.1).
         ("fabricator", ["fabricate-hopper"], R(1, 600_000_000), [mport("iron", "IN"), mport("scrap", "OUT"), power], ["fabrication"]),
         ("battery", [], R(1, 1_000_000), [power], ["storage"]),
-        # 286 kW at 1 mol of reaction per second.
-        ("fuel-cell", ["fuel-cell"], R(1, 1000), [mport("h2", "IN"), mport("o2", "IN"), mport("water", "OUT"),
+        # 400 kW: 1.4 mol of reaction per second, sized for a 300 kW load with margin (Q-13b).
+        ("fuel-cell", ["fuel-cell"], R(7, 5000), [mport("h2", "IN"), mport("o2", "IN"), mport("water", "OUT"),
                                                  {"port": "power", "type": "ELECTRICAL", "direction": "OUT"}], ["fuel-cell"]),
-        # 1 MWe; it cannot throttle below a fifth of that (LD-PEC-006 §3.2.2).
-        ("fission-reactor", ["fission"], R(1, 225_000_000), [mport("fuel", "IN"), mport("spent", "OUT"),
+        # 1 MWe (4 MWth); the core cannot run below 30 % (Q-13a). Below the load, the
+        # surplus goes to a dump load: waste heat (LD-PEC-006 §3.2.2).
+        ("fission-reactor", ["fission"], R(1, 75_000_000), [mport("fuel", "IN"), mport("spent", "OUT"),
                                                              {"port": "power", "type": "ELECTRICAL", "direction": "OUT"}], ["fission"]),
     ]:
         write(cat / f"machines/{bid}.json", {
             "blueprint_id": bid, "capabilities": caps, "processes": procs, "rated_work": rated, "lanes": "1",
-            "min_stable_rate": R(1, 1_125_000_000) if bid == "fission-reactor" else R(1, 1_000_000_000),
+            "min_stable_rate": R(1, 250_000_000) if bid == "fission-reactor" else R(1, 1_000_000_000),
             "idle_power": {"amount": R(0), "unit": "w"}, "ports": ports,
             "condition_table": [{"wear_at": "0", "capacity_factor": R(1)}, {"wear_at": "1000000", "capacity_factor": R(1, 2)}], "embodied": {},
             # 100 kWh, 400 kW in, 600 kW out: enough to carry the electrolyzer a few

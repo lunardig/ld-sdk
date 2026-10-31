@@ -65,8 +65,8 @@
               "stream": "icy",
               "fractions": {
                 "h2o-s": {
-                  "n": "9",
-                  "d": "10"
+                  "n": "13",
+                  "d": "20"
                 }
               }
             },
@@ -74,8 +74,8 @@
               "stream": "concentrate",
               "fractions": {
                 "fetio3-s": {
-                  "n": "4",
-                  "d": "5"
+                  "n": "1",
+                  "d": "2"
                 }
               }
             }

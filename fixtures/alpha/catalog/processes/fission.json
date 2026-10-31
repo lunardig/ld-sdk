@@ -57,7 +57,7 @@
           "mode": "PER_WORK",
           "dir": "PRODUCE",
           "amount": {
-            "n": "225000000",
+            "n": "75000000",
             "d": "1"
           },
           "unit": "j",

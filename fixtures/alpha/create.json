@@ -3,7 +3,7 @@
     "schema": "ld.genesis.v0",
     "world_id": "alpha-world",
     "claim_id": "claim-0001",
-    "catalog_hash": "47f7a5f9853325220ba455e356899481083a05516b46aa39edcf024f7a4f7714",
+    "catalog_hash": "bd2ba01f295e14a4c159fe0a689cd1beeaf72ec4092718b9c3949e86ed06f21d",
     "start_us": "0",
     "deposits": [
       {
@@ -170,12 +170,12 @@
         {
           "kind": "machine",
           "id": "fission-reactor",
-          "hash": "835efb89d05acf58119fb9f7c7377ad4379811df30f73890612fddfd63238d16"
+          "hash": "62251407c20036ad782bbaf4d1259094756b84d401cca47cfac115a513bb305c"
         },
         {
           "kind": "machine",
           "id": "fuel-cell",
-          "hash": "fc2265b82e25062cebb8882643e7849877afd89775e713c633bcef0157696322"
+          "hash": "20bcc19bdc13268048b71cf2a8f95e84db5639d112577cd50a0403a771ed246c"
         },
         {
           "kind": "machine",
@@ -195,7 +195,7 @@
         {
           "kind": "process",
           "id": "beneficiate",
-          "hash": "3d38acb708988f3bd20a4a5f47dc23d6cbbb110ea3ad6de8487ff6d4ceb6a9ce"
+          "hash": "58a0a931bbaa247104e2d8828acaf7a16e019c279463d82dbea7cc1e7d1feb4b"
         },
         {
           "kind": "process",
@@ -215,7 +215,7 @@
         {
           "kind": "process",
           "id": "fission",
-          "hash": "79c43eec4977b39652cf2afaf5f9eb534f8e253b11c8cef7612611c1667abf55"
+          "hash": "35441fdbaa66282a60e206c40a15435db76eaeaecbbe650bb0ee0a0595eca2ef"
         },
         {
           "kind": "process",
@@ -235,7 +235,7 @@
         {
           "kind": "process",
           "id": "reduce-ilmenite",
-          "hash": "e36c2302c0f6c278e07f2fdcb95665364b877b3445abeb57538d9c2fc4c6b47d"
+          "hash": "71434baae83ec61b51e4f058d5355584e65b0b98f41152f7c7a71ce80db2549e"
         },
         {
           "kind": "product",
@@ -355,12 +355,12 @@
         {
           "kind": "substance",
           "id": "fetio3-s",
-          "hash": "f1822151af1defb23211de2d981493097f3cd5294080550294f9f9522920b279"
+          "hash": "ad800aebd48bd4a2c12df7605164e531442b5690304770697f81f454f78ff60b"
         },
         {
           "kind": "substance",
           "id": "fuel-fresh",
-          "hash": "947735ee4ceadad3cc25f7d71f6b4464b0f0d9e469520fb35754517ff1180ee2"
+          "hash": "5ffb443f2a18878b0d778ebd0b1cb975433b40fabb9d806226ee70e68da1e24c"
         },
         {
           "kind": "substance",
@@ -375,12 +375,12 @@
         {
           "kind": "substance",
           "id": "h2o-l",
-          "hash": "de29320ae902943f92f6582f5567cb529b4e8f1af3c993d007110883ac30b48d"
+          "hash": "c977b4b549019eda9c2ee55fd36f87e981cd3d4afd1fc2b56ec5c980444b3773"
         },
         {
           "kind": "substance",
           "id": "h2o-s",
-          "hash": "3d43f12c20c75f3b3632e871436305a23ac2e5151916f15b610c3b10695e6e4d"
+          "hash": "82fa2c9faea2e8a2250eecf5738483fb15c6e505dbd74b0864a3e294776332a5"
         },
         {
           "kind": "substance",
@@ -390,12 +390,12 @@
         {
           "kind": "substance",
           "id": "regolith",
-          "hash": "06b9ca7e1b9a6e1a48e0b0a2b6a61ae6cfb644a22a8584110f825d47f06f4019"
+          "hash": "d2dadc6cac3f8c132fc6ae3b231ae7f42b0d739d2bccaf1e3d78dac3ba72c12c"
         },
         {
           "kind": "substance",
           "id": "regolith-bank",
-          "hash": "14298a96d32eaae1d0c02c7aa686d32a2edeb9fc6013ba141461d2fbe3e1184c"
+          "hash": "bdcd02aab7296b2db51887ba0d1b8bf3bd2c1a45fa904ef7afdff36b42d5c863"
         },
         {
           "kind": "substance",
@@ -605,8 +605,12 @@
         "phase": "solid",
         "quantity_unit": "mmol",
         "enthalpy": {
-          "n": "-6183",
-          "d": "5"
+          "n": "-1232",
+          "d": "1"
+        },
+        "gibbs": {
+          "n": "-2311",
+          "d": "2"
         }
       },
       {
@@ -618,7 +622,7 @@
         "phase": "solid",
         "quantity_unit": "mmol",
         "enthalpy": {
-          "n": "900000000",
+          "n": "300000000",
           "d": "1"
         }
       },
@@ -664,8 +668,8 @@
           "d": "100"
         },
         "gibbs": {
-          "n": "-23713",
-          "d": "100"
+          "n": "-237141",
+          "d": "1000"
         }
       },
       {
@@ -683,8 +687,8 @@
           }
         },
         "enthalpy": {
-          "n": "-7296",
-          "d": "25"
+          "n": "-292713",
+          "d": "1000"
         }
       },
       {
@@ -715,8 +719,8 @@
         "phase": "solid",
         "quantity_unit": "kg-reg",
         "enthalpy": {
-          "n": "-14509359",
-          "d": "1"
+          "n": "-580350007",
+          "d": "40"
         }
       },
       {
@@ -731,8 +735,8 @@
         "phase": "solid",
         "quantity_unit": "kg-reg",
         "enthalpy": {
-          "n": "-14509359",
-          "d": "1"
+          "n": "-580350007",
+          "d": "40"
         }
       },
       {
@@ -838,8 +842,8 @@
                     "stream": "icy",
                     "fractions": {
                       "h2o-s": {
-                        "n": "9",
-                        "d": "10"
+                        "n": "13",
+                        "d": "20"
                       }
                     }
                   },
@@ -847,8 +851,8 @@
                     "stream": "concentrate",
                     "fractions": {
                       "fetio3-s": {
-                        "n": "4",
-                        "d": "5"
+                        "n": "1",
+                        "d": "2"
                       }
                     }
                   }
@@ -1271,7 +1275,7 @@
                 "mode": "PER_WORK",
                 "dir": "PRODUCE",
                 "amount": {
-                  "n": "225000000",
+                  "n": "75000000",
                   "d": "1"
                 },
                 "unit": "j",
@@ -1663,7 +1667,7 @@
                     "stream": "magnetic",
                     "fractions": {
                       "fe-s": {
-                        "n": "19",
+                        "n": "17",
                         "d": "20"
                       }
                     }
@@ -2149,12 +2153,12 @@
         ],
         "rated_work": {
           "n": "1",
-          "d": "225000000"
+          "d": "75000000"
         },
         "lanes": "1",
         "min_stable_rate": {
           "n": "1",
-          "d": "1125000000"
+          "d": "250000000"
         },
         "idle_power": {
           "amount": {
@@ -2207,8 +2211,8 @@
           "fuel-cell"
         ],
         "rated_work": {
-          "n": "1",
-          "d": "1000"
+          "n": "7",
+          "d": "5000"
         },
         "lanes": "1",
         "min_stable_rate": {

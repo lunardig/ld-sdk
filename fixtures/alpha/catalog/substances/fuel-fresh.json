@@ -7,7 +7,7 @@
   "phase": "solid",
   "quantity_unit": "mmol",
   "enthalpy": {
-    "n": "900000000",
+    "n": "300000000",
     "d": "1"
   }
 }

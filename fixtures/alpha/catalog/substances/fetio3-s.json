@@ -8,7 +8,11 @@
   "phase": "solid",
   "quantity_unit": "mmol",
   "enthalpy": {
-    "n": "-6183",
-    "d": "5"
+    "n": "-1232",
+    "d": "1"
+  },
+  "gibbs": {
+    "n": "-2311",
+    "d": "2"
   }
 }
