@@ -1,7 +1,8 @@
 {
   "template_id": "rutile-bin",
   "accepts": [
-    "tio2-s"
+    "tio2-s",
+    "fe-s"
   ],
   "capacity": {
     "amount": "5000000",

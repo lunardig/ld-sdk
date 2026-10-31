@@ -1,0 +1,8 @@
+{
+  "product_id": "tailings-pile-kit",
+  "embodied": {},
+  "installs_as": {
+    "kind": "BUFFER",
+    "template": "tailings-pile"
+  }
+}

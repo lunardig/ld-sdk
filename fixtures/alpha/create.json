@@ -3,7 +3,7 @@
     "schema": "ld.genesis.v0",
     "world_id": "alpha-world",
     "claim_id": "claim-0001",
-    "catalog_hash": "9c5ad4a7540b5bc0e66b102b6e7ae3bf4d9ebcfe14e13abe17c6531e47354632",
+    "catalog_hash": "65a7db28634c06112632e297081fcdf1446fc301e25b5834f2d9d2a9dae57fcb",
     "start_us": "0",
     "deposits": [
       {
@@ -34,7 +34,7 @@
   "catalog": {
     "manifest": {
       "schema": "ld.catalog.v0",
-      "catalog_id": "alpha-m2c",
+      "catalog_id": "alpha-m3a",
       "pset_version": "0",
       "entries": [
         {
@@ -60,12 +60,17 @@
         {
           "kind": "buffer",
           "id": "rutile-bin",
-          "hash": "38886586f5666294a0c0b85427c6197391ec7c814816a555867afec4bb1e9673"
+          "hash": "c5ce4e05055b88a0ea400ee606f7637d3a3d6e51369c7e6fc70b6f4e57da8e3f"
         },
         {
           "kind": "buffer",
           "id": "scrap-bin",
           "hash": "5a66fe0510c8d3dd36efb3fc12f7c4eb5542163bee9de07610b6cf802914185c"
+        },
+        {
+          "kind": "buffer",
+          "id": "tailings-pile",
+          "hash": "6e71633681c152de1cdbc3cfafbc1bf21fa6f48df4d549132feb42a70be53549"
         },
         {
           "kind": "buffer",
@@ -125,7 +130,7 @@
         {
           "kind": "machine",
           "id": "beneficiator",
-          "hash": "8a19721974cfecd86f4a21daf8d3d7f606bc693a9a6745cffbd0645db0fad11b"
+          "hash": "2bd7700d9a6b162086a3083f04f739f73c0d38070a1804dd8538e62c289e1f22"
         },
         {
           "kind": "machine",
@@ -145,7 +150,7 @@
         {
           "kind": "machine",
           "id": "fabricator",
-          "hash": "5e8cba2e23f18af624128e6732923cbe2c98e8bdd7a3fb5d18b07d306a02be30"
+          "hash": "82f0d64389be75751cdb0a752ab7a1f84763f8e5a22b8c5d717f851cb8625bb3"
         },
         {
           "kind": "machine",
@@ -155,7 +160,7 @@
         {
           "kind": "machine",
           "id": "reactor",
-          "hash": "e50168bca6bead86046eafc13f10ede80b96c87efd77977760820fcbae66d14c"
+          "hash": "ea75f0a9d839a70dc093daa918feca3dff94135dd107a7884a7c722bdcd4ef2a"
         },
         {
           "kind": "machine",
@@ -165,7 +170,7 @@
         {
           "kind": "process",
           "id": "beneficiate",
-          "hash": "191d6eb5b243bd173aa77a98c84a74143853f1e8a8828dfd1b0af9bb78e95c9a"
+          "hash": "3d38acb708988f3bd20a4a5f47dc23d6cbbb110ea3ad6de8487ff6d4ceb6a9ce"
         },
         {
           "kind": "process",
@@ -180,7 +185,7 @@
         {
           "kind": "process",
           "id": "fabricate-hopper",
-          "hash": "7aeea51c8aa9131c5294e697221bbeba568c2ec46b1b6a65992a6460e2c1175b"
+          "hash": "a32086a6dfff0a0788c5d28e3c55fb7842abb9de4924627c8ba6d7b125b529b1"
         },
         {
           "kind": "process",
@@ -195,7 +200,7 @@
         {
           "kind": "process",
           "id": "reduce-ilmenite",
-          "hash": "a651c0a961ae955d07de40393600a709befcfed6df62f0c0acdfcb11c04f9740"
+          "hash": "e36c2302c0f6c278e07f2fdcb95665364b877b3445abeb57538d9c2fc4c6b47d"
         },
         {
           "kind": "product",
@@ -271,6 +276,11 @@
           "kind": "product",
           "id": "solar-kit",
           "hash": "536fb301a9f64b42a5610c3826309cdb9e9329641d6ff986b9b27a7ca1c6d1cb"
+        },
+        {
+          "kind": "product",
+          "id": "tailings-pile-kit",
+          "hash": "40f2a2bc925bb45a715c3d2c0165fafcb8fa50cda0dc77ea0b6145c8d3cad8f3"
         },
         {
           "kind": "product",
@@ -628,6 +638,14 @@
               "accepts": [
                 "fetio3-s"
               ]
+            },
+            {
+              "port": "tailings",
+              "accepts": [
+                "sio2-s",
+                "h2o-s",
+                "fetio3-s"
+              ]
             }
           ]
         },
@@ -649,27 +667,29 @@
                 }
               },
               {
-                "op": "LOSS",
-                "species": "sio2-s",
-                "quantity": {
-                  "kind": "op",
-                  "op": "mul",
-                  "args": [
-                    {
-                      "kind": "const",
-                      "value": {
-                        "n": "14148",
-                        "d": "1"
+                "op": "PARTITION",
+                "input": "pool",
+                "residue": "rest",
+                "outputs": [
+                  {
+                    "stream": "icy",
+                    "fractions": {
+                      "h2o-s": {
+                        "n": "9",
+                        "d": "10"
                       }
-                    },
-                    {
-                      "kind": "ref",
-                      "name": "extent"
                     }
-                  ]
-                },
-                "sink": "tailings",
-                "sink_kind": "RECOVERABLE"
+                  },
+                  {
+                    "stream": "concentrate",
+                    "fractions": {
+                      "fetio3-s": {
+                        "n": "4",
+                        "d": "5"
+                      }
+                    }
+                  }
+                ]
               },
               {
                 "op": "WORK",
@@ -702,18 +722,16 @@
             "to": "stage:beneficiate"
           },
           {
-            "from": "stage:beneficiate",
-            "to": "port:ice",
-            "species": [
-              "h2o-s"
-            ]
+            "from": "stage:beneficiate.icy",
+            "to": "port:ice"
           },
           {
-            "from": "stage:beneficiate",
-            "to": "port:ilmenite",
-            "species": [
-              "fetio3-s"
-            ]
+            "from": "stage:beneficiate.concentrate",
+            "to": "port:ilmenite"
+          },
+          {
+            "from": "stage:beneficiate.rest",
+            "to": "port:tailings"
           }
         ],
         "failure_disposition": {
@@ -1006,7 +1024,7 @@
                 "mode": "PER_WORK",
                 "dir": "DRAW",
                 "amount": {
-                  "n": "2000000",
+                  "n": "200000000",
                   "d": "1"
                 },
                 "unit": "j",
@@ -1190,8 +1208,8 @@
         "mode": "BATCH",
         "extent": {
           "unit": "rxn-mmol",
-          "min": "0",
-          "max": "1000000000000"
+          "min": "1",
+          "max": "1000000000"
         },
         "ports": {
           "in": [
@@ -1218,7 +1236,8 @@
             {
               "port": "rutile",
               "accepts": [
-                "tio2-s"
+                "tio2-s",
+                "fe-s"
               ]
             },
             {
@@ -1226,12 +1245,58 @@
               "accepts": [
                 "h2o-l"
               ]
+            },
+            {
+              "port": "unreacted",
+              "accepts": [
+                "fetio3-s"
+              ]
             }
           ]
         },
         "stages": [
           {
-            "stage_id": "reduce-ilmenite",
+            "stage_id": "charge",
+            "ops": [
+              {
+                "op": "PARTITION",
+                "input": "ilmenite",
+                "draw": {
+                  "fetio3-s": {
+                    "kind": "op",
+                    "op": "mul",
+                    "args": [
+                      {
+                        "kind": "const",
+                        "value": {
+                          "n": "2",
+                          "d": "1"
+                        }
+                      },
+                      {
+                        "kind": "ref",
+                        "name": "extent"
+                      }
+                    ]
+                  }
+                },
+                "residue": "unreacted",
+                "outputs": [
+                  {
+                    "stream": "reacting",
+                    "fractions": {
+                      "fetio3-s": {
+                        "n": "1",
+                        "d": "2"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "stage_id": "reduce",
             "ops": [
               {
                 "op": "REACT",
@@ -1246,6 +1311,31 @@
                   "kind": "ref",
                   "name": "extent"
                 }
+              },
+              {
+                "op": "PARTITION",
+                "input": "pool",
+                "residue": "nonmagnetic",
+                "outputs": [
+                  {
+                    "stream": "magnetic",
+                    "fractions": {
+                      "fe-s": {
+                        "n": "19",
+                        "d": "20"
+                      }
+                    }
+                  },
+                  {
+                    "stream": "steam",
+                    "fractions": {
+                      "h2o-l": {
+                        "n": "1",
+                        "d": "1"
+                      }
+                    }
+                  }
+                ]
               },
               {
                 "op": "WORK",
@@ -1263,7 +1353,7 @@
                 "mode": "PER_WORK",
                 "dir": "DRAW",
                 "amount": {
-                  "n": "50",
+                  "n": "500",
                   "d": "1"
                 },
                 "unit": "j",
@@ -1274,7 +1364,7 @@
                 "duration_us": {
                   "kind": "const",
                   "value": {
-                    "n": "120000000",
+                    "n": "600000000",
                     "d": "1"
                   }
                 }
@@ -1284,37 +1374,33 @@
         ],
         "edges": [
           {
-            "from": "port:ilmenite",
-            "to": "stage:reduce-ilmenite"
+            "from": "stage:charge.reacting",
+            "to": "stage:reduce"
+          },
+          {
+            "from": "stage:charge.unreacted",
+            "to": "port:unreacted"
           },
           {
             "from": "port:h2",
-            "to": "stage:reduce-ilmenite"
+            "to": "stage:reduce"
           },
           {
-            "from": "stage:reduce-ilmenite",
-            "to": "port:iron",
-            "species": [
-              "fe-s"
-            ]
+            "from": "stage:reduce.magnetic",
+            "to": "port:iron"
           },
           {
-            "from": "stage:reduce-ilmenite",
-            "to": "port:rutile",
-            "species": [
-              "tio2-s"
-            ]
+            "from": "stage:reduce.steam",
+            "to": "port:water"
           },
           {
-            "from": "stage:reduce-ilmenite",
-            "to": "port:water",
-            "species": [
-              "h2o-l"
-            ]
+            "from": "stage:reduce.nonmagnetic",
+            "to": "port:rutile"
           }
         ],
         "failure_disposition": {
-          "reduce-ilmenite": "RETAIN"
+          "charge": "RETAIN",
+          "reduce": "RETAIN"
         },
         "restart_thresholds": {},
         "constants": {}
@@ -1433,6 +1519,11 @@
           },
           {
             "port": "ilmenite",
+            "type": "MATERIAL",
+            "direction": "OUT"
+          },
+          {
+            "port": "tailings",
             "type": "MATERIAL",
             "direction": "OUT"
           },
@@ -1657,7 +1748,7 @@
         ],
         "rated_work": {
           "n": "1",
-          "d": "120000000"
+          "d": "600000000"
         },
         "lanes": "1",
         "min_stable_rate": {
@@ -1775,7 +1866,7 @@
         ],
         "rated_work": {
           "n": "1",
-          "d": "1000"
+          "d": "2000"
         },
         "lanes": "1",
         "min_stable_rate": {
@@ -1812,6 +1903,11 @@
           },
           {
             "port": "water",
+            "type": "MATERIAL",
+            "direction": "OUT"
+          },
+          {
+            "port": "unreacted",
             "type": "MATERIAL",
             "direction": "OUT"
           },
@@ -2006,6 +2102,14 @@
         }
       },
       {
+        "product_id": "tailings-pile-kit",
+        "embodied": {},
+        "installs_as": {
+          "kind": "BUFFER",
+          "template": "tailings-pile"
+        }
+      },
+      {
         "product_id": "tank-kit",
         "embodied": {},
         "installs_as": {
@@ -2066,7 +2170,8 @@
       {
         "template_id": "rutile-bin",
         "accepts": [
-          "tio2-s"
+          "tio2-s",
+          "fe-s"
         ],
         "capacity": {
           "amount": "5000000",
@@ -2080,6 +2185,18 @@
         ],
         "capacity": {
           "amount": "1000000",
+          "unit": "mmol"
+        }
+      },
+      {
+        "template_id": "tailings-pile",
+        "accepts": [
+          "sio2-s",
+          "h2o-s",
+          "fetio3-s"
+        ],
+        "capacity": {
+          "amount": "200000000",
           "unit": "mmol"
         }
       },

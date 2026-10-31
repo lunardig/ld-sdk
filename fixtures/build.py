@@ -221,11 +221,12 @@ def build_alpha() -> None:
 
     # Rates for play: the excavator takes 100 kg in 50 s (2 kg/s), which the
     # beneficiator matches; the melter keeps up with the ice that makes.
-    excavate, beneficiate, melt = m2.excavate(), m2.beneficiate(), m2.melt()
-    # Reduction dwells 2 minutes here rather than the plan's 10, for play (LD-PEC-005 Q-06).
-    reduce = m2c.reduce_ilmenite()
-    reduce["stages"][0]["ops"][3]["duration_us"]["value"] = R(120_000_000)
-    for proc in (excavate, beneficiate, melt, reduce, m2c.fabricate_hopper()):
+    excavate, melt = m2.excavate(), m2.melt()
+    import m3a_vectors as m3a  # the M3a sorter and reactor (LD-PEC-006 §3.3)
+    beneficiate, reduce, fabricate = m3a.alpha_beneficiate(), m3a.alpha_reduce(), m2c.fabricate_hopper()
+    # Fabrication melts and forms the iron: 200 MJ per hopper (LD-PEC-006 §2.1).
+    fabricate["stages"][0]["ops"][2]["amount"] = R(200_000_000)
+    for proc in (excavate, beneficiate, melt, reduce, fabricate):
         write(cat / f"processes/{proc['process_id']}.json", proc)
     power = {"port": "power", "type": "ELECTRICAL", "direction": "IN"}
 
@@ -234,12 +235,14 @@ def build_alpha() -> None:
 
     for bid, procs, rated, ports, caps in [
         ("excavator", ["excavate"], R(1, 50_000_000), [mport("face", "IN"), mport("out", "OUT"), power], ["excavation"]),
-        ("beneficiator", ["beneficiate"], R(1, 500_000), [mport("feed", "IN"), mport("ice", "OUT"), mport("ilmenite", "OUT"), power], ["beneficiation"]),
+        ("beneficiator", ["beneficiate"], R(1, 500_000), [mport("feed", "IN"), mport("ice", "OUT"), mport("ilmenite", "OUT"), mport("tailings", "OUT"), power],
+         ["beneficiation"]),
         ("ice-melter", ["melt-ice"], R(6, 1000), [mport("ice", "IN"), mport("water", "OUT"), power], ["melting"]),
-        ("reactor", ["reduce-ilmenite"], R(1, 1000), [mport("ilmenite", "IN"), mport("h2", "IN"), mport("iron", "OUT"), mport("rutile", "OUT"),
-                                                     mport("water", "OUT"), power], ["reduction"]),
-        # Two minutes per hopper, for play (the plan says ten; LD-PEC-005 Q-06).
-        ("fabricator", ["fabricate-hopper"], R(1, 120_000_000), [mport("iron", "IN"), mport("scrap", "OUT"), power], ["fabrication"]),
+        # Feeds 1 mol/s of ilmenite and reacts half of it (LD-PEC-006 §3.3).
+        ("reactor", ["reduce-ilmenite"], R(1, 2000), [mport("ilmenite", "IN"), mport("h2", "IN"), mport("iron", "OUT"), mport("rutile", "OUT"),
+                                                     mport("water", "OUT"), mport("unreacted", "OUT"), power], ["reduction"]),
+        # Ten minutes per hopper: 200 MJ at about 333 kW (LD-PEC-006 §2.1).
+        ("fabricator", ["fabricate-hopper"], R(1, 600_000_000), [mport("iron", "IN"), mport("scrap", "OUT"), power], ["fabrication"]),
         ("battery", [], R(1, 1_000_000), [power], ["storage"]),
     ]:
         write(cat / f"machines/{bid}.json", {
@@ -253,17 +256,20 @@ def build_alpha() -> None:
                if bid == "battery" else {})})
     for tid, accepts, amount, unit in [("hopper", ["regolith"], "5000", "kg-reg"), ("ice-bin", ["h2o-s"], "2000000", "mmol"),
                                        ("ilmenite-bin", ["fetio3-s"], "2000000", "mmol"), ("iron-bin", [m2c.IRON], "5000000", "mmol"),
-                                       ("rutile-bin", [m2c.RUTILE], "5000000", "mmol"), ("scrap-bin", [m2c.IRON], "1000000", "mmol")]:
+                                       ("rutile-bin", [m2c.RUTILE, m2c.IRON], "5000000", "mmol"), ("scrap-bin", [m2c.IRON], "1000000", "mmol"),
+                                       # Everything the plant does not recover, mostly silicate: about 14 mol per kg dug.
+                                       ("tailings-pile", ["sio2-s", "h2o-s", "fetio3-s"], "200000000", "mmol")]:
         write(cat / f"buffers/{tid}.json", {"template_id": tid, "accepts": accepts, "capacity": {"amount": amount, "unit": unit}})
     for pid, kind, tpl in [("excavator-kit", "MACHINE", "excavator"), ("beneficiator-kit", "MACHINE", "beneficiator"),
                            ("melter-kit", "MACHINE", "ice-melter"), ("hopper-kit", "BUFFER", "hopper"), ("ice-bin-kit", "BUFFER", "ice-bin"),
                            ("ilmenite-bin-kit", "BUFFER", "ilmenite-bin"), ("reactor-kit", "MACHINE", "reactor"),
                            ("fabricator-kit", "MACHINE", "fabricator"), ("battery-kit", "MACHINE", "battery"), ("iron-bin-kit", "BUFFER", "iron-bin"),
-                           ("rutile-bin-kit", "BUFFER", "rutile-bin"), ("scrap-bin-kit", "BUFFER", "scrap-bin")]:
+                           ("rutile-bin-kit", "BUFFER", "rutile-bin"), ("scrap-bin-kit", "BUFFER", "scrap-bin"),
+                           ("tailings-pile-kit", "BUFFER", "tailings-pile")]:
         # A hopper embodies 1 800 mol of iron, about 100 kg (LD-PEC-005 §8.4).
         embodied = {m2c.IRON: str(m2c.HOPPER_IRON)} if pid == "hopper-kit" else {}
         write(cat / f"products/{pid}.json", {"product_id": pid, "embodied": embodied, "installs_as": {"kind": kind, "template": tpl}})
-    write(cat / "manifest.json", ld.manifest_for("alpha-m2c", ld.read_catalog_entries(cat)))
+    write(cat / "manifest.json", ld.manifest_for("alpha-m3a", ld.read_catalog_entries(cat)))
 
     genesis = {
         "schema": "ld.genesis.v0", "world_id": "alpha-world", "claim_id": "claim-0001",

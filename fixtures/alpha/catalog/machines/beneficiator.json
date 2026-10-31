@@ -39,6 +39,11 @@
       "direction": "OUT"
     },
     {
+      "port": "tailings",
+      "type": "MATERIAL",
+      "direction": "OUT"
+    },
+    {
       "port": "power",
       "type": "ELECTRICAL",
       "direction": "IN"

@@ -4,8 +4,8 @@
   "mode": "BATCH",
   "extent": {
     "unit": "rxn-mmol",
-    "min": "0",
-    "max": "1000000000000"
+    "min": "1",
+    "max": "1000000000"
   },
   "ports": {
     "in": [
@@ -32,7 +32,8 @@
       {
         "port": "rutile",
         "accepts": [
-          "tio2-s"
+          "tio2-s",
+          "fe-s"
         ]
       },
       {
@@ -40,12 +41,58 @@
         "accepts": [
           "h2o-l"
         ]
+      },
+      {
+        "port": "unreacted",
+        "accepts": [
+          "fetio3-s"
+        ]
       }
     ]
   },
   "stages": [
     {
-      "stage_id": "reduce-ilmenite",
+      "stage_id": "charge",
+      "ops": [
+        {
+          "op": "PARTITION",
+          "input": "ilmenite",
+          "draw": {
+            "fetio3-s": {
+              "kind": "op",
+              "op": "mul",
+              "args": [
+                {
+                  "kind": "const",
+                  "value": {
+                    "n": "2",
+                    "d": "1"
+                  }
+                },
+                {
+                  "kind": "ref",
+                  "name": "extent"
+                }
+              ]
+            }
+          },
+          "residue": "unreacted",
+          "outputs": [
+            {
+              "stream": "reacting",
+              "fractions": {
+                "fetio3-s": {
+                  "n": "1",
+                  "d": "2"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "stage_id": "reduce",
       "ops": [
         {
           "op": "REACT",
@@ -60,6 +107,31 @@
             "kind": "ref",
             "name": "extent"
           }
+        },
+        {
+          "op": "PARTITION",
+          "input": "pool",
+          "residue": "nonmagnetic",
+          "outputs": [
+            {
+              "stream": "magnetic",
+              "fractions": {
+                "fe-s": {
+                  "n": "19",
+                  "d": "20"
+                }
+              }
+            },
+            {
+              "stream": "steam",
+              "fractions": {
+                "h2o-l": {
+                  "n": "1",
+                  "d": "1"
+                }
+              }
+            }
+          ]
         },
         {
           "op": "WORK",
@@ -77,7 +149,7 @@
           "mode": "PER_WORK",
           "dir": "DRAW",
           "amount": {
-            "n": "50",
+            "n": "500",
             "d": "1"
           },
           "unit": "j",
@@ -88,7 +160,7 @@
           "duration_us": {
             "kind": "const",
             "value": {
-              "n": "120000000",
+              "n": "600000000",
               "d": "1"
             }
           }
@@ -98,37 +170,33 @@
   ],
   "edges": [
     {
-      "from": "port:ilmenite",
-      "to": "stage:reduce-ilmenite"
+      "from": "stage:charge.reacting",
+      "to": "stage:reduce"
+    },
+    {
+      "from": "stage:charge.unreacted",
+      "to": "port:unreacted"
     },
     {
       "from": "port:h2",
-      "to": "stage:reduce-ilmenite"
+      "to": "stage:reduce"
     },
     {
-      "from": "stage:reduce-ilmenite",
-      "to": "port:iron",
-      "species": [
-        "fe-s"
-      ]
+      "from": "stage:reduce.magnetic",
+      "to": "port:iron"
     },
     {
-      "from": "stage:reduce-ilmenite",
-      "to": "port:rutile",
-      "species": [
-        "tio2-s"
-      ]
+      "from": "stage:reduce.steam",
+      "to": "port:water"
     },
     {
-      "from": "stage:reduce-ilmenite",
-      "to": "port:water",
-      "species": [
-        "h2o-l"
-      ]
+      "from": "stage:reduce.nonmagnetic",
+      "to": "port:rutile"
     }
   ],
   "failure_disposition": {
-    "reduce-ilmenite": "RETAIN"
+    "charge": "RETAIN",
+    "reduce": "RETAIN"
   },
   "restart_thresholds": {},
   "constants": {}

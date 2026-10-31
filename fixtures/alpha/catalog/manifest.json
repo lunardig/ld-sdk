@@ -1,6 +1,6 @@
 {
   "schema": "ld.catalog.v0",
-  "catalog_id": "alpha-m2c",
+  "catalog_id": "alpha-m3a",
   "pset_version": "0",
   "entries": [
     {
@@ -26,12 +26,17 @@
     {
       "kind": "buffer",
       "id": "rutile-bin",
-      "hash": "38886586f5666294a0c0b85427c6197391ec7c814816a555867afec4bb1e9673"
+      "hash": "c5ce4e05055b88a0ea400ee606f7637d3a3d6e51369c7e6fc70b6f4e57da8e3f"
     },
     {
       "kind": "buffer",
       "id": "scrap-bin",
       "hash": "5a66fe0510c8d3dd36efb3fc12f7c4eb5542163bee9de07610b6cf802914185c"
+    },
+    {
+      "kind": "buffer",
+      "id": "tailings-pile",
+      "hash": "6e71633681c152de1cdbc3cfafbc1bf21fa6f48df4d549132feb42a70be53549"
     },
     {
       "kind": "buffer",
@@ -91,7 +96,7 @@
     {
       "kind": "machine",
       "id": "beneficiator",
-      "hash": "8a19721974cfecd86f4a21daf8d3d7f606bc693a9a6745cffbd0645db0fad11b"
+      "hash": "2bd7700d9a6b162086a3083f04f739f73c0d38070a1804dd8538e62c289e1f22"
     },
     {
       "kind": "machine",
@@ -111,7 +116,7 @@
     {
       "kind": "machine",
       "id": "fabricator",
-      "hash": "5e8cba2e23f18af624128e6732923cbe2c98e8bdd7a3fb5d18b07d306a02be30"
+      "hash": "82f0d64389be75751cdb0a752ab7a1f84763f8e5a22b8c5d717f851cb8625bb3"
     },
     {
       "kind": "machine",
@@ -121,7 +126,7 @@
     {
       "kind": "machine",
       "id": "reactor",
-      "hash": "e50168bca6bead86046eafc13f10ede80b96c87efd77977760820fcbae66d14c"
+      "hash": "ea75f0a9d839a70dc093daa918feca3dff94135dd107a7884a7c722bdcd4ef2a"
     },
     {
       "kind": "machine",
@@ -131,7 +136,7 @@
     {
       "kind": "process",
       "id": "beneficiate",
-      "hash": "191d6eb5b243bd173aa77a98c84a74143853f1e8a8828dfd1b0af9bb78e95c9a"
+      "hash": "3d38acb708988f3bd20a4a5f47dc23d6cbbb110ea3ad6de8487ff6d4ceb6a9ce"
     },
     {
       "kind": "process",
@@ -146,7 +151,7 @@
     {
       "kind": "process",
       "id": "fabricate-hopper",
-      "hash": "7aeea51c8aa9131c5294e697221bbeba568c2ec46b1b6a65992a6460e2c1175b"
+      "hash": "a32086a6dfff0a0788c5d28e3c55fb7842abb9de4924627c8ba6d7b125b529b1"
     },
     {
       "kind": "process",
@@ -161,7 +166,7 @@
     {
       "kind": "process",
       "id": "reduce-ilmenite",
-      "hash": "a651c0a961ae955d07de40393600a709befcfed6df62f0c0acdfcb11c04f9740"
+      "hash": "e36c2302c0f6c278e07f2fdcb95665364b877b3445abeb57538d9c2fc4c6b47d"
     },
     {
       "kind": "product",
@@ -237,6 +242,11 @@
       "kind": "product",
       "id": "solar-kit",
       "hash": "536fb301a9f64b42a5610c3826309cdb9e9329641d6ff986b9b27a7ca1c6d1cb"
+    },
+    {
+      "kind": "product",
+      "id": "tailings-pile-kit",
+      "hash": "40f2a2bc925bb45a715c3d2c0165fafcb8fa50cda0dc77ea0b6145c8d3cad8f3"
     },
     {
       "kind": "product",
