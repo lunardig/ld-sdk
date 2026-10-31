@@ -1,0 +1,8 @@
+{
+  "product_id": "battery-kit",
+  "embodied": {},
+  "installs_as": {
+    "kind": "MACHINE",
+    "template": "battery"
+  }
+}

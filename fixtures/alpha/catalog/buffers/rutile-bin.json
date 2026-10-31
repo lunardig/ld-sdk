@@ -1,0 +1,10 @@
+{
+  "template_id": "rutile-bin",
+  "accepts": [
+    "tio2-s"
+  ],
+  "capacity": {
+    "amount": "5000000",
+    "unit": "mmol"
+  }
+}

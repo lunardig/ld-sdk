@@ -1,0 +1,9 @@
+{
+  "substance_id": "tio2-s",
+  "formula": {
+    "ti": "1",
+    "o": "2"
+  },
+  "phase": "solid",
+  "quantity_unit": "mmol"
+}

@@ -1,6 +1,6 @@
 {
   "schema": "ld.catalog.v0",
-  "catalog_id": "alpha-m2a",
+  "catalog_id": "alpha-m2c",
   "pset_version": "0",
   "entries": [
     {
@@ -17,6 +17,21 @@
       "kind": "buffer",
       "id": "ilmenite-bin",
       "hash": "aaeb2bd90e1add37b6f7d03c7dbde83efcd6fa522d2655fd6d104eb6f7592c5e"
+    },
+    {
+      "kind": "buffer",
+      "id": "iron-bin",
+      "hash": "312f89cfd2f1280b1d82107e68b80fc38a7ef357e9c68fdf2d4db6804e534833"
+    },
+    {
+      "kind": "buffer",
+      "id": "rutile-bin",
+      "hash": "38886586f5666294a0c0b85427c6197391ec7c814816a555867afec4bb1e9673"
+    },
+    {
+      "kind": "buffer",
+      "id": "scrap-bin",
+      "hash": "5a66fe0510c8d3dd36efb3fc12f7c4eb5542163bee9de07610b6cf802914185c"
     },
     {
       "kind": "buffer",
@@ -70,6 +85,11 @@
     },
     {
       "kind": "machine",
+      "id": "battery",
+      "hash": "6defaaee9a4b095666f2dab91c47bd82a1df12f602a2061cd1337d8c063dfaec"
+    },
+    {
+      "kind": "machine",
       "id": "beneficiator",
       "hash": "8a19721974cfecd86f4a21daf8d3d7f606bc693a9a6745cffbd0645db0fad11b"
     },
@@ -90,8 +110,18 @@
     },
     {
       "kind": "machine",
+      "id": "fabricator",
+      "hash": "82f0d64389be75751cdb0a752ab7a1f84763f8e5a22b8c5d717f851cb8625bb3"
+    },
+    {
+      "kind": "machine",
       "id": "ice-melter",
       "hash": "05f7ec5de69fd75150726daf9b3fe15608263851e77903b7e92922b3c3bdae88"
+    },
+    {
+      "kind": "machine",
+      "id": "reactor",
+      "hash": "e50168bca6bead86046eafc13f10ede80b96c87efd77977760820fcbae66d14c"
     },
     {
       "kind": "machine",
@@ -115,6 +145,11 @@
     },
     {
       "kind": "process",
+      "id": "fabricate-hopper",
+      "hash": "7aeea51c8aa9131c5294e697221bbeba568c2ec46b1b6a65992a6460e2c1175b"
+    },
+    {
+      "kind": "process",
       "id": "generate-solar",
       "hash": "34509acaab798a9148a2cac794815268b10caaab0180333fc60fb0904b83a889"
     },
@@ -122,6 +157,16 @@
       "kind": "process",
       "id": "melt-ice",
       "hash": "76aac967f4bb3accbf00e13ef4a743195c2de7a64d5602b59dc9368404f476e3"
+    },
+    {
+      "kind": "process",
+      "id": "reduce-ilmenite",
+      "hash": "a651c0a961ae955d07de40393600a709befcfed6df62f0c0acdfcb11c04f9740"
+    },
+    {
+      "kind": "product",
+      "id": "battery-kit",
+      "hash": "1023619c0590de4e4f0bb25fc3d44bf998f665a1993edb523631fa0b7c216524"
     },
     {
       "kind": "product",
@@ -140,13 +185,18 @@
     },
     {
       "kind": "product",
+      "id": "fabricator-kit",
+      "hash": "4d0c40eb935d38260ec3b81a65cd2d48aa4b0235aaa64bc57ecae2a3db3a069d"
+    },
+    {
+      "kind": "product",
       "id": "fragile-electrolyzer-kit",
       "hash": "84bef722d85c2127afc82944db344a07e77591b49a0f182d2961741215c63570"
     },
     {
       "kind": "product",
       "id": "hopper-kit",
-      "hash": "bf72ca7645f367adf3ce708fab16768f02108f0d9ff58700e0cddc78f94b9704"
+      "hash": "cf7a137f614987bfe8066a21e26cbb8fef35268a8273314eaa4aaf12e5cd8853"
     },
     {
       "kind": "product",
@@ -160,8 +210,28 @@
     },
     {
       "kind": "product",
+      "id": "iron-bin-kit",
+      "hash": "c04931981f159743e4048304a809bb0ee74f9d08bb4975448b97f23246697a6c"
+    },
+    {
+      "kind": "product",
       "id": "melter-kit",
       "hash": "bdbe7f5aa2bcdfd39613c8ac43fc96e48609dd2e705be0ca117b0cbfe57dca9c"
+    },
+    {
+      "kind": "product",
+      "id": "reactor-kit",
+      "hash": "bdaea5beee271916a8f770270c18cbc9a464600eb19312ed6b74467baf804a29"
+    },
+    {
+      "kind": "product",
+      "id": "rutile-bin-kit",
+      "hash": "e3a962a4b1c75fe1a03f3fabf1e2acfd0dd6ef12c1026f0f3a6d7e646862c928"
+    },
+    {
+      "kind": "product",
+      "id": "scrap-bin-kit",
+      "hash": "43aaa2bfc539a59658e227073b8c6caade73138165e05b9cabf742c789f26623"
     },
     {
       "kind": "product",
@@ -177,6 +247,11 @@
       "kind": "product",
       "id": "tiny-tank-kit",
       "hash": "969153e9e75523fdd75d40bced47607fc782cac3cb815be9af69f7a791a4f78e"
+    },
+    {
+      "kind": "substance",
+      "id": "fe-s",
+      "hash": "3b5ee482368dc87e06570be63a9fc413ccabbd0dc544adf5472460125edecace"
     },
     {
       "kind": "substance",
@@ -217,6 +292,16 @@
       "kind": "substance",
       "id": "sio2-s",
       "hash": "16210090094160b19c3a34d25cf3b06549d1d8438c8f852afa692e0dd75f91ca"
+    },
+    {
+      "kind": "substance",
+      "id": "tio2-s",
+      "hash": "1d7fd824cd71ee54e6881d3c944ec0506b7e8ea0fd46445fa0f8b7f5f3df533a"
+    },
+    {
+      "kind": "unit",
+      "id": "count",
+      "hash": "327b4ed5240661dac2256c69952acab888e9f80147e0cf258c7ba9ad4593f1ba"
     },
     {
       "kind": "unit",

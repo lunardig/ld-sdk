@@ -199,10 +199,11 @@ ALPHA = ROOT / "fixtures/alpha"
 
 
 def build_alpha() -> None:
-    """The starter catalog plus the M2a mining chain (LD-PEC-005 §4), for clients on
-    ld-engine. Not a mock fixture: the mock engine stops at M1, so this has no
+    """The starter catalog plus the M2a mining chain (LD-PEC-005 §4) and the M2c loop
+    closers (§8.4: reduction, fabrication, a battery), for clients on ld-engine. Not a mock fixture: the mock engine stops at M1, so this has no
     requests.jsonl, only create.json (I-1 create params) and the catalog."""
     import m2_vectors as m2  # the mining chemistry, from ld-interfaces
+    import m2c_vectors as m2c  # the loop closers
 
     cat = ALPHA / "catalog"
     if ALPHA.exists():
@@ -211,8 +212,8 @@ def build_alpha() -> None:
     (cat / "manifest.json").unlink()
     entries = {
         "elements": [e for e in m2.elements() if e["element_id"] in ("si", "fe", "ti")],
-        "units": [u for u in m2.units() if u["unit_id"] == "kg-reg"],
-        "substances": [x for x in m2.substances() if x["substance_id"] in ("regolith-bank", "regolith", "h2o-s", "fetio3-s", "sio2-s")],
+        "units": [u for u in m2c.m2c_units() if u["unit_id"] in ("kg-reg", "count")],
+        "substances": [x for x in m2c.m2c_substances() if x["substance_id"] in ("regolith-bank", "regolith", "h2o-s", "fetio3-s", "sio2-s", m2c.IRON, m2c.RUTILE)],
     }
     for key, items in entries.items():
         for item in items:
@@ -221,7 +222,10 @@ def build_alpha() -> None:
     # Rates for play: the excavator takes 100 kg in 50 s (2 kg/s), which the
     # beneficiator matches; the melter keeps up with the ice that makes.
     excavate, beneficiate, melt = m2.excavate(), m2.beneficiate(), m2.melt()
-    for proc in (excavate, beneficiate, melt):
+    # Reduction dwells 2 minutes here rather than the plan's 10, for play (LD-PEC-005 Q-06).
+    reduce = m2c.reduce_ilmenite()
+    reduce["stages"][0]["ops"][3]["duration_us"]["value"] = R(120_000_000)
+    for proc in (excavate, beneficiate, melt, reduce, m2c.fabricate_hopper()):
         write(cat / f"processes/{proc['process_id']}.json", proc)
     power = {"port": "power", "type": "ELECTRICAL", "direction": "IN"}
 
@@ -232,19 +236,33 @@ def build_alpha() -> None:
         ("excavator", ["excavate"], R(1, 50_000_000), [mport("face", "IN"), mport("out", "OUT"), power], ["excavation"]),
         ("beneficiator", ["beneficiate"], R(1, 500_000), [mport("feed", "IN"), mport("ice", "OUT"), mport("ilmenite", "OUT"), power], ["beneficiation"]),
         ("ice-melter", ["melt-ice"], R(6, 1000), [mport("ice", "IN"), mport("water", "OUT"), power], ["melting"]),
+        ("reactor", ["reduce-ilmenite"], R(1, 1000), [mport("ilmenite", "IN"), mport("h2", "IN"), mport("iron", "OUT"), mport("rutile", "OUT"),
+                                                     mport("water", "OUT"), power], ["reduction"]),
+        ("fabricator", ["fabricate-hopper"], R(1, 600_000_000), [mport("iron", "IN"), mport("scrap", "OUT"), power], ["fabrication"]),
+        ("battery", [], R(1, 1_000_000), [power], ["storage"]),
     ]:
         write(cat / f"machines/{bid}.json", {
             "blueprint_id": bid, "capabilities": caps, "processes": procs, "rated_work": rated, "lanes": "1",
             "min_stable_rate": R(1, 1_000_000_000), "idle_power": {"amount": R(0), "unit": "w"}, "ports": ports,
-            "condition_table": [{"wear_at": "0", "capacity_factor": R(1)}, {"wear_at": "1000000", "capacity_factor": R(1, 2)}], "embodied": {}})
+            "condition_table": [{"wear_at": "0", "capacity_factor": R(1)}, {"wear_at": "1000000", "capacity_factor": R(1, 2)}], "embodied": {},
+            # 100 kWh, 400 kW in, 600 kW out: enough to carry the electrolyzer a few
+            # minutes past dusk. Placeholders (LD-PEC-005 Q-06).
+            **({"energy_store": {"capacity": {"amount": R(360_000_000), "unit": "j"}, "max_charge": {"amount": R(400_000), "unit": "w"},
+                                 "max_discharge": {"amount": R(600_000), "unit": "w"}, "charge_efficiency": R(9, 10), "heat_sink": "battery-heat"}}
+               if bid == "battery" else {})})
     for tid, accepts, amount, unit in [("hopper", ["regolith"], "5000", "kg-reg"), ("ice-bin", ["h2o-s"], "2000000", "mmol"),
-                                       ("ilmenite-bin", ["fetio3-s"], "2000000", "mmol")]:
+                                       ("ilmenite-bin", ["fetio3-s"], "2000000", "mmol"), ("iron-bin", [m2c.IRON], "5000000", "mmol"),
+                                       ("rutile-bin", [m2c.RUTILE], "5000000", "mmol"), ("scrap-bin", [m2c.IRON], "1000000", "mmol")]:
         write(cat / f"buffers/{tid}.json", {"template_id": tid, "accepts": accepts, "capacity": {"amount": amount, "unit": unit}})
     for pid, kind, tpl in [("excavator-kit", "MACHINE", "excavator"), ("beneficiator-kit", "MACHINE", "beneficiator"),
                            ("melter-kit", "MACHINE", "ice-melter"), ("hopper-kit", "BUFFER", "hopper"), ("ice-bin-kit", "BUFFER", "ice-bin"),
-                           ("ilmenite-bin-kit", "BUFFER", "ilmenite-bin")]:
-        write(cat / f"products/{pid}.json", {"product_id": pid, "embodied": {}, "installs_as": {"kind": kind, "template": tpl}})
-    write(cat / "manifest.json", ld.manifest_for("alpha-m2a", ld.read_catalog_entries(cat)))
+                           ("ilmenite-bin-kit", "BUFFER", "ilmenite-bin"), ("reactor-kit", "MACHINE", "reactor"),
+                           ("fabricator-kit", "MACHINE", "fabricator"), ("battery-kit", "MACHINE", "battery"), ("iron-bin-kit", "BUFFER", "iron-bin"),
+                           ("rutile-bin-kit", "BUFFER", "rutile-bin"), ("scrap-bin-kit", "BUFFER", "scrap-bin")]:
+        # A hopper embodies 1 800 mol of iron, about 100 kg (LD-PEC-005 §8.4).
+        embodied = {m2c.IRON: str(m2c.HOPPER_IRON)} if pid == "hopper-kit" else {}
+        write(cat / f"products/{pid}.json", {"product_id": pid, "embodied": embodied, "installs_as": {"kind": kind, "template": tpl}})
+    write(cat / "manifest.json", ld.manifest_for("alpha-m2c", ld.read_catalog_entries(cat)))
 
     genesis = {
         "schema": "ld.genesis.v0", "world_id": "alpha-world", "claim_id": "claim-0001",

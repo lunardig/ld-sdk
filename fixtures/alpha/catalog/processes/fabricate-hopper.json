@@ -1,0 +1,87 @@
+{
+  "process_id": "fabricate-hopper",
+  "pset_version": "0",
+  "mode": "BATCH",
+  "extent": {
+    "unit": "count",
+    "min": "1",
+    "max": "100"
+  },
+  "ports": {
+    "in": [
+      {
+        "port": "iron",
+        "accepts": [
+          "fe-s"
+        ]
+      }
+    ],
+    "out": [
+      {
+        "port": "scrap",
+        "accepts": [
+          "fe-s"
+        ]
+      }
+    ]
+  },
+  "stages": [
+    {
+      "stage_id": "fabricate",
+      "ops": [
+        {
+          "op": "ASSEMBLE",
+          "product": "hopper-kit",
+          "count": {
+            "kind": "ref",
+            "name": "extent"
+          },
+          "materials": {
+            "fe-s": "1900000"
+          },
+          "scrap": {
+            "fe-s": "100000"
+          },
+          "scrap_stream": "offcuts"
+        },
+        {
+          "op": "WORK",
+          "a": {
+            "n": "1",
+            "d": "1"
+          },
+          "b": {
+            "n": "0",
+            "d": "1"
+          }
+        },
+        {
+          "op": "ENERGY",
+          "mode": "PER_WORK",
+          "dir": "DRAW",
+          "amount": {
+            "n": "2000000",
+            "d": "1"
+          },
+          "unit": "j",
+          "heat_sink": "waste-heat"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "port:iron",
+      "to": "stage:fabricate"
+    },
+    {
+      "from": "stage:fabricate.offcuts",
+      "to": "port:scrap"
+    }
+  ],
+  "failure_disposition": {
+    "fabricate": "RETAIN"
+  },
+  "restart_thresholds": {},
+  "constants": {}
+}

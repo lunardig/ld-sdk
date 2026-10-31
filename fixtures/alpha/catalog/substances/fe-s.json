@@ -1,0 +1,8 @@
+{
+  "substance_id": "fe-s",
+  "formula": {
+    "fe": "1"
+  },
+  "phase": "solid",
+  "quantity_unit": "mmol"
+}
