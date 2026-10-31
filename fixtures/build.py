@@ -238,7 +238,8 @@ def build_alpha() -> None:
         ("ice-melter", ["melt-ice"], R(6, 1000), [mport("ice", "IN"), mport("water", "OUT"), power], ["melting"]),
         ("reactor", ["reduce-ilmenite"], R(1, 1000), [mport("ilmenite", "IN"), mport("h2", "IN"), mport("iron", "OUT"), mport("rutile", "OUT"),
                                                      mport("water", "OUT"), power], ["reduction"]),
-        ("fabricator", ["fabricate-hopper"], R(1, 600_000_000), [mport("iron", "IN"), mport("scrap", "OUT"), power], ["fabrication"]),
+        # Two minutes per hopper, for play (the plan says ten; LD-PEC-005 Q-06).
+        ("fabricator", ["fabricate-hopper"], R(1, 120_000_000), [mport("iron", "IN"), mport("scrap", "OUT"), power], ["fabrication"]),
         ("battery", [], R(1, 1_000_000), [power], ["storage"]),
     ]:
         write(cat / f"machines/{bid}.json", {

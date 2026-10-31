@@ -3,7 +3,7 @@
     "schema": "ld.genesis.v0",
     "world_id": "alpha-world",
     "claim_id": "claim-0001",
-    "catalog_hash": "341363a53a5dc2108c317d5b364d44fdb1867a3ed34fd5fdab6cbe9b6df69c80",
+    "catalog_hash": "9c5ad4a7540b5bc0e66b102b6e7ae3bf4d9ebcfe14e13abe17c6531e47354632",
     "start_us": "0",
     "deposits": [
       {
@@ -145,7 +145,7 @@
         {
           "kind": "machine",
           "id": "fabricator",
-          "hash": "82f0d64389be75751cdb0a752ab7a1f84763f8e5a22b8c5d717f851cb8625bb3"
+          "hash": "5e8cba2e23f18af624128e6732923cbe2c98e8bdd7a3fb5d18b07d306a02be30"
         },
         {
           "kind": "machine",
@@ -1657,7 +1657,7 @@
         ],
         "rated_work": {
           "n": "1",
-          "d": "600000000"
+          "d": "120000000"
         },
         "lanes": "1",
         "min_stable_rate": {
