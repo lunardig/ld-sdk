@@ -806,6 +806,7 @@ impl MockEngine {
             products: l.products.iter().map(|(p, n)| (id(p), uint(*n))).collect(),
             // The mock does not model worn kits (LD-PEC-004 A1-1); the real engine does.
             wear: None,
+            charge: None,
         }).collect();
         for (b, buf) in &self.buffers {
             lots.push(Lot_ {
@@ -815,6 +816,7 @@ impl MockEngine {
                 composition: species_amounts(&buf.contents),
                 products: BTreeMap::new(),
                 wear: None,
+                charge: None,
             });
         }
         lots.sort_by(|a, b| a.lot_id.cmp(&b.lot_id));
@@ -1155,6 +1157,7 @@ impl Engine for MockEngine {
                     wear_accumulator: uint(m.wear),
                     assigned_job_ids: self.assigned(k),
                     rate: m.rate.to_rational(),
+                    unpowered: None,
                 }
             }).collect(),
             jobs: self.jobs.iter().map(|(k, j)| JobView {

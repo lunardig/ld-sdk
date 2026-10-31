@@ -1,0 +1,10 @@
+{
+  "template_id": "scrap-bin",
+  "accepts": [
+    "fe-s"
+  ],
+  "capacity": {
+    "amount": "1000000",
+    "unit": "mmol"
+  }
+}

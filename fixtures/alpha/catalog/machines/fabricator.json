@@ -1,0 +1,59 @@
+{
+  "blueprint_id": "fabricator",
+  "capabilities": [
+    "fabrication"
+  ],
+  "processes": [
+    "fabricate-hopper"
+  ],
+  "rated_work": {
+    "n": "1",
+    "d": "120000000"
+  },
+  "lanes": "1",
+  "min_stable_rate": {
+    "n": "1",
+    "d": "1000000000"
+  },
+  "idle_power": {
+    "amount": {
+      "n": "0",
+      "d": "1"
+    },
+    "unit": "w"
+  },
+  "ports": [
+    {
+      "port": "iron",
+      "type": "MATERIAL",
+      "direction": "IN"
+    },
+    {
+      "port": "scrap",
+      "type": "MATERIAL",
+      "direction": "OUT"
+    },
+    {
+      "port": "power",
+      "type": "ELECTRICAL",
+      "direction": "IN"
+    }
+  ],
+  "condition_table": [
+    {
+      "wear_at": "0",
+      "capacity_factor": {
+        "n": "1",
+        "d": "1"
+      }
+    },
+    {
+      "wear_at": "1000000",
+      "capacity_factor": {
+        "n": "1",
+        "d": "2"
+      }
+    }
+  ],
+  "embodied": {}
+}

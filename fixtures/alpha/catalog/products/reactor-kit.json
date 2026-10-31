@@ -1,0 +1,8 @@
+{
+  "product_id": "reactor-kit",
+  "embodied": {},
+  "installs_as": {
+    "kind": "MACHINE",
+    "template": "reactor"
+  }
+}

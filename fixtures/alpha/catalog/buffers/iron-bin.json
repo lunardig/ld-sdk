@@ -1,0 +1,10 @@
+{
+  "template_id": "iron-bin",
+  "accepts": [
+    "fe-s"
+  ],
+  "capacity": {
+    "amount": "5000000",
+    "unit": "mmol"
+  }
+}
