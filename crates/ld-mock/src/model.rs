@@ -546,7 +546,9 @@ impl MockEngine {
         let state_hash = self.state_hash();
         let record = HistoryRecord {
             prev_hash: self.history_head.clone(),
-            time_us: time(self.time),
+            world: id(&self.world_id),
+            claim: id(&self.claim_id),
+            timestamp: time(self.time),
             inputs_hash,
             transition_hash: state_hash.clone(),
             resulting_state_hash: state_hash,
