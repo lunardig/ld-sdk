@@ -6,7 +6,7 @@
     "fetio3-s"
   ],
   "capacity": {
-    "amount": "200000000",
+    "amount": "100000000000",
     "unit": "mmol"
   }
 }

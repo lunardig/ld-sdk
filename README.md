@@ -109,3 +109,13 @@ The mock implements I-1 exactly and the physics loosely (LD-PEC-002 §6). It exi
 ## License
 
 Apache License 2.0 (LICENSE, NOTICE). The mock engine and fixtures are covered by it. ld-engine, the real engine, is proprietary and not part of this repository.
+
+## Examples
+
+`examples/loop_controller.py` is an external controller that plays *The loop* (the
+final ld-web challenge, LD-PEC-006 §3.1) over I-1 against any engine speaking the line
+protocol. It builds the mining chain from kits, makes iron, fabricates a hopper and
+installs it, then keeps the plant working through the lunar night on fission or on the
+fuel cell. It exits 0 when both goals hold; ld-engine's CI runs it.
+
+    python examples/loop_controller.py --engine ../ld-engine/target/release/ld-engine-cli --night fuel-cell --report

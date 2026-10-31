@@ -105,7 +105,7 @@
   },
   "restart_thresholds": {
     "water": {
-      "restart_at": "5000",
+      "restart_at": "100000",
       "unit": "mmol"
     }
   },

@@ -3,7 +3,7 @@
     "schema": "ld.genesis.v0",
     "world_id": "alpha-world",
     "claim_id": "claim-0001",
-    "catalog_hash": "bd2ba01f295e14a4c159fe0a689cd1beeaf72ec4092718b9c3949e86ed06f21d",
+    "catalog_hash": "03707db2336b3fc7c3a329d1d048b6036d2a08da8adfa230ab5aabc36f34ead8",
     "start_us": "0",
     "deposits": [
       {
@@ -70,7 +70,7 @@
         {
           "kind": "buffer",
           "id": "rutile-bin",
-          "hash": "c5ce4e05055b88a0ea400ee606f7637d3a3d6e51369c7e6fc70b6f4e57da8e3f"
+          "hash": "f47db203ecea3262a3de12de1c11553c8b97f3df795cac1bc19b2b4c51d81a16"
         },
         {
           "kind": "buffer",
@@ -80,7 +80,7 @@
         {
           "kind": "buffer",
           "id": "tailings-pile",
-          "hash": "6e71633681c152de1cdbc3cfafbc1bf21fa6f48df4d549132feb42a70be53549"
+          "hash": "3b00de7c7b52da8896c61e8ae2b1e061f352b2cec7337ff6535cce5bae8e25e2"
         },
         {
           "kind": "buffer",
@@ -200,7 +200,7 @@
         {
           "kind": "process",
           "id": "electrolyze-water",
-          "hash": "82b6d0f61821b66590966ea310cf12502d77c71e6116b2271bbf72320c9cfa97"
+          "hash": "02844f3a8ed716c4ad23547a6daeb03b79a0ba80bc53d1b1c18036244e6a0856"
         },
         {
           "kind": "process",
@@ -230,7 +230,7 @@
         {
           "kind": "process",
           "id": "melt-ice",
-          "hash": "76aac967f4bb3accbf00e13ef4a743195c2de7a64d5602b59dc9368404f476e3"
+          "hash": "b17e97c235622ca10a186c7aac347ff44aafef072b1478536681a6c965e7e9e5"
         },
         {
           "kind": "process",
@@ -1019,7 +1019,7 @@
         },
         "restart_thresholds": {
           "water": {
-            "restart_at": "5000",
+            "restart_at": "100000",
             "unit": "mmol"
           }
         },
@@ -1542,7 +1542,7 @@
         },
         "restart_thresholds": {
           "ice": {
-            "restart_at": "20000",
+            "restart_at": "500000",
             "unit": "mmol"
           }
         },
@@ -2698,7 +2698,7 @@
           "fe-s"
         ],
         "capacity": {
-          "amount": "5000000",
+          "amount": "1000000000",
           "unit": "mmol"
         }
       },
@@ -2720,7 +2720,7 @@
           "fetio3-s"
         ],
         "capacity": {
-          "amount": "200000000",
+          "amount": "100000000000",
           "unit": "mmol"
         }
       },

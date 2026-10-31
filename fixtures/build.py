@@ -240,6 +240,12 @@ def build_alpha() -> None:
     electrolyze["edges"] = [{"from": "port:water", "to": "stage:split"}, {"from": "stage:split", "to": "port:h2", "species": ["h2-g"]},
                             {"from": "stage:split", "to": "port:o2", "species": ["o2-g"]}]
     electrolyze["failure_disposition"] = {"split": "RELEASE"}
+    # Level switches with a wide band (LD-PEC-006 §3.5): a melter fed slower than it can
+    # melt waits for 500 mol of ice before it restarts, and the electrolyzer for 100 mol
+    # of water. Each stop and restart is an event; a 20 mol band cycled every 20 s and
+    # cost 10 000 events per simulated day in a backed-up plant.
+    melt["restart_thresholds"] = {"ice": {"restart_at": "500000", "unit": "mmol"}}
+    electrolyze["restart_thresholds"] = {"water": {"restart_at": "100000", "unit": "mmol"}}
     # The fuel cell sells 286 J of the 571.66 J a mmol of reaction releases; fission sells
     # 25 % of its fuel's energy (Stirling or Brayton conversion). Both follow load.
     fuel_cell, fission = m3b.fuel_cell(286), m3b.fission(75_000_000)
@@ -281,9 +287,12 @@ def build_alpha() -> None:
                if bid == "battery" else {})})
     for tid, accepts, amount, unit in [("hopper", ["regolith"], "5000", "kg-reg"), ("ice-bin", ["h2o-s"], "2000000", "mmol"),
                                        ("ilmenite-bin", ["fetio3-s"], "2000000", "mmol"), ("iron-bin", [m2c.IRON], "5000000", "mmol"),
-                                       ("rutile-bin", [m2c.RUTILE, m2c.IRON], "5000000", "mmol"), ("scrap-bin", [m2c.IRON], "1000000", "mmol"),
+                                       ("rutile-bin", [m2c.RUTILE, m2c.IRON], "1000000000", "mmol"), ("scrap-bin", [m2c.IRON], "1000000", "mmol"),
                                        # Everything the plant does not recover, mostly silicate: about 14 mol per kg dug.
-                                       ("tailings-pile", ["sio2-s", "h2o-s", "fetio3-s"], "200000000", "mmol"),
+                                       # A month of digging at 2 kg/s leaves about 70 million mol, so the pile
+                                       # holds 100 million (LD-PEC-006 §3.1). The rutile bin takes a month of
+                                       # reduction: about 1 million mol.
+                                       ("tailings-pile", ["sio2-s", "h2o-s", "fetio3-s"], "100000000000", "mmol"),
                                        # Night storage is big: 5 million mol (LD-PEC-006 §3.2.4).
                                        ("bulk-tank", ["h2-g", "o2-g", "h2o-l"], "5000000000", "mmol"),
                                        ("fuel-cask", [m3b.FRESH, m3b.SPENT], "100000", "mmol")]:
