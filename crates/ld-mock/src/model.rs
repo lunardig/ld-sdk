@@ -1170,7 +1170,7 @@ impl Engine for MockEngine {
             }).collect(),
             buffers: self.buffers.iter().map(|(k, b)| {
                 let tpl = &self.cat.buffers[&b.template];
-                BufferView { buffer_id: id(k), contents: species_amounts(&b.contents), capacity: tpl.capacity.clone(), reserved: SpeciesAmounts(BTreeMap::new()) }
+                BufferView { buffer_id: id(k), template: Some(id(&b.template)), contents: species_amounts(&b.contents), capacity: tpl.capacity.clone(), reserved: SpeciesAmounts(BTreeMap::new()) }
             }).collect(),
             energy: EnergyView {
                 unit: id("j"),
