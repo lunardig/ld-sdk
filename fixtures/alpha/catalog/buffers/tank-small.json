@@ -1,0 +1,12 @@
+{
+  "template_id": "tank-small",
+  "accepts": [
+    "h2o-l",
+    "h2-g",
+    "o2-g"
+  ],
+  "capacity": {
+    "amount": "1000000",
+    "unit": "mmol"
+  }
+}

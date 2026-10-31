@@ -1,0 +1,129 @@
+{
+  "process_id": "beneficiate",
+  "pset_version": "0",
+  "mode": "FLOW",
+  "extent": {
+    "unit": "kg-reg",
+    "min": "0",
+    "max": "1000000000000"
+  },
+  "ports": {
+    "in": [
+      {
+        "port": "feed",
+        "accepts": [
+          "regolith"
+        ]
+      }
+    ],
+    "out": [
+      {
+        "port": "ice",
+        "accepts": [
+          "h2o-s"
+        ]
+      },
+      {
+        "port": "ilmenite",
+        "accepts": [
+          "fetio3-s"
+        ]
+      }
+    ]
+  },
+  "stages": [
+    {
+      "stage_id": "beneficiate",
+      "ops": [
+        {
+          "op": "REACT",
+          "vector": {
+            "regolith": "-1",
+            "h2o-s": "2775",
+            "fetio3-s": "659",
+            "sio2-s": "14148"
+          },
+          "extent": {
+            "kind": "ref",
+            "name": "extent"
+          }
+        },
+        {
+          "op": "LOSS",
+          "species": "sio2-s",
+          "quantity": {
+            "kind": "op",
+            "op": "mul",
+            "args": [
+              {
+                "kind": "const",
+                "value": {
+                  "n": "14148",
+                  "d": "1"
+                }
+              },
+              {
+                "kind": "ref",
+                "name": "extent"
+              }
+            ]
+          },
+          "sink": "tailings",
+          "sink_kind": "RECOVERABLE"
+        },
+        {
+          "op": "WORK",
+          "a": {
+            "n": "1",
+            "d": "1"
+          },
+          "b": {
+            "n": "0",
+            "d": "1"
+          }
+        },
+        {
+          "op": "ENERGY",
+          "mode": "PER_WORK",
+          "dir": "DRAW",
+          "amount": {
+            "n": "20000",
+            "d": "1"
+          },
+          "unit": "j",
+          "heat_sink": "waste-heat"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "port:feed",
+      "to": "stage:beneficiate"
+    },
+    {
+      "from": "stage:beneficiate",
+      "to": "port:ice",
+      "species": [
+        "h2o-s"
+      ]
+    },
+    {
+      "from": "stage:beneficiate",
+      "to": "port:ilmenite",
+      "species": [
+        "fetio3-s"
+      ]
+    }
+  ],
+  "failure_disposition": {
+    "beneficiate": "RETAIN"
+  },
+  "restart_thresholds": {
+    "feed": {
+      "restart_at": "50",
+      "unit": "kg-reg"
+    }
+  },
+  "constants": {}
+}

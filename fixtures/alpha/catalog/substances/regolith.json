@@ -1,0 +1,12 @@
+{
+  "substance_id": "regolith",
+  "formula": {
+    "h": "5550",
+    "o": "33048",
+    "si": "14148",
+    "fe": "659",
+    "ti": "659"
+  },
+  "phase": "solid",
+  "quantity_unit": "kg-reg"
+}

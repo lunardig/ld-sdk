@@ -1,0 +1,10 @@
+{
+  "template_id": "conveyor",
+  "kind": "CONVEYOR",
+  "throughput": {
+    "n": "1",
+    "d": "1000"
+  },
+  "unit": "mmol",
+  "delay_us": "2000000"
+}

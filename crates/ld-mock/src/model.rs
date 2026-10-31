@@ -1140,6 +1140,8 @@ impl Engine for MockEngine {
     fn observe(&self) -> ClaimView {
         let tick = Rat::int(TICK_US as i128);
         ClaimView {
+            deposits: vec![],
+            sinks: vec![],
             time_us: time(self.time),
             state_hash: self.state_hash(),
             environment: self.env_last.iter().map(|(k, v)| (id(k), v.to_rational())).collect(),
@@ -1168,7 +1170,7 @@ impl Engine for MockEngine {
             }).collect(),
             buffers: self.buffers.iter().map(|(k, b)| {
                 let tpl = &self.cat.buffers[&b.template];
-                BufferView { buffer_id: id(k), contents: species_amounts(&b.contents), capacity: tpl.capacity.clone(), reserved: SpeciesAmounts(BTreeMap::new()) }
+                BufferView { buffer_id: id(k), template: Some(id(&b.template)), contents: species_amounts(&b.contents), capacity: tpl.capacity.clone(), reserved: SpeciesAmounts(BTreeMap::new()) }
             }).collect(),
             energy: EnergyView {
                 unit: id("j"),

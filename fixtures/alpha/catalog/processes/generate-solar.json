@@ -1,0 +1,64 @@
+{
+  "process_id": "generate-solar",
+  "pset_version": "0",
+  "mode": "FLOW",
+  "extent": {
+    "unit": "s",
+    "min": "0",
+    "max": "1000000000000"
+  },
+  "ports": {
+    "in": [],
+    "out": []
+  },
+  "stages": [
+    {
+      "stage_id": "generate",
+      "ops": [
+        {
+          "op": "REQUIRE",
+          "predicate": {
+            "kind": "environment",
+            "function_id": "irradiance",
+            "min": {
+              "n": "100",
+              "d": "1"
+            },
+            "max": {
+              "n": "2000",
+              "d": "1"
+            }
+          }
+        },
+        {
+          "op": "WORK",
+          "a": {
+            "n": "1",
+            "d": "1"
+          },
+          "b": {
+            "n": "0",
+            "d": "1"
+          }
+        },
+        {
+          "op": "ENERGY",
+          "mode": "PER_WORK",
+          "dir": "PRODUCE",
+          "amount": {
+            "n": "1000000",
+            "d": "1"
+          },
+          "unit": "j",
+          "heat_sink": "waste-heat"
+        }
+      ]
+    }
+  ],
+  "edges": [],
+  "failure_disposition": {
+    "generate": "RETAIN"
+  },
+  "restart_thresholds": {},
+  "constants": {}
+}

@@ -1,0 +1,9 @@
+{
+  "substance_id": "sio2-s",
+  "formula": {
+    "si": "1",
+    "o": "2"
+  },
+  "phase": "solid",
+  "quantity_unit": "mmol"
+}

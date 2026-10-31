@@ -1,0 +1,9 @@
+{
+  "substance_id": "h2o-l",
+  "formula": {
+    "h": "2",
+    "o": "1"
+  },
+  "phase": "liquid",
+  "quantity_unit": "mmol"
+}

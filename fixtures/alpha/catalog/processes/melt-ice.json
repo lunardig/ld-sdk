@@ -1,0 +1,89 @@
+{
+  "process_id": "melt-ice",
+  "pset_version": "0",
+  "mode": "FLOW",
+  "extent": {
+    "unit": "mmol",
+    "min": "0",
+    "max": "1000000000000"
+  },
+  "ports": {
+    "in": [
+      {
+        "port": "ice",
+        "accepts": [
+          "h2o-s"
+        ]
+      }
+    ],
+    "out": [
+      {
+        "port": "water",
+        "accepts": [
+          "h2o-l"
+        ]
+      }
+    ]
+  },
+  "stages": [
+    {
+      "stage_id": "melt-ice",
+      "ops": [
+        {
+          "op": "PHASE",
+          "from": "h2o-s",
+          "to": "h2o-l",
+          "quantity": {
+            "kind": "ref",
+            "name": "extent"
+          }
+        },
+        {
+          "op": "WORK",
+          "a": {
+            "n": "1",
+            "d": "1"
+          },
+          "b": {
+            "n": "0",
+            "d": "1"
+          }
+        },
+        {
+          "op": "ENERGY",
+          "mode": "PER_WORK",
+          "dir": "DRAW",
+          "amount": {
+            "n": "8",
+            "d": "1"
+          },
+          "unit": "j",
+          "heat_sink": "waste-heat"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "port:ice",
+      "to": "stage:melt-ice"
+    },
+    {
+      "from": "stage:melt-ice",
+      "to": "port:water",
+      "species": [
+        "h2o-l"
+      ]
+    }
+  ],
+  "failure_disposition": {
+    "melt-ice": "RETAIN"
+  },
+  "restart_thresholds": {
+    "ice": {
+      "restart_at": "20000",
+      "unit": "mmol"
+    }
+  },
+  "constants": {}
+}

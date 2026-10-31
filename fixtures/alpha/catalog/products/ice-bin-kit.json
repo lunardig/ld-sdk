@@ -1,0 +1,8 @@
+{
+  "product_id": "ice-bin-kit",
+  "embodied": {},
+  "installs_as": {
+    "kind": "BUFFER",
+    "template": "ice-bin"
+  }
+}

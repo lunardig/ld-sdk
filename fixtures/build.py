@@ -194,8 +194,73 @@ def scenarios() -> dict[str, tuple[str, Script, dict]]:
     return out
 
 
+# ------------------------------------------------------------------ the alpha catalog
+ALPHA = ROOT / "fixtures/alpha"
+
+
+def build_alpha() -> None:
+    """The starter catalog plus the M2a mining chain (LD-PEC-005 §4), for clients on
+    ld-engine. Not a mock fixture: the mock engine stops at M1, so this has no
+    requests.jsonl, only create.json (I-1 create params) and the catalog."""
+    import m2_vectors as m2  # the mining chemistry, from ld-interfaces
+
+    cat = ALPHA / "catalog"
+    if ALPHA.exists():
+        shutil.rmtree(ALPHA)
+    shutil.copytree(CAT, cat)
+    (cat / "manifest.json").unlink()
+    entries = {
+        "elements": [e for e in m2.elements() if e["element_id"] in ("si", "fe", "ti")],
+        "units": [u for u in m2.units() if u["unit_id"] == "kg-reg"],
+        "substances": [x for x in m2.substances() if x["substance_id"] in ("regolith-bank", "regolith", "h2o-s", "fetio3-s", "sio2-s")],
+    }
+    for key, items in entries.items():
+        for item in items:
+            write(cat / key / f"{item[next(k for k in item if k.endswith('_id'))]}.json", item)
+
+    # Rates for play: the excavator takes 100 kg in 50 s (2 kg/s), which the
+    # beneficiator matches; the melter keeps up with the ice that makes.
+    excavate, beneficiate, melt = m2.excavate(), m2.beneficiate(), m2.melt()
+    for proc in (excavate, beneficiate, melt):
+        write(cat / f"processes/{proc['process_id']}.json", proc)
+    power = {"port": "power", "type": "ELECTRICAL", "direction": "IN"}
+
+    def mport(name, direction):
+        return {"port": name, "type": "MATERIAL", "direction": direction}
+
+    for bid, procs, rated, ports, caps in [
+        ("excavator", ["excavate"], R(1, 50_000_000), [mport("face", "IN"), mport("out", "OUT"), power], ["excavation"]),
+        ("beneficiator", ["beneficiate"], R(1, 500_000), [mport("feed", "IN"), mport("ice", "OUT"), mport("ilmenite", "OUT"), power], ["beneficiation"]),
+        ("ice-melter", ["melt-ice"], R(6, 1000), [mport("ice", "IN"), mport("water", "OUT"), power], ["melting"]),
+    ]:
+        write(cat / f"machines/{bid}.json", {
+            "blueprint_id": bid, "capabilities": caps, "processes": procs, "rated_work": rated, "lanes": "1",
+            "min_stable_rate": R(1, 1_000_000_000), "idle_power": {"amount": R(0), "unit": "w"}, "ports": ports,
+            "condition_table": [{"wear_at": "0", "capacity_factor": R(1)}, {"wear_at": "1000000", "capacity_factor": R(1, 2)}], "embodied": {}})
+    for tid, accepts, amount, unit in [("hopper", ["regolith"], "5000", "kg-reg"), ("ice-bin", ["h2o-s"], "2000000", "mmol"),
+                                       ("ilmenite-bin", ["fetio3-s"], "2000000", "mmol")]:
+        write(cat / f"buffers/{tid}.json", {"template_id": tid, "accepts": accepts, "capacity": {"amount": amount, "unit": unit}})
+    for pid, kind, tpl in [("excavator-kit", "MACHINE", "excavator"), ("beneficiator-kit", "MACHINE", "beneficiator"),
+                           ("melter-kit", "MACHINE", "ice-melter"), ("hopper-kit", "BUFFER", "hopper"), ("ice-bin-kit", "BUFFER", "ice-bin"),
+                           ("ilmenite-bin-kit", "BUFFER", "ilmenite-bin")]:
+        write(cat / f"products/{pid}.json", {"product_id": pid, "embodied": {}, "installs_as": {"kind": kind, "template": tpl}})
+    write(cat / "manifest.json", ld.manifest_for("alpha-m2a", ld.read_catalog_entries(cat)))
+
+    genesis = {
+        "schema": "ld.genesis.v0", "world_id": "alpha-world", "claim_id": "claim-0001",
+        "catalog_hash": ld.catalog_hash(ld.load_json(cat / "manifest.json")), "start_us": "0",
+        "deposits": [{"deposit_id": "icy-crater", "remaining": {"regolith-bank": "1000000000"}, "extracted": {}}],
+        "environment": ["irradiance"],
+        "starting_lots": [{"lot_id": "starter-kit", "location": "inventory", "state": "AVAILABLE", "composition": {},
+                           "products": {"solar-kit": "1", "excavator-kit": "1", "hopper-kit": "1"}}],
+    }
+    write(ALPHA / "create.json", {"genesis": genesis, "catalog": ld.bundle_for(cat)})
+    print(f"alpha: catalog {ld.catalog_hash(ld.load_json(cat / 'manifest.json'))[:12]}")
+
+
 def main() -> None:
     build_catalog()
+    build_alpha()
     for name, (description, script, expect) in scenarios().items():
         d = ROOT / "fixtures" / name
         if d.exists():

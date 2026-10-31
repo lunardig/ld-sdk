@@ -1,0 +1,8 @@
+{
+  "product_id": "electrolyzer-kit",
+  "embodied": {},
+  "installs_as": {
+    "kind": "MACHINE",
+    "template": "electrolyzer"
+  }
+}

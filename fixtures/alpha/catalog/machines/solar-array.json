@@ -1,0 +1,42 @@
+{
+  "blueprint_id": "solar-array",
+  "capabilities": [
+    "solar"
+  ],
+  "processes": [
+    "generate-solar"
+  ],
+  "rated_work": {
+    "n": "1",
+    "d": "1000000"
+  },
+  "lanes": "1",
+  "min_stable_rate": {
+    "n": "1",
+    "d": "1000000000"
+  },
+  "idle_power": {
+    "amount": {
+      "n": "0",
+      "d": "1"
+    },
+    "unit": "w"
+  },
+  "ports": [
+    {
+      "port": "power",
+      "type": "ELECTRICAL",
+      "direction": "OUT"
+    }
+  ],
+  "condition_table": [
+    {
+      "wear_at": "0",
+      "capacity_factor": {
+        "n": "1",
+        "d": "1"
+      }
+    }
+  ],
+  "embodied": {}
+}
