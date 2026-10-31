@@ -1,0 +1,262 @@
+{
+  "schema": "ld.catalog.v0",
+  "catalog_id": "alpha-m2a",
+  "pset_version": "0",
+  "entries": [
+    {
+      "kind": "buffer",
+      "id": "hopper",
+      "hash": "f8128295df4b650b475b00df10a446a0dcdb7ec1e11a541ceca49d1eb3609b0e"
+    },
+    {
+      "kind": "buffer",
+      "id": "ice-bin",
+      "hash": "d4f96ea76521bc9caf48212e51a4f18429a2529e1f945eb25bcb22f8a8f699a4"
+    },
+    {
+      "kind": "buffer",
+      "id": "ilmenite-bin",
+      "hash": "aaeb2bd90e1add37b6f7d03c7dbde83efcd6fa522d2655fd6d104eb6f7592c5e"
+    },
+    {
+      "kind": "buffer",
+      "id": "tank-small",
+      "hash": "d85f149b42a6c352c7552afb92df8da3709d14cc727442d9d5dcdc1202b35f1f"
+    },
+    {
+      "kind": "buffer",
+      "id": "tank-tiny",
+      "hash": "1e710f0c7d09c51aba00b68c092b355eb1df23d5ce4b2351a92b8df3934abbd9"
+    },
+    {
+      "kind": "connection",
+      "id": "conveyor",
+      "hash": "feed715b735b563eecfc446954fb7eeb8fb6eb74d9fca4ed5612dcc307ef4dbb"
+    },
+    {
+      "kind": "connection",
+      "id": "pipe",
+      "hash": "a464683ae430e63b2dabffdc7f973fa8bfe1a950519842fc248d5e190567a6e1"
+    },
+    {
+      "kind": "element",
+      "id": "fe",
+      "hash": "2615afa84e274ad9574b9c1aa35bb7bd0fc6f5bba9eff63c328d60bb406f993b"
+    },
+    {
+      "kind": "element",
+      "id": "h",
+      "hash": "88a7ad999caa2d53b4298f0e58c9649a0de69ecf84262bd42172cec053210f09"
+    },
+    {
+      "kind": "element",
+      "id": "o",
+      "hash": "e8eb01d27733e7190dd28cf9025633868bc93dad49ee6e99201cbf36965f24d2"
+    },
+    {
+      "kind": "element",
+      "id": "si",
+      "hash": "55a06a2fbd46bdeb69ffa991e30e40d8a10a3964fb35359c30d2a32a03f3dd5a"
+    },
+    {
+      "kind": "element",
+      "id": "ti",
+      "hash": "61c140e20fbb438183f779cbd7cc77841fc5f4820f50c270cd89e543daa5e62a"
+    },
+    {
+      "kind": "environment",
+      "id": "irradiance",
+      "hash": "d2d190deb705cde7db51af55dcd5d1170910449ffadba15bffd59e691c70b496"
+    },
+    {
+      "kind": "machine",
+      "id": "beneficiator",
+      "hash": "8a19721974cfecd86f4a21daf8d3d7f606bc693a9a6745cffbd0645db0fad11b"
+    },
+    {
+      "kind": "machine",
+      "id": "electrolyzer",
+      "hash": "862be1f56a5de33d888e5b8ee2e179f68932b4c6b78656a0cbc9f2f88ea1f055"
+    },
+    {
+      "kind": "machine",
+      "id": "electrolyzer-fragile",
+      "hash": "1ad2ed7c7ffb7227816176b400d2500b2aa6242111dba7107b4af0caea033f96"
+    },
+    {
+      "kind": "machine",
+      "id": "excavator",
+      "hash": "620ead5d14d1a2a0458e984664ea1108552e13a05e50207d4dc86af140684078"
+    },
+    {
+      "kind": "machine",
+      "id": "ice-melter",
+      "hash": "05f7ec5de69fd75150726daf9b3fe15608263851e77903b7e92922b3c3bdae88"
+    },
+    {
+      "kind": "machine",
+      "id": "solar-array",
+      "hash": "a0b5c0407074ef76e02f86ad81a7f5076c4e55cd28765942d8e007234c83741e"
+    },
+    {
+      "kind": "process",
+      "id": "beneficiate",
+      "hash": "191d6eb5b243bd173aa77a98c84a74143853f1e8a8828dfd1b0af9bb78e95c9a"
+    },
+    {
+      "kind": "process",
+      "id": "electrolyze-water",
+      "hash": "60e070a48773012c43ee562db94fd0527dd8d53b2f7f56c1c39b7646b63eb9b4"
+    },
+    {
+      "kind": "process",
+      "id": "excavate",
+      "hash": "d72d2e89bcd4e638b0ce7e6841960f4315014a36b9d6699918ed82e538e3f1c8"
+    },
+    {
+      "kind": "process",
+      "id": "generate-solar",
+      "hash": "34509acaab798a9148a2cac794815268b10caaab0180333fc60fb0904b83a889"
+    },
+    {
+      "kind": "process",
+      "id": "melt-ice",
+      "hash": "76aac967f4bb3accbf00e13ef4a743195c2de7a64d5602b59dc9368404f476e3"
+    },
+    {
+      "kind": "product",
+      "id": "beneficiator-kit",
+      "hash": "ec7e5b14c55badc8a5719493e042b23024cdfeec67c6c729471962a92ff2ba7f"
+    },
+    {
+      "kind": "product",
+      "id": "electrolyzer-kit",
+      "hash": "7690d6c1da6820c398bfbf997c517cd56de82c31839fb641a0a2a5610afd5a6e"
+    },
+    {
+      "kind": "product",
+      "id": "excavator-kit",
+      "hash": "6d739d4c4e5e6d64bcfc1760b9ed22c97cdf77dc4a903f1692a22fc269a950a8"
+    },
+    {
+      "kind": "product",
+      "id": "fragile-electrolyzer-kit",
+      "hash": "84bef722d85c2127afc82944db344a07e77591b49a0f182d2961741215c63570"
+    },
+    {
+      "kind": "product",
+      "id": "hopper-kit",
+      "hash": "bf72ca7645f367adf3ce708fab16768f02108f0d9ff58700e0cddc78f94b9704"
+    },
+    {
+      "kind": "product",
+      "id": "ice-bin-kit",
+      "hash": "02ee688b61a0ccbefaa39f596e7eaaf73f3b1fe0497558ae5224a9fd996962f6"
+    },
+    {
+      "kind": "product",
+      "id": "ilmenite-bin-kit",
+      "hash": "e7a0697e2066c60ffb963a1d2cf4d627a13beb97de3101fcd0b4ee1c1696af1c"
+    },
+    {
+      "kind": "product",
+      "id": "melter-kit",
+      "hash": "bdbe7f5aa2bcdfd39613c8ac43fc96e48609dd2e705be0ca117b0cbfe57dca9c"
+    },
+    {
+      "kind": "product",
+      "id": "solar-kit",
+      "hash": "536fb301a9f64b42a5610c3826309cdb9e9329641d6ff986b9b27a7ca1c6d1cb"
+    },
+    {
+      "kind": "product",
+      "id": "tank-kit",
+      "hash": "0117e673484c8dd9e9b37f42432a3c5497c378ffa6e06f266c2a29f47c26f5c2"
+    },
+    {
+      "kind": "product",
+      "id": "tiny-tank-kit",
+      "hash": "969153e9e75523fdd75d40bced47607fc782cac3cb815be9af69f7a791a4f78e"
+    },
+    {
+      "kind": "substance",
+      "id": "fetio3-s",
+      "hash": "27ce4fa19676d3cf5e8829eca6ec89cb002d825560dee896563eee3e465ae732"
+    },
+    {
+      "kind": "substance",
+      "id": "h2-g",
+      "hash": "9715cb6cc08df0f3f7b2aef23c79d90b606fade447c11bf4889b366fb90c9a64"
+    },
+    {
+      "kind": "substance",
+      "id": "h2o-l",
+      "hash": "03247ca81b8b84046f3b9c58445f0cf929a10884ca0e0f022b2abd51923ada2f"
+    },
+    {
+      "kind": "substance",
+      "id": "h2o-s",
+      "hash": "90037ac116557adff010298e175fd843b72bd8215eda8d6e2cfb099a09a32c68"
+    },
+    {
+      "kind": "substance",
+      "id": "o2-g",
+      "hash": "8060dd5fa32e3c478ed3eebb2ec5cbf1ac840c0855671e4dc2cd99cf0a145e2d"
+    },
+    {
+      "kind": "substance",
+      "id": "regolith",
+      "hash": "3d0aeff1f725247ffa4c8e425aae888627f60e9dc70b782fbfbfddb1a7ada0b6"
+    },
+    {
+      "kind": "substance",
+      "id": "regolith-bank",
+      "hash": "68c3438f9788d2875fda63cb96baa17ed8d4ce9234ef173e675a163ea8fe8df4"
+    },
+    {
+      "kind": "substance",
+      "id": "sio2-s",
+      "hash": "16210090094160b19c3a34d25cf3b06549d1d8438c8f852afa692e0dd75f91ca"
+    },
+    {
+      "kind": "unit",
+      "id": "j",
+      "hash": "93a96cf3830bfe856239ac85d0081861e5e84c0926f69abfbdfdecddde453eda"
+    },
+    {
+      "kind": "unit",
+      "id": "kg-reg",
+      "hash": "7d4798b14897105366a7f70bd9d67dbb17d01f978dd2b613970c1092749ada35"
+    },
+    {
+      "kind": "unit",
+      "id": "mmol",
+      "hash": "84de9ada851402ee9e0c3661ba67440f3344252e678be4f8758eee96e46da91d"
+    },
+    {
+      "kind": "unit",
+      "id": "rxn-mmol",
+      "hash": "4e6def10483605f5a4f1befdcf561bfb680321debb7dbc20e9df06db1c197c5c"
+    },
+    {
+      "kind": "unit",
+      "id": "s",
+      "hash": "be7d5ca3600299d3edc2bbedc1c3eed4b1b97206c41608781f43f16ce64447e1"
+    },
+    {
+      "kind": "unit",
+      "id": "w",
+      "hash": "1994936379b54d484b03d941155b1f877c8b3bcb23d325dba3cb333b5eb9a0d3"
+    },
+    {
+      "kind": "unit",
+      "id": "w-m2",
+      "hash": "0e7f896fa353a870b1a7122477410d5d0c4224cdb15c95f433455a5f8809b12b"
+    },
+    {
+      "kind": "unit",
+      "id": "wu",
+      "hash": "efea4af8af165dbfed770c2abeb79bf1cfe1b6f3922af05d640d18378a821c22"
+    }
+  ]
+}

@@ -1140,6 +1140,8 @@ impl Engine for MockEngine {
     fn observe(&self) -> ClaimView {
         let tick = Rat::int(TICK_US as i128);
         ClaimView {
+            deposits: vec![],
+            sinks: vec![],
             time_us: time(self.time),
             state_hash: self.state_hash(),
             environment: self.env_last.iter().map(|(k, v)| (id(k), v.to_rational())).collect(),

@@ -1,0 +1,10 @@
+{
+  "template_id": "ice-bin",
+  "accepts": [
+    "h2o-s"
+  ],
+  "capacity": {
+    "amount": "2000000",
+    "unit": "mmol"
+  }
+}

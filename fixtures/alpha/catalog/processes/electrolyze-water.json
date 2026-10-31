@@ -1,0 +1,113 @@
+{
+  "process_id": "electrolyze-water",
+  "pset_version": "0",
+  "mode": "FLOW",
+  "extent": {
+    "unit": "rxn-mmol",
+    "min": "0",
+    "max": "1000000000000"
+  },
+  "ports": {
+    "in": [
+      {
+        "port": "water",
+        "accepts": [
+          "h2o-l"
+        ]
+      }
+    ],
+    "out": [
+      {
+        "port": "h2",
+        "accepts": [
+          "h2-g"
+        ]
+      },
+      {
+        "port": "o2",
+        "accepts": [
+          "o2-g"
+        ]
+      }
+    ]
+  },
+  "stages": [
+    {
+      "stage_id": "split",
+      "ops": [
+        {
+          "op": "REACT",
+          "vector": {
+            "h2-g": "2",
+            "h2o-l": "-2",
+            "o2-g": "1"
+          },
+          "extent": {
+            "kind": "ref",
+            "name": "extent"
+          }
+        },
+        {
+          "op": "WORK",
+          "a": {
+            "n": "1",
+            "d": "1"
+          },
+          "b": {
+            "n": "0",
+            "d": "1"
+          }
+        },
+        {
+          "op": "ENERGY",
+          "mode": "PER_WORK",
+          "dir": "DRAW",
+          "amount": {
+            "n": "572",
+            "d": "1"
+          },
+          "unit": "j",
+          "heat_sink": "waste-heat"
+        },
+        {
+          "op": "WEAR",
+          "per": "WORK",
+          "amount": {
+            "n": "1",
+            "d": "1000"
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "port:water",
+      "to": "stage:split"
+    },
+    {
+      "from": "stage:split",
+      "to": "port:h2",
+      "species": [
+        "h2-g"
+      ]
+    },
+    {
+      "from": "stage:split",
+      "to": "port:o2",
+      "species": [
+        "o2-g"
+      ]
+    }
+  ],
+  "failure_disposition": {
+    "split": "RELEASE"
+  },
+  "restart_thresholds": {
+    "water": {
+      "restart_at": "5000",
+      "unit": "mmol"
+    }
+  },
+  "constants": {}
+}

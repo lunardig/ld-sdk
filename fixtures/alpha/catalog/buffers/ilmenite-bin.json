@@ -1,0 +1,10 @@
+{
+  "template_id": "ilmenite-bin",
+  "accepts": [
+    "fetio3-s"
+  ],
+  "capacity": {
+    "amount": "2000000",
+    "unit": "mmol"
+  }
+}
