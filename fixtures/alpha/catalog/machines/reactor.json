@@ -8,7 +8,7 @@
   ],
   "rated_work": {
     "n": "1",
-    "d": "1000"
+    "d": "2000"
   },
   "lanes": "1",
   "min_stable_rate": {
@@ -45,6 +45,11 @@
     },
     {
       "port": "water",
+      "type": "MATERIAL",
+      "direction": "OUT"
+    },
+    {
+      "port": "unreacted",
       "type": "MATERIAL",
       "direction": "OUT"
     },

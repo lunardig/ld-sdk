@@ -1,0 +1,12 @@
+{
+  "template_id": "tailings-pile",
+  "accepts": [
+    "sio2-s",
+    "h2o-s",
+    "fetio3-s"
+  ],
+  "capacity": {
+    "amount": "200000000",
+    "unit": "mmol"
+  }
+}

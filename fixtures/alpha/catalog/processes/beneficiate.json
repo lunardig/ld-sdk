@@ -28,6 +28,14 @@
         "accepts": [
           "fetio3-s"
         ]
+      },
+      {
+        "port": "tailings",
+        "accepts": [
+          "sio2-s",
+          "h2o-s",
+          "fetio3-s"
+        ]
       }
     ]
   },
@@ -49,27 +57,29 @@
           }
         },
         {
-          "op": "LOSS",
-          "species": "sio2-s",
-          "quantity": {
-            "kind": "op",
-            "op": "mul",
-            "args": [
-              {
-                "kind": "const",
-                "value": {
-                  "n": "14148",
-                  "d": "1"
+          "op": "PARTITION",
+          "input": "pool",
+          "residue": "rest",
+          "outputs": [
+            {
+              "stream": "icy",
+              "fractions": {
+                "h2o-s": {
+                  "n": "9",
+                  "d": "10"
                 }
-              },
-              {
-                "kind": "ref",
-                "name": "extent"
               }
-            ]
-          },
-          "sink": "tailings",
-          "sink_kind": "RECOVERABLE"
+            },
+            {
+              "stream": "concentrate",
+              "fractions": {
+                "fetio3-s": {
+                  "n": "4",
+                  "d": "5"
+                }
+              }
+            }
+          ]
         },
         {
           "op": "WORK",
@@ -102,18 +112,16 @@
       "to": "stage:beneficiate"
     },
     {
-      "from": "stage:beneficiate",
-      "to": "port:ice",
-      "species": [
-        "h2o-s"
-      ]
+      "from": "stage:beneficiate.icy",
+      "to": "port:ice"
     },
     {
-      "from": "stage:beneficiate",
-      "to": "port:ilmenite",
-      "species": [
-        "fetio3-s"
-      ]
+      "from": "stage:beneficiate.concentrate",
+      "to": "port:ilmenite"
+    },
+    {
+      "from": "stage:beneficiate.rest",
+      "to": "port:tailings"
     }
   ],
   "failure_disposition": {
