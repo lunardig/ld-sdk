@@ -1,0 +1,13 @@
+{
+  "substance_id": "fuel-spent",
+  "formula": {
+    "u": "1",
+    "o": "2"
+  },
+  "phase": "solid",
+  "quantity_unit": "mmol",
+  "enthalpy": {
+    "n": "0",
+    "d": "1"
+  }
+}

@@ -5,5 +5,13 @@
     "o": "1"
   },
   "phase": "liquid",
-  "quantity_unit": "mmol"
+  "quantity_unit": "mmol",
+  "enthalpy": {
+    "n": "-28583",
+    "d": "100"
+  },
+  "gibbs": {
+    "n": "-23713",
+    "d": "100"
+  }
 }

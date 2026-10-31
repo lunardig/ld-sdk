@@ -1,0 +1,8 @@
+{
+  "product_id": "fission-reactor-kit",
+  "embodied": {},
+  "installs_as": {
+    "kind": "MACHINE",
+    "template": "fission-reactor"
+  }
+}

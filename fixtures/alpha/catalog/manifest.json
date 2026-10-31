@@ -1,8 +1,18 @@
 {
   "schema": "ld.catalog.v0",
-  "catalog_id": "alpha-m3a",
+  "catalog_id": "alpha-m3b",
   "pset_version": "0",
   "entries": [
+    {
+      "kind": "buffer",
+      "id": "bulk-tank",
+      "hash": "d6ef26e3961b92a1b4e9684e690e45980b5921bb1e99f5775f1503525a170e1c"
+    },
+    {
+      "kind": "buffer",
+      "id": "fuel-cask",
+      "hash": "d8f83c34748853773864acd75fe8148b39420c63315489cdef895894c44c01e0"
+    },
     {
       "kind": "buffer",
       "id": "hopper",
@@ -84,6 +94,11 @@
       "hash": "61c140e20fbb438183f779cbd7cc77841fc5f4820f50c270cd89e543daa5e62a"
     },
     {
+      "kind": "element",
+      "id": "u",
+      "hash": "42d8741a05c0abad0aabf359eddd431bd922974e391e920c221d02e106528444"
+    },
+    {
       "kind": "environment",
       "id": "irradiance",
       "hash": "d2d190deb705cde7db51af55dcd5d1170910449ffadba15bffd59e691c70b496"
@@ -120,6 +135,16 @@
     },
     {
       "kind": "machine",
+      "id": "fission-reactor",
+      "hash": "835efb89d05acf58119fb9f7c7377ad4379811df30f73890612fddfd63238d16"
+    },
+    {
+      "kind": "machine",
+      "id": "fuel-cell",
+      "hash": "fc2265b82e25062cebb8882643e7849877afd89775e713c633bcef0157696322"
+    },
+    {
+      "kind": "machine",
       "id": "ice-melter",
       "hash": "05f7ec5de69fd75150726daf9b3fe15608263851e77903b7e92922b3c3bdae88"
     },
@@ -141,7 +166,7 @@
     {
       "kind": "process",
       "id": "electrolyze-water",
-      "hash": "60e070a48773012c43ee562db94fd0527dd8d53b2f7f56c1c39b7646b63eb9b4"
+      "hash": "82b6d0f61821b66590966ea310cf12502d77c71e6116b2271bbf72320c9cfa97"
     },
     {
       "kind": "process",
@@ -152,6 +177,16 @@
       "kind": "process",
       "id": "fabricate-hopper",
       "hash": "a32086a6dfff0a0788c5d28e3c55fb7842abb9de4924627c8ba6d7b125b529b1"
+    },
+    {
+      "kind": "process",
+      "id": "fission",
+      "hash": "79c43eec4977b39652cf2afaf5f9eb534f8e253b11c8cef7612611c1667abf55"
+    },
+    {
+      "kind": "process",
+      "id": "fuel-cell",
+      "hash": "2824af2cb8a2d79e37d506c78377cf627030325a4994ef786496f06a9913b9ee"
     },
     {
       "kind": "process",
@@ -180,6 +215,11 @@
     },
     {
       "kind": "product",
+      "id": "bulk-tank-kit",
+      "hash": "525d57089215d1b614f48a9945767812e6cdfc969f40831acdce85b8705b87d8"
+    },
+    {
+      "kind": "product",
       "id": "electrolyzer-kit",
       "hash": "7690d6c1da6820c398bfbf997c517cd56de82c31839fb641a0a2a5610afd5a6e"
     },
@@ -195,8 +235,23 @@
     },
     {
       "kind": "product",
+      "id": "fission-reactor-kit",
+      "hash": "10b253a065caafd0f6a5c188a5d1b697f1bcfc59e20d48dfe1c7f6e11d0aa310"
+    },
+    {
+      "kind": "product",
       "id": "fragile-electrolyzer-kit",
       "hash": "84bef722d85c2127afc82944db344a07e77591b49a0f182d2961741215c63570"
+    },
+    {
+      "kind": "product",
+      "id": "fuel-cask-kit",
+      "hash": "83b4988d50fb8ea67a52567c2477cfb929ec5460d948a21fc96e57658582be84"
+    },
+    {
+      "kind": "product",
+      "id": "fuel-cell-kit",
+      "hash": "9200c03883f624205bf638b4e2ed43327ecbc7a304f629f0543ebdfa7d8d8d02"
     },
     {
       "kind": "product",
@@ -261,52 +316,62 @@
     {
       "kind": "substance",
       "id": "fe-s",
-      "hash": "3b5ee482368dc87e06570be63a9fc413ccabbd0dc544adf5472460125edecace"
+      "hash": "afc98b561f363127d937688ec6c2fb602322d1fa32486ad2881bfc43d5086d36"
     },
     {
       "kind": "substance",
       "id": "fetio3-s",
-      "hash": "27ce4fa19676d3cf5e8829eca6ec89cb002d825560dee896563eee3e465ae732"
+      "hash": "f1822151af1defb23211de2d981493097f3cd5294080550294f9f9522920b279"
+    },
+    {
+      "kind": "substance",
+      "id": "fuel-fresh",
+      "hash": "947735ee4ceadad3cc25f7d71f6b4464b0f0d9e469520fb35754517ff1180ee2"
+    },
+    {
+      "kind": "substance",
+      "id": "fuel-spent",
+      "hash": "f95aef383e8c205e9b935600e953d68bf38d46159239bc5843bb124ac47e2852"
     },
     {
       "kind": "substance",
       "id": "h2-g",
-      "hash": "9715cb6cc08df0f3f7b2aef23c79d90b606fade447c11bf4889b366fb90c9a64"
+      "hash": "5ac8c0f07f6892a74a14d092d3342ea93e2c50dfdaa5ef7e358bbfefc5bcfd61"
     },
     {
       "kind": "substance",
       "id": "h2o-l",
-      "hash": "03247ca81b8b84046f3b9c58445f0cf929a10884ca0e0f022b2abd51923ada2f"
+      "hash": "de29320ae902943f92f6582f5567cb529b4e8f1af3c993d007110883ac30b48d"
     },
     {
       "kind": "substance",
       "id": "h2o-s",
-      "hash": "90037ac116557adff010298e175fd843b72bd8215eda8d6e2cfb099a09a32c68"
+      "hash": "3d43f12c20c75f3b3632e871436305a23ac2e5151916f15b610c3b10695e6e4d"
     },
     {
       "kind": "substance",
       "id": "o2-g",
-      "hash": "8060dd5fa32e3c478ed3eebb2ec5cbf1ac840c0855671e4dc2cd99cf0a145e2d"
+      "hash": "0b4adb4f34dd9a207ae19322948c01ba018d244d95b446fd44dc38d52130f94e"
     },
     {
       "kind": "substance",
       "id": "regolith",
-      "hash": "3d0aeff1f725247ffa4c8e425aae888627f60e9dc70b782fbfbfddb1a7ada0b6"
+      "hash": "06b9ca7e1b9a6e1a48e0b0a2b6a61ae6cfb644a22a8584110f825d47f06f4019"
     },
     {
       "kind": "substance",
       "id": "regolith-bank",
-      "hash": "68c3438f9788d2875fda63cb96baa17ed8d4ce9234ef173e675a163ea8fe8df4"
+      "hash": "14298a96d32eaae1d0c02c7aa686d32a2edeb9fc6013ba141461d2fbe3e1184c"
     },
     {
       "kind": "substance",
       "id": "sio2-s",
-      "hash": "16210090094160b19c3a34d25cf3b06549d1d8438c8f852afa692e0dd75f91ca"
+      "hash": "04b310ebbd7b2882bce0fe16b76177fde28267308da8afb60be22ab9568804f6"
     },
     {
       "kind": "substance",
       "id": "tio2-s",
-      "hash": "1d7fd824cd71ee54e6881d3c944ec0506b7e8ea0fd46445fa0f8b7f5f3df533a"
+      "hash": "052ebe6dcafe2cb130e0be9346eda516584ba2f30f063a01af80ef9c10ef3c75"
     },
     {
       "kind": "unit",

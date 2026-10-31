@@ -4,5 +4,13 @@
     "fe": "1"
   },
   "phase": "solid",
-  "quantity_unit": "mmol"
+  "quantity_unit": "mmol",
+  "enthalpy": {
+    "n": "0",
+    "d": "1"
+  },
+  "gibbs": {
+    "n": "0",
+    "d": "1"
+  }
 }

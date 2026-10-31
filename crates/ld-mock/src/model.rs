@@ -1171,6 +1171,7 @@ impl Engine for MockEngine {
                 reason: j.reason.clone(),
                 completed_work: uint(j.done_work),
                 required_work: uint(j.required_work),
+                energy_held: None,
                 rate: j.rate.to_rational(),
             }).collect(),
             buffers: self.buffers.iter().map(|(k, b)| {

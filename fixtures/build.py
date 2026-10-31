@@ -204,6 +204,8 @@ def build_alpha() -> None:
     requests.jsonl, only create.json (I-1 create params) and the catalog."""
     import m2_vectors as m2  # the mining chemistry, from ld-interfaces
     import m2c_vectors as m2c  # the loop closers
+    import m3a_vectors as m3a  # the M3a sorter and reactor (LD-PEC-006 §3.3)
+    import m3b_vectors as m3b  # the fuel cell and fission reactor (LD-PEC-006 §3.2)
 
     cat = ALPHA / "catalog"
     if ALPHA.exists():
@@ -211,9 +213,13 @@ def build_alpha() -> None:
     shutil.copytree(CAT, cat)
     (cat / "manifest.json").unlink()
     entries = {
-        "elements": [e for e in m2.elements() if e["element_id"] in ("si", "fe", "ti")],
+        "elements": [e for e in m2.elements() if e["element_id"] in ("si", "fe", "ti")] + [m3b.URANIUM],
         "units": [u for u in m2c.m2c_units() if u["unit_id"] in ("kg-reg", "count")],
-        "substances": [x for x in m2c.m2c_substances() if x["substance_id"] in ("regolith-bank", "regolith", "h2o-s", "fetio3-s", "sio2-s", m2c.IRON, m2c.RUTILE)],
+        # Every substance carries its energy content (LD-PEC-006 §3.2.1). Fission fuel holds
+        # 900 MJ per mmol of UO2 (about 3.3 TJ/kg), a provisional figure (Q-13).
+        "substances": [x for x in m2c.m2c_substances()
+                       if x["substance_id"] in ("regolith-bank", "regolith", "h2o-s", "h2o-l", "h2-g", "o2-g", "fetio3-s", "sio2-s", m2c.IRON, m2c.RUTILE)]
+        + m3b.fuel_substances(900_000_000),
     }
     for key, items in entries.items():
         for item in items:
@@ -222,11 +228,22 @@ def build_alpha() -> None:
     # Rates for play: the excavator takes 100 kg in 50 s (2 kg/s), which the
     # beneficiator matches; the melter keeps up with the ice that makes.
     excavate, melt = m2.excavate(), m2.melt()
-    import m3a_vectors as m3a  # the M3a sorter and reactor (LD-PEC-006 §3.3)
     beneficiate, reduce, fabricate = m3a.alpha_beneficiate(), m3a.alpha_reduce(), m2c.fabricate_hopper()
     # Fabrication melts and forms the iron: 200 MJ per hopper (LD-PEC-006 §2.1).
     fabricate["stages"][0]["ops"][2]["amount"] = R(200_000_000)
-    for proc in (excavate, beneficiate, melt, reduce, fabricate):
+    # Electrolysis at about 70 % of the ideal: 800 J per mmol of reaction, not the 572 J
+    # minimum (LD-PEC-006 §2.1, Q-06b). The starter catalog keeps the ideal.
+    electrolyze = m2.electrolyze()
+    electrolyze["stages"][0]["ops"][2]["amount"] = R(800)
+    electrolyze["stages"][0]["ops"].append({"op": "WEAR", "per": "WORK", "amount": R(1, 1000)})
+    electrolyze["stages"][0]["stage_id"] = "split"
+    electrolyze["edges"] = [{"from": "port:water", "to": "stage:split"}, {"from": "stage:split", "to": "port:h2", "species": ["h2-g"]},
+                            {"from": "stage:split", "to": "port:o2", "species": ["o2-g"]}]
+    electrolyze["failure_disposition"] = {"split": "RELEASE"}
+    # The fuel cell sells 286 J of the 571.66 J a mmol of reaction releases; fission sells
+    # 25 % of its fuel's energy (Stirling or Brayton conversion). Both follow load.
+    fuel_cell, fission = m3b.fuel_cell(286), m3b.fission(225_000_000)
+    for proc in (excavate, beneficiate, melt, reduce, fabricate, electrolyze, fuel_cell, fission):
         write(cat / f"processes/{proc['process_id']}.json", proc)
     power = {"port": "power", "type": "ELECTRICAL", "direction": "IN"}
 
@@ -244,10 +261,17 @@ def build_alpha() -> None:
         # Ten minutes per hopper: 200 MJ at about 333 kW (LD-PEC-006 §2.1).
         ("fabricator", ["fabricate-hopper"], R(1, 600_000_000), [mport("iron", "IN"), mport("scrap", "OUT"), power], ["fabrication"]),
         ("battery", [], R(1, 1_000_000), [power], ["storage"]),
+        # 286 kW at 1 mol of reaction per second.
+        ("fuel-cell", ["fuel-cell"], R(1, 1000), [mport("h2", "IN"), mport("o2", "IN"), mport("water", "OUT"),
+                                                 {"port": "power", "type": "ELECTRICAL", "direction": "OUT"}], ["fuel-cell"]),
+        # 1 MWe; it cannot throttle below a fifth of that (LD-PEC-006 §3.2.2).
+        ("fission-reactor", ["fission"], R(1, 225_000_000), [mport("fuel", "IN"), mport("spent", "OUT"),
+                                                             {"port": "power", "type": "ELECTRICAL", "direction": "OUT"}], ["fission"]),
     ]:
         write(cat / f"machines/{bid}.json", {
             "blueprint_id": bid, "capabilities": caps, "processes": procs, "rated_work": rated, "lanes": "1",
-            "min_stable_rate": R(1, 1_000_000_000), "idle_power": {"amount": R(0), "unit": "w"}, "ports": ports,
+            "min_stable_rate": R(1, 1_125_000_000) if bid == "fission-reactor" else R(1, 1_000_000_000),
+            "idle_power": {"amount": R(0), "unit": "w"}, "ports": ports,
             "condition_table": [{"wear_at": "0", "capacity_factor": R(1)}, {"wear_at": "1000000", "capacity_factor": R(1, 2)}], "embodied": {},
             # 100 kWh, 400 kW in, 600 kW out: enough to carry the electrolyzer a few
             # minutes past dusk. Placeholders (LD-PEC-005 Q-06).
@@ -258,18 +282,23 @@ def build_alpha() -> None:
                                        ("ilmenite-bin", ["fetio3-s"], "2000000", "mmol"), ("iron-bin", [m2c.IRON], "5000000", "mmol"),
                                        ("rutile-bin", [m2c.RUTILE, m2c.IRON], "5000000", "mmol"), ("scrap-bin", [m2c.IRON], "1000000", "mmol"),
                                        # Everything the plant does not recover, mostly silicate: about 14 mol per kg dug.
-                                       ("tailings-pile", ["sio2-s", "h2o-s", "fetio3-s"], "200000000", "mmol")]:
+                                       ("tailings-pile", ["sio2-s", "h2o-s", "fetio3-s"], "200000000", "mmol"),
+                                       # Night storage is big: 5 million mol (LD-PEC-006 §3.2.4).
+                                       ("bulk-tank", ["h2-g", "o2-g", "h2o-l"], "5000000000", "mmol"),
+                                       ("fuel-cask", [m3b.FRESH, m3b.SPENT], "100000", "mmol")]:
         write(cat / f"buffers/{tid}.json", {"template_id": tid, "accepts": accepts, "capacity": {"amount": amount, "unit": unit}})
     for pid, kind, tpl in [("excavator-kit", "MACHINE", "excavator"), ("beneficiator-kit", "MACHINE", "beneficiator"),
                            ("melter-kit", "MACHINE", "ice-melter"), ("hopper-kit", "BUFFER", "hopper"), ("ice-bin-kit", "BUFFER", "ice-bin"),
                            ("ilmenite-bin-kit", "BUFFER", "ilmenite-bin"), ("reactor-kit", "MACHINE", "reactor"),
                            ("fabricator-kit", "MACHINE", "fabricator"), ("battery-kit", "MACHINE", "battery"), ("iron-bin-kit", "BUFFER", "iron-bin"),
                            ("rutile-bin-kit", "BUFFER", "rutile-bin"), ("scrap-bin-kit", "BUFFER", "scrap-bin"),
-                           ("tailings-pile-kit", "BUFFER", "tailings-pile")]:
+                           ("tailings-pile-kit", "BUFFER", "tailings-pile"), ("fuel-cell-kit", "MACHINE", "fuel-cell"),
+                           ("fission-reactor-kit", "MACHINE", "fission-reactor"), ("bulk-tank-kit", "BUFFER", "bulk-tank"),
+                           ("fuel-cask-kit", "BUFFER", "fuel-cask")]:
         # A hopper embodies 1 800 mol of iron, about 100 kg (LD-PEC-005 §8.4).
         embodied = {m2c.IRON: str(m2c.HOPPER_IRON)} if pid == "hopper-kit" else {}
         write(cat / f"products/{pid}.json", {"product_id": pid, "embodied": embodied, "installs_as": {"kind": kind, "template": tpl}})
-    write(cat / "manifest.json", ld.manifest_for("alpha-m3a", ld.read_catalog_entries(cat)))
+    write(cat / "manifest.json", ld.manifest_for("alpha-m3b", ld.read_catalog_entries(cat)))
 
     genesis = {
         "schema": "ld.genesis.v0", "world_id": "alpha-world", "claim_id": "claim-0001",

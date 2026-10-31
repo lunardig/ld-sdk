@@ -8,5 +8,9 @@
     "ti": "659"
   },
   "phase": "solid",
-  "quantity_unit": "kg-reg"
+  "quantity_unit": "kg-reg",
+  "enthalpy": {
+    "n": "-14509359",
+    "d": "1"
+  }
 }

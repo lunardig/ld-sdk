@@ -5,5 +5,13 @@
     "o": "2"
   },
   "phase": "solid",
-  "quantity_unit": "mmol"
+  "quantity_unit": "mmol",
+  "enthalpy": {
+    "n": "-9107",
+    "d": "10"
+  },
+  "gibbs": {
+    "n": "-8563",
+    "d": "10"
+  }
 }

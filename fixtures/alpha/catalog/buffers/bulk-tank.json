@@ -1,0 +1,12 @@
+{
+  "template_id": "bulk-tank",
+  "accepts": [
+    "h2-g",
+    "o2-g",
+    "h2o-l"
+  ],
+  "capacity": {
+    "amount": "5000000000",
+    "unit": "mmol"
+  }
+}

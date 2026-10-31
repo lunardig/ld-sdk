@@ -1,0 +1,95 @@
+{
+  "process_id": "fuel-cell",
+  "pset_version": "0",
+  "mode": "FLOW",
+  "dispatch": "FOLLOW_LOAD",
+  "extent": {
+    "unit": "rxn-mmol",
+    "min": "0",
+    "max": "1000000000000"
+  },
+  "ports": {
+    "in": [
+      {
+        "port": "h2",
+        "accepts": [
+          "h2-g"
+        ]
+      },
+      {
+        "port": "o2",
+        "accepts": [
+          "o2-g"
+        ]
+      }
+    ],
+    "out": [
+      {
+        "port": "water",
+        "accepts": [
+          "h2o-l"
+        ]
+      }
+    ]
+  },
+  "stages": [
+    {
+      "stage_id": "cell",
+      "ops": [
+        {
+          "op": "REACT",
+          "vector": {
+            "h2-g": "-2",
+            "o2-g": "-1",
+            "h2o-l": "2"
+          },
+          "extent": {
+            "kind": "ref",
+            "name": "extent"
+          }
+        },
+        {
+          "op": "WORK",
+          "a": {
+            "n": "1",
+            "d": "1"
+          },
+          "b": {
+            "n": "0",
+            "d": "1"
+          }
+        },
+        {
+          "op": "ENERGY",
+          "mode": "PER_WORK",
+          "dir": "PRODUCE",
+          "amount": {
+            "n": "286",
+            "d": "1"
+          },
+          "unit": "j",
+          "heat_sink": "waste-heat"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "port:h2",
+      "to": "stage:cell"
+    },
+    {
+      "from": "port:o2",
+      "to": "stage:cell"
+    },
+    {
+      "from": "stage:cell",
+      "to": "port:water"
+    }
+  ],
+  "failure_disposition": {
+    "cell": "RETAIN"
+  },
+  "restart_thresholds": {},
+  "constants": {}
+}

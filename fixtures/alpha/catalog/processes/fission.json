@@ -1,0 +1,84 @@
+{
+  "process_id": "fission",
+  "pset_version": "0",
+  "mode": "FLOW",
+  "dispatch": "FOLLOW_LOAD",
+  "extent": {
+    "unit": "mmol",
+    "min": "0",
+    "max": "1000000000000"
+  },
+  "ports": {
+    "in": [
+      {
+        "port": "fuel",
+        "accepts": [
+          "fuel-fresh"
+        ]
+      }
+    ],
+    "out": [
+      {
+        "port": "spent",
+        "accepts": [
+          "fuel-spent"
+        ]
+      }
+    ]
+  },
+  "stages": [
+    {
+      "stage_id": "core",
+      "ops": [
+        {
+          "op": "REACT",
+          "vector": {
+            "fuel-fresh": "-1",
+            "fuel-spent": "1"
+          },
+          "extent": {
+            "kind": "ref",
+            "name": "extent"
+          }
+        },
+        {
+          "op": "WORK",
+          "a": {
+            "n": "1",
+            "d": "1"
+          },
+          "b": {
+            "n": "0",
+            "d": "1"
+          }
+        },
+        {
+          "op": "ENERGY",
+          "mode": "PER_WORK",
+          "dir": "PRODUCE",
+          "amount": {
+            "n": "225000000",
+            "d": "1"
+          },
+          "unit": "j",
+          "heat_sink": "reactor-heat"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "port:fuel",
+      "to": "stage:core"
+    },
+    {
+      "from": "stage:core",
+      "to": "port:spent"
+    }
+  ],
+  "failure_disposition": {
+    "core": "RETAIN"
+  },
+  "restart_thresholds": {},
+  "constants": {}
+}
