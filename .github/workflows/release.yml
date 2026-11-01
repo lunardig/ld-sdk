@@ -1,0 +1,165 @@
+name: release
+
+# An SDK release that stands on its own (LD-PEC-008 §3.3): this repository, the pinned
+# ld-interfaces, and ld-engine binaries built from the commit in engine/ENGINE_REF, for
+# Linux, macOS and Windows, plus the WebAssembly build. The engine's source is not part
+# of the release.
+#
+# Run it from the Actions tab (workflow_dispatch) with a version, or push a tag v<version>.
+#
+# Secrets (Actions repository secrets on ld-sdk):
+#   LD_INTERFACES_TOKEN  Contents: read on lunardig/ld-interfaces (the CI one)
+#   LD_ENGINE_TOKEN      Contents: read on lunardig/ld-engine, ld-sdk and ld-interfaces
+#                        (ld-engine's own submodules are fetched with it)
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version, without the v: for example 0.1.0-alpha.1"
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  WASM_BINDGEN_VERSION: "0.2.100"
+
+jobs:
+  engine:
+    name: Engine (${{ matrix.platform }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, platform: linux-x86_64, exe: ld-engine-cli }
+          - { os: macos-latest, platform: macos-arm64, exe: ld-engine-cli }
+          - { os: windows-latest, platform: windows-x86_64, exe: ld-engine-cli.exe }
+    runs-on: ${{ matrix.os }}
+    # Windows is best effort for the first release: the package job ships what built.
+    continue-on-error: ${{ matrix.platform == 'windows-x86_64' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Fetch ld-engine at engine/ENGINE_REF
+        shell: bash
+        env:
+          T: ${{ secrets.LD_ENGINE_TOKEN }}
+        run: |
+          if [ -z "$T" ]; then echo "::error::LD_ENGINE_TOKEN is not set on ld-sdk (see the header of this workflow)"; exit 1; fi
+          git config --global url."https://x-access-token:${T}@github.com/lunardig/ld-".insteadOf "https://github.com/lunardig/ld-"
+          git clone -q https://github.com/lunardig/ld-engine "$RUNNER_TEMP/ld-engine"
+          git -C "$RUNNER_TEMP/ld-engine" checkout -q "$(tr -d '[:space:]' < engine/ENGINE_REF)"
+          git -C "$RUNNER_TEMP/ld-engine" submodule update -q --init --recursive
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build ld-engine-cli
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP/ld-engine"
+          cargo build --release --bin ld-engine-cli
+          mkdir -p "$GITHUB_WORKSPACE/out/${{ matrix.platform }}"
+          cp "target/release/${{ matrix.exe }}" "$GITHUB_WORKSPACE/out/${{ matrix.platform }}/"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: engine-${{ matrix.platform }}
+          path: out
+
+  wasm:
+    name: Engine (WebAssembly)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Fetch ld-engine at engine/ENGINE_REF
+        env:
+          T: ${{ secrets.LD_ENGINE_TOKEN }}
+        run: |
+          if [ -z "$T" ]; then echo "::error::LD_ENGINE_TOKEN is not set on ld-sdk"; exit 1; fi
+          git config --global url."https://x-access-token:${T}@github.com/lunardig/ld-".insteadOf "https://github.com/lunardig/ld-"
+          git clone -q https://github.com/lunardig/ld-engine "$RUNNER_TEMP/ld-engine"
+          git -C "$RUNNER_TEMP/ld-engine" checkout -q "$(tr -d '[:space:]' < engine/ENGINE_REF)"
+          git -C "$RUNNER_TEMP/ld-engine" submodule update -q --init --recursive
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - run: cargo install wasm-bindgen-cli --version ${{ env.WASM_BINDGEN_VERSION }} --locked
+      - name: Build the WebAssembly engine, and record what was built
+        run: |
+          cd "$RUNNER_TEMP/ld-engine"
+          ./tools/build-wasm.sh
+          mkdir -p "$GITHUB_WORKSPACE/out/meta"
+          cp -r wasm "$GITHUB_WORKSPACE/out/wasm"
+          cp LICENSE "$GITHUB_WORKSPACE/out/meta/LICENSE-ENGINE"
+          version=$(sed -n 's/^pub const ENGINE_VERSION: &str = "\(.*\)";/\1/p' crates/ld-engine/src/lib.rs)
+          printf '{"commit": "%s", "engine_version": "%s"}\n' "$(git rev-parse HEAD)" "$version" > "$GITHUB_WORKSPACE/out/meta/ENGINE.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: engine-wasm
+          path: out
+
+  package:
+    name: Package, verify and publish
+    needs: [engine, wasm]
+    if: ${{ !cancelled() && needs.wasm.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Fetch vendor/ld-interfaces
+        env:
+          T: ${{ secrets.LD_INTERFACES_TOKEN }}
+        run: |
+          git config --global url."https://x-access-token:${T}@github.com/lunardig/ld-interfaces".insteadOf "https://github.com/lunardig/ld-interfaces"
+          git submodule update --init --recursive
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: engine-*
+          path: artifacts
+          merge-multiple: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Version
+        id: v
+        run: |
+          v="${{ inputs.version }}"
+          [ -n "$v" ] || v="${GITHUB_REF_NAME#v}"
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+      - name: Package
+        run: |
+          mkdir -p artifacts/engines
+          for d in artifacts/*/; do case "$(basename "$d")" in wasm|meta|engines) ;; *) mv "$d" artifacts/engines/ ;; esac; done
+          ls -R artifacts | head -40
+          python tools/package_release.py --version "${{ steps.v.outputs.version }}" --engines artifacts/engines --wasm artifacts/wasm \
+            --engine-info artifacts/meta/ENGINE.json --engine-license artifacts/meta/LICENSE-ENGINE --out dist | tee dist-sha256.txt
+      - name: Verify the release on its own, native and browser builds
+        run: |
+          pip install -r vendor/ld-interfaces/requirements.txt
+          python tools/verify_release.py "dist/ld-sdk-${{ steps.v.outputs.version }}.tar.gz" --platform linux-x86_64 --wasm
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${{ steps.v.outputs.version }}"
+          {
+            echo "Lunar Dig SDK $v. Self-contained: unpack it and start with docs/guide.md."
+            echo
+            echo "Engines: $(ls artifacts/engines | paste -sd, - | sed 's/,/, /g'), and WebAssembly."
+            echo "Built from: ld-sdk ${GITHUB_SHA}, ld-engine $(python -c 'import json;print(json.load(open("artifacts/meta/ENGINE.json"))["commit"])'), ld-interfaces $(git -C vendor/ld-interfaces rev-parse HEAD)."
+            echo
+            echo '```'
+            cat dist-sha256.txt
+            echo '```'
+          } > notes.md
+          gh release create "v$v" dist/*.tar.gz dist/*.zip --title "ld-sdk $v" --notes-file notes.md --prerelease --target "$GITHUB_SHA" \
+            || gh release upload "v$v" dist/*.tar.gz dist/*.zip --clobber

@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -30,7 +31,8 @@ import ld  # noqa: E402
 
 class Engine:
     def __init__(self, binary: str):
-        self.p = subprocess.Popen([binary], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
+        # A path, or a command line such as "node engine/wasm-cli.mjs".
+        self.p = subprocess.Popen(shlex.split(binary), stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
         self.n = 0
 
     def call(self, method: str, params: dict | None = None) -> dict:

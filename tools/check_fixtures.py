@@ -12,6 +12,7 @@ For each fixture:
 from __future__ import annotations
 
 import json
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -20,7 +21,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "vendor/ld-interfaces/tools"))
 import ld  # noqa: E402
 
-BIN = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "target/release/ld-mock-cli"
+# A path, or a command line such as "node engine/wasm-cli.mjs".
+BIN = sys.argv[1] if len(sys.argv) > 1 else str(ROOT / "target/release/ld-mock-cli")
 FAILURES: list[str] = []
 
 
@@ -32,7 +34,7 @@ def check(cond: bool, msg: str) -> None:
 
 def run(requests: list[dict]) -> list[dict]:
     payload = "".join(json.dumps(r) + "\n" for r in requests)
-    out = subprocess.run([str(BIN)], input=payload, capture_output=True, text=True, check=True).stdout
+    out = subprocess.run(shlex.split(BIN), input=payload, capture_output=True, text=True, check=True).stdout
     return [json.loads(line) for line in out.splitlines()]
 
 
