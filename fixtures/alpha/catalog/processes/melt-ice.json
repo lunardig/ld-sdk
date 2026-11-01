@@ -81,7 +81,7 @@
   },
   "restart_thresholds": {
     "ice": {
-      "restart_at": "500000",
+      "restart_at": "1600000",
       "unit": "mmol"
     }
   },
