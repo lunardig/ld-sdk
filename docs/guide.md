@@ -17,6 +17,13 @@ need something that is not here, that is a defect in the SDK; please report it.
 | `tools/` | `run_vectors.py` and `check_fixtures.py`: check any engine against the vectors and fixtures |
 | `crates/`, `fixtures/*` | A Rust engine trait and protocol host, and a mock engine that implements only the first milestone (M1). Use the real engine in `engine/` for everything in this guide |
 
+**Licenses.** Everything here is Apache-2.0 except the engine binaries, which are under
+the Functional Source License 1.1 (FSL-1.1-ALv2) with an Additional Permission: you may
+play, build and sell player tools, verify claims, run private worlds and build clients for
+official worlds. What is not allowed is a competing use, such as running a paid world
+that substitutes for an official one. `engine/NOTICE.md` has the details, and each
+engine version becomes Apache-2.0 two years after its release.
+
 You need Python 3.10 or later. Node 18 or later is needed only for the WebAssembly engine
 and the TypeScript client.
 

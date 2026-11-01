@@ -54,6 +54,9 @@ def main() -> int:
     if not exe.exists():
         raise SystemExit(f"no engine for {a.platform} in the release: {exe}")
     exe.chmod(0o755)
+    for f in ("LICENSE.md", "NOTICE.md", "THIRD-PARTY-NOTICES.md", "ENGINE.json"):
+        if not (top / "engine" / f).exists():
+            raise SystemExit(f"FAILED: the release has no engine/{f}")
     py = sys.executable
     engine = str(exe)
     print(f"verifying {top.name} with {a.platform} in {work}")

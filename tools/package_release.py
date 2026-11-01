@@ -4,7 +4,8 @@ engine binaries under engine/. Nothing untracked is included.
 
     python tools/package_release.py --version 0.1.0-alpha.1 \\
         --engines dist/engines --wasm dist/wasm --engine-info dist/ENGINE.json \\
-        --engine-license dist/LICENSE-ENGINE --out dist
+        --engine-license dist/LICENSE.md --engine-notice dist/NOTICE.md \\
+        --engine-third-party dist/THIRD-PARTY-NOTICES.md --out dist
 
 `--engines` holds one folder per platform (linux-x86_64, macos-arm64, windows-x86_64),
 each with ld-engine-cli or ld-engine-cli.exe. Writes ld-sdk-<version>.tar.gz and .zip,
@@ -44,7 +45,9 @@ def main() -> int:
     ap.add_argument("--engines", type=Path, required=True)
     ap.add_argument("--wasm", type=Path)
     ap.add_argument("--engine-info", type=Path, required=True, help="JSON: engine commit and version")
-    ap.add_argument("--engine-license", type=Path, required=True)
+    ap.add_argument("--engine-license", type=Path, required=True, help="ld-engine's LICENSE.md")
+    ap.add_argument("--engine-notice", type=Path, required=True, help="ld-engine's NOTICE.md (license summary and Additional Permission)")
+    ap.add_argument("--engine-third-party", type=Path, required=True, help="tools/third_party.py output for the engine binaries")
     ap.add_argument("--out", type=Path, default=ROOT / "dist")
     a = ap.parse_args()
 
@@ -76,10 +79,15 @@ def main() -> int:
         raise SystemExit("no engine binaries found under --engines")
     if a.wasm:
         shutil.copytree(a.wasm, top / "engine/wasm", ignore=shutil.ignore_patterns("*.d.ts", "package.json", ".gitignore"))
+    # The engine's FSL clock starts on the date a version is made available: this release.
+    released = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     info = json.loads(a.engine_info.read_text())
-    info |= {"platforms": platforms, "wasm": bool(a.wasm)}
+    info |= {"platforms": platforms, "wasm": bool(a.wasm), "license": "FSL-1.1-ALv2 with the Additional Permission in NOTICE.md",
+             "made_available": released}
     (top / "engine/ENGINE.json").write_text(json.dumps(info, indent=2) + "\n")
-    shutil.copy2(a.engine_license, top / "engine/LICENSE-ENGINE")
+    shutil.copy2(a.engine_license, top / "engine/LICENSE.md")
+    shutil.copy2(a.engine_notice, top / "engine/NOTICE.md")
+    shutil.copy2(a.engine_third_party, top / "engine/THIRD-PARTY-NOTICES.md")
 
     manifest = {
         "release": a.version,
@@ -88,6 +96,8 @@ def main() -> int:
         "ld-interfaces": git(iface, "rev-parse", "HEAD"),
         "ld-engine": info.get("commit"),
         "engine_version": info.get("engine_version"),
+        "engine_made_available": released,
+        "licenses": {"sdk, interfaces, catalog, client, examples": "Apache-2.0", "engine": "FSL-1.1-ALv2 with an Additional Permission (engine/NOTICE.md)"},
         "catalog_hash": json.loads((ROOT / "fixtures/alpha/create.json").read_text())["genesis"]["catalog_hash"],
     }
     (top / "RELEASE.json").write_text(json.dumps(manifest, indent=2) + "\n")

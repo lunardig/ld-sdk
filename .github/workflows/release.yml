@@ -94,7 +94,8 @@ jobs:
           ./tools/build-wasm.sh
           mkdir -p "$GITHUB_WORKSPACE/out/meta"
           cp -r wasm "$GITHUB_WORKSPACE/out/wasm"
-          cp LICENSE "$GITHUB_WORKSPACE/out/meta/LICENSE-ENGINE"
+          cp LICENSE.md NOTICE.md "$GITHUB_WORKSPACE/out/meta/"
+          python3 "$GITHUB_WORKSPACE/tools/third_party.py" --workspace . --crate ld-engine-cli --crate ld-engine-wasm > "$GITHUB_WORKSPACE/out/meta/THIRD-PARTY-NOTICES.md"
           version=$(sed -n 's/^pub const ENGINE_VERSION: &str = "\(.*\)";/\1/p' crates/ld-engine/src/lib.rs)
           printf '{"commit": "%s", "engine_version": "%s"}\n' "$(git rev-parse HEAD)" "$version" > "$GITHUB_WORKSPACE/out/meta/ENGINE.json"
       - uses: actions/upload-artifact@v4
@@ -141,7 +142,8 @@ jobs:
           for d in artifacts/*/; do case "$(basename "$d")" in wasm|meta|engines) ;; *) mv "$d" artifacts/engines/ ;; esac; done
           ls -R artifacts | head -40
           python tools/package_release.py --version "${{ steps.v.outputs.version }}" --engines artifacts/engines --wasm artifacts/wasm \
-            --engine-info artifacts/meta/ENGINE.json --engine-license artifacts/meta/LICENSE-ENGINE --out dist | tee dist-sha256.txt
+            --engine-info artifacts/meta/ENGINE.json --engine-license artifacts/meta/LICENSE.md --engine-notice artifacts/meta/NOTICE.md \
+            --engine-third-party artifacts/meta/THIRD-PARTY-NOTICES.md --out dist | tee dist-sha256.txt
       - name: Verify the release on its own, native and browser builds
         run: |
           pip install -r vendor/ld-interfaces/requirements.txt
@@ -153,6 +155,8 @@ jobs:
           v="${{ steps.v.outputs.version }}"
           {
             echo "Lunar Dig SDK $v. Self-contained: unpack it and start with docs/guide.md."
+            echo
+            echo "Licenses: the SDK is Apache-2.0; the engine binaries are FSL-1.1-ALv2 with the Additional Permission in engine/NOTICE.md, and become Apache-2.0 two years after today."
             echo
             echo "Engines: $(ls artifacts/engines | paste -sd, - | sed 's/,/, /g'), and WebAssembly."
             echo "Built from: ld-sdk ${GITHUB_SHA}, ld-engine $(python -c 'import json;print(json.load(open("artifacts/meta/ENGINE.json"))["commit"])'), ld-interfaces $(git -C vendor/ld-interfaces rev-parse HEAD)."
