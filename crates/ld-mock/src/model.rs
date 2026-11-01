@@ -543,6 +543,8 @@ impl MockEngine {
     }
 
     fn record_history(&mut self, inputs_hash: Hash) {
+        // Finished jobs leave the state (LD-PEC-004 A2-1); M1 jobs never hold material.
+        self.jobs.retain(|_, j| !matches!(j.status, JobStatus::Completed | JobStatus::Cancelled | JobStatus::Failed));
         let state_hash = self.state_hash();
         let record = HistoryRecord {
             prev_hash: self.history_head.clone(),
@@ -551,7 +553,7 @@ impl MockEngine {
             timestamp: time(self.time),
             inputs_hash,
             transition_hash: state_hash.clone(),
-            resulting_state_hash: state_hash,
+            resulting_state_hash: Some(state_hash),
         };
         self.history_head = hash_value("ld.pec.history.v1", &record);
         self.history_count += 1;
@@ -809,6 +811,7 @@ impl MockEngine {
             // The mock does not model worn kits (LD-PEC-004 A1-1); the real engine does.
             wear: None,
             charge: None,
+            core: None,
         }).collect();
         for (b, buf) in &self.buffers {
             lots.push(Lot_ {
@@ -819,6 +822,7 @@ impl MockEngine {
                 products: BTreeMap::new(),
                 wear: None,
                 charge: None,
+                core: None,
             });
         }
         lots.sort_by(|a, b| a.lot_id.cmp(&b.lot_id));
@@ -1160,6 +1164,7 @@ impl Engine for MockEngine {
                     assigned_job_ids: self.assigned(k),
                     rate: m.rate.to_rational(),
                     unpowered: None,
+                    core: None,
                 }
             }).collect(),
             jobs: self.jobs.iter().map(|(k, j)| JobView {

@@ -10,8 +10,13 @@
     },
     {
       "kind": "buffer",
-      "id": "fuel-cask",
-      "hash": "d8f83c34748853773864acd75fe8148b39420c63315489cdef895894c44c01e0"
+      "id": "fission-reactor-core",
+      "hash": "3f7014c1d1fca0b23a705feebcbfddce472eb1b1ba0456e0e5e95cb0d20f1c72"
+    },
+    {
+      "kind": "buffer",
+      "id": "fission-reactor-small-core",
+      "hash": "7f53b7f3eb0dc2e1ee2611c5b502216321489adb29ab54115ef6e65037fe6000"
     },
     {
       "kind": "buffer",
@@ -62,6 +67,11 @@
       "kind": "connection",
       "id": "conveyor",
       "hash": "feed715b735b563eecfc446954fb7eeb8fb6eb74d9fca4ed5612dcc307ef4dbb"
+    },
+    {
+      "kind": "connection",
+      "id": "core-link",
+      "hash": "34249c632d05d56228e95ef86b42d007f938d2cdea79ca26aec98be1deec293d"
     },
     {
       "kind": "connection",
@@ -136,12 +146,12 @@
     {
       "kind": "machine",
       "id": "fission-reactor",
-      "hash": "62251407c20036ad782bbaf4d1259094756b84d401cca47cfac115a513bb305c"
+      "hash": "b9b0e6348cb47a8efb14216ce5887200fc8a3f61fe96449287bada2d1780e0b5"
     },
     {
       "kind": "machine",
       "id": "fission-reactor-small",
-      "hash": "7ea243e4cdbcb383a85aef0ed4b1cfb5c4b61f4ecfb20157d12a60149ad456ad"
+      "hash": "0a8a080f24037f3a1f0d590e74619b0229c6b138c469e7dc811dfab946eb867a"
     },
     {
       "kind": "machine",
@@ -247,11 +257,6 @@
       "kind": "product",
       "id": "fragile-electrolyzer-kit",
       "hash": "84bef722d85c2127afc82944db344a07e77591b49a0f182d2961741215c63570"
-    },
-    {
-      "kind": "product",
-      "id": "fuel-cask-kit",
-      "hash": "83b4988d50fb8ea67a52567c2477cfb929ec5460d948a21fc96e57658582be84"
     },
     {
       "kind": "product",

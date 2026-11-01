@@ -55,5 +55,13 @@
       }
     }
   ],
-  "embodied": {}
+  "embodied": {},
+  "core": {
+    "buffer": "fission-reactor-core",
+    "connection": "core-link",
+    "ports": [
+      "fuel",
+      "spent"
+    ]
+  }
 }

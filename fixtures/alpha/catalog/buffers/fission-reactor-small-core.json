@@ -1,0 +1,11 @@
+{
+  "template_id": "fission-reactor-small-core",
+  "accepts": [
+    "fuel-fresh",
+    "fuel-spent"
+  ],
+  "capacity": {
+    "amount": "1717000",
+    "unit": "mmol"
+  }
+}

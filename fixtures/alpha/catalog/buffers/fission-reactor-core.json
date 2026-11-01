@@ -1,11 +1,11 @@
 {
-  "template_id": "fuel-cask",
+  "template_id": "fission-reactor-core",
   "accepts": [
     "fuel-fresh",
     "fuel-spent"
   ],
   "capacity": {
-    "amount": "100000",
+    "amount": "4242000",
     "unit": "mmol"
   }
 }

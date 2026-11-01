@@ -1,8 +1,0 @@
-{
-  "product_id": "fuel-cask-kit",
-  "embodied": {},
-  "installs_as": {
-    "kind": "BUFFER",
-    "template": "fuel-cask"
-  }
-}

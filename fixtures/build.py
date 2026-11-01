@@ -183,8 +183,8 @@ def scenarios() -> dict[str, tuple[str, Script, dict]]:
                           {"jobs": {"job-solar": ["STARVED", "STARVED_REQUIRE"], "job-electrolysis": ["STARVED", "STARVED_POWER"]}})
 
     s = Script(water_mmol=500_000); s.plant(electrolyzer_kit="fragile-electrolyzer-kit"); s.jobs(); s.advance(120 * S); s.finish()
-    out["failed-machine"] = ("A fragile electrolyzer wears out after 100 s of work and fails; the job reports FAILED.", s,
-                             {"jobs": {"job-electrolysis": ["FAILED", "FAILED"]}, "machines": {"electrolyzer-1": "FAILED"}})
+    out["failed-machine"] = ("A fragile electrolyzer wears out after 100 s of work and fails; the job reports FAILED in its last event and leaves the state (LD-PEC-004 A2-1).", s,
+                             {"machines": {"electrolyzer-1": "FAILED"}, "events": ["FAILED"]})
 
     s = Script(water_mmol=500_000); s.plant()
     bad = s.cmd("CREATE_JOB", job_id="job-orphan", process="electrolyze-water", machine_id="no-such-machine", target_extent=1000, priority=1)
@@ -289,7 +289,13 @@ def build_alpha() -> None:
             # minutes past dusk. Placeholders (LD-PEC-005 Q-06).
             **({"energy_store": {"capacity": {"amount": R(360_000_000), "unit": "j"}, "max_charge": {"amount": R(400_000), "unit": "w"},
                                  "max_discharge": {"amount": R(600_000), "unit": "w"}, "charge_efficiency": R(9, 10), "heat_sink": "battery-heat"}}
-               if bid == "battery" else {})})
+               if bid == "battery" else {}),
+            # A reactor carries its fuel in a core that travels with its kit (LD-PEC-004 A2-3,
+            # LD-PEC-006 §3.7): fission draws fresh fuel from it and returns spent fuel to it.
+            **({"core": {"buffer": f"{bid}-core", "connection": "core-link", "ports": ["fuel", "spent"]}}
+               if bid.startswith("fission-reactor") else {})})
+    # The link between a reactor and its core: internal, fast enough never to limit it.
+    write(cat / "connections/core-link.json", {"template_id": "core-link", "kind": "FEED", "throughput": R(1000), "unit": "mmol", "delay_us": "0"})
     for tid, accepts, amount, unit in [("hopper", ["regolith"], "5000", "kg-reg"), ("ice-bin", ["h2o-s"], "2000000", "mmol"),
                                        ("ilmenite-bin", ["fetio3-s"], "2000000", "mmol"), ("iron-bin", [m2c.IRON], "5000000", "mmol"),
                                        ("rutile-bin", [m2c.RUTILE, m2c.IRON], "1000000000", "mmol"), ("scrap-bin", [m2c.IRON], "1000000", "mmol"),
@@ -300,7 +306,12 @@ def build_alpha() -> None:
                                        ("tailings-pile", ["sio2-s", "h2o-s", "fetio3-s"], "100000000000", "mmol"),
                                        # Night storage is big: 5 million mol (LD-PEC-006 §3.2.4).
                                        ("bulk-tank", ["h2-g", "o2-g", "h2o-l"], "5000000000", "mmol"),
-                                       ("fuel-cask", [m3b.FRESH, m3b.SPENT], "100000", "mmol")]:
+                                       # Reactor cores, loaded for ten years at rated power (LD-PEC-006 §3.7):
+                                       # 1.15 mol a day at 4 MWth, so 4,200 mol; 1,700 for the small unit.
+                                       # Capacity leaves 1 % headroom: spent fuel needs room reserved before
+                                       # fresh fuel is drawn, even in the same buffer (LD-PEC-004 A2-3).
+                                       ("fission-reactor-core", [m3b.FRESH, m3b.SPENT], "4242000", "mmol"),
+                                       ("fission-reactor-small-core", [m3b.FRESH, m3b.SPENT], "1717000", "mmol")]:
         write(cat / f"buffers/{tid}.json", {"template_id": tid, "accepts": accepts, "capacity": {"amount": amount, "unit": unit}})
     for pid, kind, tpl in [("excavator-kit", "MACHINE", "excavator"), ("beneficiator-kit", "MACHINE", "beneficiator"),
                            ("melter-kit", "MACHINE", "ice-melter"), ("hopper-kit", "BUFFER", "hopper"), ("ice-bin-kit", "BUFFER", "ice-bin"),
@@ -309,7 +320,7 @@ def build_alpha() -> None:
                            ("rutile-bin-kit", "BUFFER", "rutile-bin"), ("scrap-bin-kit", "BUFFER", "scrap-bin"),
                            ("tailings-pile-kit", "BUFFER", "tailings-pile"), ("fuel-cell-kit", "MACHINE", "fuel-cell"),
                            ("fission-reactor-kit", "MACHINE", "fission-reactor"), ("small-reactor-kit", "MACHINE", "fission-reactor-small"), ("bulk-tank-kit", "BUFFER", "bulk-tank"),
-                           ("fuel-cask-kit", "BUFFER", "fuel-cask")]:
+                           ]:
         # A hopper embodies 1 800 mol of iron, about 100 kg (LD-PEC-005 §8.4).
         embodied = {m2c.IRON: str(m2c.HOPPER_IRON)} if pid == "hopper-kit" else {}
         write(cat / f"products/{pid}.json", {"product_id": pid, "embodied": embodied, "installs_as": {"kind": kind, "template": tpl}})

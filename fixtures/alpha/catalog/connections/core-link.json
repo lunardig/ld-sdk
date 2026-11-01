@@ -1,0 +1,10 @@
+{
+  "template_id": "core-link",
+  "kind": "FEED",
+  "throughput": {
+    "n": "1000",
+    "d": "1"
+  },
+  "unit": "mmol",
+  "delay_us": "0"
+}
