@@ -21,7 +21,7 @@ CHAINS = 10
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--engine", required=True)
+    ap.add_argument("--engine", required=True, help="path to ld-engine-cli, or a command such as 'node tools/wasm-cli.mjs'")
     ap.add_argument("--step-hours", type=int, default=6, help="advance this many hours between observations")
     a = ap.parse_args()
     create = json.loads(ALPHA.read_text())
@@ -57,7 +57,7 @@ def main() -> int:
     v = e.view()
     days = DUSK / DAY
     running = sum(1 for j in v["jobs"] if j["status"] == "RUNNING")
-    print(json.dumps({"machines": machines, "stores": len(v["buffers"]), "simulated_days": round(days, 2), "events": e.events,
+    print(json.dumps({"engine": a.engine, "machines": machines, "stores": len(v["buffers"]), "simulated_days": round(days, 2), "events": e.events,
                       "events_per_day": round(e.events / days), "event_kb_per_day": round(e.event_bytes / days / 1000),
                       "observe_kb": round(len(json.dumps(v)) / 1000, 1), "wall_s": round(wall, 1), "wall_s_per_day": round(wall / days, 2),
                       "running_at_dusk": running}, indent=1))

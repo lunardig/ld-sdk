@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shlex
 import subprocess
 import sys
 from fractions import Fraction
@@ -61,7 +62,8 @@ def loop_setup() -> list[tuple[str, dict]]:
 
 class Engine:
     def __init__(self, path: str):
-        self.p = subprocess.Popen([path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
+        # A path, or a command line such as "node tools/wasm-cli.mjs" for the browser build.
+        self.p = subprocess.Popen(shlex.split(path), stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
         self.n = 0
         self.seq = 0
         self.now = 0
