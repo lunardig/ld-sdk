@@ -45,7 +45,7 @@ def loop_genesis() -> list[dict]:
     kits = {"solar-kit": 1, "battery-kit": 1, "excavator-kit": 1, "hopper-kit": 1, "beneficiator-kit": 1, "ice-bin-kit": 1,
             "ilmenite-bin-kit": 1, "tailings-pile-kit": 1, "melter-kit": 1, "electrolyzer-kit": 1, "bulk-tank-kit": 3,
             "reactor-kit": 1, "iron-bin-kit": 1, "rutile-bin-kit": 1, "fabricator-kit": 1, "scrap-bin-kit": 1,
-            "fuel-cell-kit": 1, "fission-reactor-kit": 1, "fuel-cask-kit": 2}
+            "fuel-cell-kit": 1, "fission-reactor-kit": 1, "small-reactor-kit": 1, "fuel-cask-kit": 2}
     return [
         {"lot_id": "kits", "location": "inventory", "state": "AVAILABLE", "composition": {}, "products": {k: str(n) for k, n in kits.items()}},
         {"lot_id": "lander-water", "location": "water-store", "state": "AVAILABLE", "composition": {"h2o-l": "50000"}, "products": {}},
@@ -184,8 +184,8 @@ class Controller:
 
     def prepare_night(self) -> None:
         """Install the night supply a little before dusk."""
-        if self.night == "fission":
-            self.install("fission-reactor-kit", "fission-1")
+        if self.night in ("fission", "small-fission"):
+            self.install("fission-reactor-kit" if self.night == "fission" else "small-reactor-kit", "fission-1")
             self.install("fuel-cask-kit", "spent-cask")
             self.pipe("c-fuel", "fuel-cask.io", "fission-1.fuel")
             self.pipe("c-spent", "fission-1.spent", "spent-cask.io")
@@ -239,7 +239,7 @@ class Controller:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--engine", required=True, help="path to ld-engine-cli")
-    ap.add_argument("--night", choices=["fission", "fuel-cell"], default="fission")
+    ap.add_argument("--night", choices=["fission", "small-fission", "fuel-cell"], default="fission")
     ap.add_argument("--report", action="store_true", help="print events and bytes per simulated day")
     a = ap.parse_args()
     create = json.loads(ALPHA.read_text())

@@ -275,10 +275,14 @@ def build_alpha() -> None:
         # surplus goes to a dump load: waste heat (LD-PEC-006 §3.2.2).
         ("fission-reactor", ["fission"], R(1, 75_000_000), [mport("fuel", "IN"), mport("spent", "OUT"),
                                                              {"port": "power", "type": "ELECTRICAL", "direction": "OUT"}], ["fission"]),
+        # The small tier: 400 kWe (1.6 MWth), for a firm night load without a megawatt's
+        # dump (LD-PEC-006 Q-28, Q-24 review). Same fuel and conversion; 30 % floor, 120 kWe.
+        ("fission-reactor-small", ["fission"], R(1, 187_500_000), [mport("fuel", "IN"), mport("spent", "OUT"),
+                                                                    {"port": "power", "type": "ELECTRICAL", "direction": "OUT"}], ["fission"]),
     ]:
         write(cat / f"machines/{bid}.json", {
             "blueprint_id": bid, "capabilities": caps, "processes": procs, "rated_work": rated, "lanes": "1",
-            "min_stable_rate": R(1, 250_000_000) if bid == "fission-reactor" else R(1, 1_000_000_000),
+            "min_stable_rate": {"fission-reactor": R(1, 250_000_000), "fission-reactor-small": R(1, 625_000_000)}.get(bid, R(1, 1_000_000_000)),
             "idle_power": {"amount": R(0), "unit": "w"}, "ports": ports,
             "condition_table": [{"wear_at": "0", "capacity_factor": R(1)}, {"wear_at": "1000000", "capacity_factor": R(1, 2)}], "embodied": {},
             # 100 kWh, 400 kW in, 600 kW out: enough to carry the electrolyzer a few
@@ -304,7 +308,7 @@ def build_alpha() -> None:
                            ("fabricator-kit", "MACHINE", "fabricator"), ("battery-kit", "MACHINE", "battery"), ("iron-bin-kit", "BUFFER", "iron-bin"),
                            ("rutile-bin-kit", "BUFFER", "rutile-bin"), ("scrap-bin-kit", "BUFFER", "scrap-bin"),
                            ("tailings-pile-kit", "BUFFER", "tailings-pile"), ("fuel-cell-kit", "MACHINE", "fuel-cell"),
-                           ("fission-reactor-kit", "MACHINE", "fission-reactor"), ("bulk-tank-kit", "BUFFER", "bulk-tank"),
+                           ("fission-reactor-kit", "MACHINE", "fission-reactor"), ("small-reactor-kit", "MACHINE", "fission-reactor-small"), ("bulk-tank-kit", "BUFFER", "bulk-tank"),
                            ("fuel-cask-kit", "BUFFER", "fuel-cask")]:
         # A hopper embodies 1 800 mol of iron, about 100 kg (LD-PEC-005 §8.4).
         embodied = {m2c.IRON: str(m2c.HOPPER_IRON)} if pid == "hopper-kit" else {}

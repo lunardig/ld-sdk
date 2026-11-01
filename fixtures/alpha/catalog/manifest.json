@@ -140,6 +140,11 @@
     },
     {
       "kind": "machine",
+      "id": "fission-reactor-small",
+      "hash": "7ea243e4cdbcb383a85aef0ed4b1cfb5c4b61f4ecfb20157d12a60149ad456ad"
+    },
+    {
+      "kind": "machine",
       "id": "fuel-cell",
       "hash": "20bcc19bdc13268048b71cf2a8f95e84db5639d112577cd50a0403a771ed246c"
     },
@@ -292,6 +297,11 @@
       "kind": "product",
       "id": "scrap-bin-kit",
       "hash": "43aaa2bfc539a59658e227073b8c6caade73138165e05b9cabf742c789f26623"
+    },
+    {
+      "kind": "product",
+      "id": "small-reactor-kit",
+      "hash": "73cee3281252839ae4aaefdc36f72f956948005e87a9d4f75991b43ef0770b0c"
     },
     {
       "kind": "product",

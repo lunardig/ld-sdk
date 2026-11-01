@@ -1,0 +1,59 @@
+{
+  "blueprint_id": "fission-reactor-small",
+  "capabilities": [
+    "fission"
+  ],
+  "processes": [
+    "fission"
+  ],
+  "rated_work": {
+    "n": "1",
+    "d": "187500000"
+  },
+  "lanes": "1",
+  "min_stable_rate": {
+    "n": "1",
+    "d": "625000000"
+  },
+  "idle_power": {
+    "amount": {
+      "n": "0",
+      "d": "1"
+    },
+    "unit": "w"
+  },
+  "ports": [
+    {
+      "port": "fuel",
+      "type": "MATERIAL",
+      "direction": "IN"
+    },
+    {
+      "port": "spent",
+      "type": "MATERIAL",
+      "direction": "OUT"
+    },
+    {
+      "port": "power",
+      "type": "ELECTRICAL",
+      "direction": "OUT"
+    }
+  ],
+  "condition_table": [
+    {
+      "wear_at": "0",
+      "capacity_factor": {
+        "n": "1",
+        "d": "1"
+      }
+    },
+    {
+      "wear_at": "1000000",
+      "capacity_factor": {
+        "n": "1",
+        "d": "2"
+      }
+    }
+  ],
+  "embodied": {}
+}
