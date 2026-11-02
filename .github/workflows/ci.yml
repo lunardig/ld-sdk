@@ -13,6 +13,11 @@ env:
   CARGO_TERM_COLOR: always
   WASM_BINDGEN_VERSION: "0.2.100"
 
+# A newer push to the same ref supersedes a run still going: cancel it (Actions minutes).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   native:
     name: Rust, fixtures and TS client (native mock)
