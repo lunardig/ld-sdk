@@ -27,6 +27,9 @@ python examples/first_controller.py --engine engine/linux-x86_64/ld-engine-cli
 python tools/verify_release.py ld-sdk-<version>.tar.gz --sums SHA256SUMS   # the published file, and that it works on its own
 ```
 
+On macOS, clear the download's quarantine flag first (`xattr -dr com.apple.quarantine
+ld-sdk-<version>`): the engine binaries are not yet signed or notarized. See the guide, §2.
+
 `RELEASE.json` and `engine/ENGINE.json` say exactly which commits a release was built from.
 
 ## Making a release

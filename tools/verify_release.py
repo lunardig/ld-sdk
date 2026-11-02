@@ -77,6 +77,12 @@ def main() -> int:
     if not exe.exists():
         raise SystemExit(f"no engine for {a.platform} in the release: {exe}")
     exe.chmod(0o755)
+    if a.platform.startswith("macos"):
+        # Not signed or notarized yet: a quarantined download will not run (guide §2).
+        q = subprocess.run(["xattr", "-p", "com.apple.quarantine", str(a.archive)], capture_output=True)
+        if q.returncode == 0:
+            print("note: this archive is quarantined; unpacked by hand, run "
+                  "`xattr -dr com.apple.quarantine <folder>` before using the engine (guide §2)")
     for f in ("LICENSE.md", "NOTICE.md", "THIRD-PARTY-NOTICES.md", "ENGINE.json"):
         if not (top / "engine" / f).exists():
             raise SystemExit(f"FAILED: the release has no engine/{f}")
