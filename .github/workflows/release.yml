@@ -106,7 +106,7 @@ jobs:
   package:
     name: Package, verify and publish
     needs: [engine, wasm]
-    if: ${{ !cancelled() && needs.wasm.result == 'success' }}
+    if: ${{ !cancelled() && needs.wasm.result == 'success' && needs.engine.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
