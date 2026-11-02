@@ -5,9 +5,9 @@ engine was first made available under `FSL-1.1-ALv2` with the Additional Permiss
 (`NOTICE.md`), and so when it becomes available under the Apache License, Version 2.0.
 It is evidence of those dates and does not change them. Times are UTC.
 
-The license was adopted on Nov 1, 2026 (commit `01bb284`). The repositories were private
-until then and remain private as of this record, so the routes so far are ld-sdk releases
-and builds delivered by lunardig.com.
+The license was adopted on Nov 1, 2026 (commit `01bb284`). The engine repository is
+private, so the routes so far are ld-sdk releases and builds delivered by lunardig.com.
+ld-sdk, which ships the engine binaries, became public on Nov 2, 2026.
 
 | Engine commit | First made available | Route | Apache-2.0 from | Content hash |
 | --- | --- | --- | --- | --- |
