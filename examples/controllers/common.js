@@ -1,0 +1,52 @@
+// Shared by the sample controllers: connect to the host named by ?host= (default
+// https://lunardig.com), show status, and log every command any application issues.
+import { LdcpClient, windowPort } from "./ldcp.js";
+
+export const $ = (sel) => document.querySelector(sel);
+export const num = (r) => (r ? Number(r.n) / Number(r.d) : 0);
+export const hostOrigin = new URLSearchParams(location.search).get("host") ?? "https://lunardig.com";
+
+export function status(text, tone = "") {
+  const el = $("#status");
+  el.textContent = text;
+  el.dataset.tone = tone;
+}
+
+export function log(text) {
+  const li = document.createElement("li");
+  li.textContent = text;
+  $("#log").prepend(li);
+  while ($("#log").children.length > 200) $("#log").lastChild.remove();
+}
+
+/** "who did what": every COMMAND event names the application that issued it. */
+export function describeCommand(e) {
+  const by = e.issued_by ? `${e.issued_by.app_name ?? ""} ${e.issued_by.origin}`.trim() : "unattributed";
+  return `${e.command_id} ${e.status} by ${by}`;
+}
+
+export async function connect(app, scopes, handlers) {
+  if (!window.opener) {
+    status("Open this page from the Lunar Dig host's Controllers dialog.", "bad");
+    throw new Error("no host");
+  }
+  status(`Waiting for the player to allow ${location.origin}…`);
+  const host = await LdcpClient.connect({
+    app,
+    scopes,
+    port: windowPort(hostOrigin),
+    handlers: {
+      ended: (reason) => status(`Disconnected: ${reason}.`, "bad"),
+      ...handlers,
+    },
+  });
+  status(`Connected to claim ${host.claim} as session ${host.session} (${host.scopes.join(", ")}).`, "ok");
+  document.body.dataset.session = host.session;
+  return host;
+}
+
+export async function run(host, op, args) {
+  const out = await host.submit(op, args);
+  log(out.outcome === "applied" ? `${op} applied as ${out.command_id}` : `${op} rejected (${out.stage} ${out.code}): ${out.message ?? ""}`);
+  return out;
+}

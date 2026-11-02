@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sample schematic</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<h1>Schematic</h1>
+<p id="status">Starting…</p>
+<h2>Machines</h2>
+<table><thead><tr><th>Machine</th><th>Blueprint</th><th>Jobs</th><th>Rate</th></tr></thead><tbody id="machines"></tbody></table>
+<h2>Connections</h2>
+<table><thead><tr><th>Connection</th><th>From</th><th>To</th><th></th></tr></thead><tbody id="conns"></tbody></table>
+<h2>Commands</h2>
+<ol id="log"></ol>
+<script type="module">
+// read + build. Redraws on every batch of events; can disconnect a connection.
+import { $, connect, describeCommand, log, num, run } from "./common.js";
+let host;
+async function refresh() {
+  const { view } = await host.observe();
+  $("#machines").replaceChildren(...view.machines.map((m) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${m.machine_id}</td><td>${m.blueprint}</td><td>${m.assigned_job_ids.join(", ")}</td><td class="n">${(num(m.rate) * 1e6).toFixed(3)}</td>`;
+    return tr;
+  }));
+  const rows = view.connections.map((c) => {
+    const tr = document.createElement("tr");
+    tr.dataset.conn = c.connection_id;
+    tr.innerHTML = `<td>${c.connection_id}</td><td>${c.from_port}</td><td>${c.to_port}</td><td></td>`;
+    const b = document.createElement("button");
+    b.textContent = "Disconnect";
+    b.dataset.action = "disconnect";
+    b.onclick = () => run(host, "DISCONNECT", { connection_id: c.connection_id });
+    tr.lastChild.append(b);
+    return tr;
+  });
+  $("#conns").replaceChildren(...rows);
+}
+host = await connect({ name: "Sample schematic", version: "1" }, ["read", "build"], { reset: refresh, gap: refresh });
+await refresh();
+await host.subscribe({}, (events) => {
+  for (const e of events) if (e.kind === "COMMAND") log(describeCommand(e));
+  if (events.length) refresh();
+});
+window.ldcp = host;
+</script>
+</body>
+</html>

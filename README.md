@@ -171,3 +171,10 @@ installs it, then keeps the plant working through the lunar night on fission or 
 fuel cell. It exits 0 when both goals hold; ld-engine's CI runs it.
 
     python examples/loop_controller.py --engine ../ld-engine/target/release/ld-engine-cli --night fuel-cell --report
+
+`examples/controllers/` holds three browser controllers for a claim running in the game's
+host window, over ldcp-0 (LD-PEC-009; guide §8): a spreadsheet (`read`, `operate`), a
+schematic (`read`, `build`) and a scripted operator that pauses power-starved jobs at dusk
+(`read`, `operate`). ld-web's UI suite runs all three from three origins against one claim.
+
+    (cd ts && npm run build) && node examples/controllers/serve.mjs 5174

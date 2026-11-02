@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sample spreadsheet</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<h1>Spreadsheet</h1>
+<p id="status">Starting…</p>
+<h2>Jobs</h2>
+<table><thead><tr><th>Job</th><th>Machine</th><th>Status</th><th>Rate (work/s)</th><th>Done</th><th></th></tr></thead><tbody id="jobs"></tbody></table>
+<h2>Stock</h2>
+<table><thead><tr><th>Buffer</th><th>Species</th><th class="n">Amount</th></tr></thead><tbody id="stock"></tbody></table>
+<h2>Commands</h2>
+<ol id="log"></ol>
+<script type="module">
+// read + operate. Live inventories and job rates from a filtered subscription: it hears only
+// job and command events, and re-reads the view when one arrives.
+import { $, connect, describeCommand, log, num, run } from "./common.js";
+let host;
+async function refresh() {
+  const { view } = await host.observe();
+  $("#jobs").replaceChildren(...view.jobs.map((j) => {
+    const tr = document.createElement("tr");
+    tr.dataset.job = j.job_id;
+    tr.innerHTML = `<td>${j.job_id}</td><td>${j.machine_id}</td><td data-status>${j.status}</td><td class="n">${(num(j.rate) * 1e6).toFixed(3)}</td><td class="n">${j.completed_work}/${j.required_work}</td><td></td>`;
+    const b = document.createElement("button");
+    const paused = j.status === "PAUSED";
+    b.textContent = paused ? "Resume" : "Pause";
+    b.dataset.action = paused ? "resume" : "pause";
+    b.onclick = () => run(host, paused ? "RESUME" : "PAUSE", { job_id: j.job_id });
+    tr.lastChild.append(b);
+    return tr;
+  }));
+  $("#stock").replaceChildren(...view.buffers.flatMap((b) => Object.entries(b.contents).map(([sp, q]) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${b.buffer_id}</td><td>${sp}</td><td class="n">${q}</td>`;
+    return tr;
+  })));
+}
+host = await connect({ name: "Sample spreadsheet", version: "1" }, ["read", "operate"], { reset: refresh, gap: refresh });
+await refresh();
+await host.subscribe({ kinds: ["JOB_STATUS", "STAGE_COMPLETED", "COMMAND"] }, (events) => {
+  for (const e of events) if (e.kind === "COMMAND") log(describeCommand(e));
+  if (events.length) refresh();
+});
+window.ldcp = host;
+</script>
+</body>
+</html>

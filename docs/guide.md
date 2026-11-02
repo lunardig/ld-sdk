@@ -291,7 +291,29 @@ challenge (a story, goals and a deadline) for its Goal tab, and players load it 
 plant, writes it as a challenge, and with `--solve` proves it can be won.
 [`save-format.md`](save-format.md) is the reference for both formats.
 
-## 8. Alpha limits
+## 8. Controllers for a running claim (ldcp-0)
+
+The game's host window can run a claim while other applications watch and drive it from their own windows: a spreadsheet, a schematic, a scripted operator (LD-PEC-009). Each is an ordinary web page on its own site. The player opens it from the host's **Controllers** dialog, and approves what it may do the first time it connects.
+
+```js
+import { LdcpClient } from "@lunardig/ld-sdk";
+
+const host = await LdcpClient.connect({ app: { name: "My Sheet" }, scopes: ["read", "operate"] });
+const { view } = await host.observe();
+await host.subscribe({ kinds: ["JOB_STATUS", "COMMAND"] }, (events, cursor) => render(events));
+const outcome = await host.submit("PAUSE", { job_id: "job-electrolysis" });
+// outcome.outcome is "applied" (with seq and time_us) or "rejected" (stage host or engine)
+```
+
+- **Scopes.** `read` sees the claim; `operate` runs jobs (create, start, pause, resume, cancel, priority, operating policy, maintenance); `build` changes the plant (install, remove, connect, disconnect, transfer). The host enforces them.
+- **Attribution.** The host records every command with `issued_by: {origin, session, app_name}`, the origin as the browser reports it. Every subscriber sees every command as a `COMMAND` event carrying it, so controllers learn of each other's changes; the claim's history commits to it (LD-PEC-004 Amendment 5).
+- **The clock is the host's.** A controller can read it (`clock`, and `time_us` on every batch of events) but not change it. Commands take effect at the host's current time.
+- **Cursors.** Keep the `cursor` of the last batch handled and subscribe from it after reconnecting. If the host no longer has those events you hear `gap`; if it loaded or restored a claim you hear `reset`. Either way, observe afresh.
+- **Conflicts.** Last write wins, and everyone sees both commands.
+
+Three working samples are in `examples/controllers/` (spreadsheet, schematic, operator). Serve them with `node examples/controllers/serve.mjs` after building `ts/`, and open `http://localhost:5174/spreadsheet.html?host=<host origin>` from the host's Controllers dialog. The host accepts `https` pages, and `http` only on localhost.
+
+## 9. Alpha limits
 
 - Commands apply at the current time only; there are no future-dated commands yet.
 - There is one claim per engine and no multiplayer protocol yet. A player's evidence is

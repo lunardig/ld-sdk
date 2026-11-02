@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sample operator</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<h1>Operator</h1>
+<p id="status">Starting…</p>
+<p>Rule: when a job stalls for want of power (at dusk, say), pause it, lowest priority first, so
+it lets go of what it holds; when supply returns, resume what this operator paused. Every step
+of the claim is checked.</p>
+<p>Supply <strong id="supply">–</strong> W · demand <strong id="demand">–</strong> W · <span id="state">idle</span></p>
+<h2>Commands</h2>
+<ol id="log"></ol>
+<script type="module">
+// read + operate. A scripted operator reacting to a power shortfall.
+import { $, connect, describeCommand, log, num, run } from "./common.js";
+let host;
+const paused = []; // jobs this operator paused, most recent last
+let busy = false;
+async function check() {
+  if (busy) return;
+  busy = true;
+  try {
+    const { view } = await host.observe();
+    const supply = num(view.energy.supply) * 1e6, demand = num(view.energy.demand) * 1e6;
+    $("#supply").textContent = supply.toFixed(0);
+    $("#demand").textContent = demand.toFixed(0);
+    const short = view.jobs.filter((j) => j.status === "STARVED" && j.reason?.code === "STARVED_POWER");
+    if (short.length) {
+      const j = short.sort((a, b) => a.priority - b.priority)[0];
+      $("#state").textContent = `shortfall: pausing ${j.job_id}`;
+      const out = await run(host, "PAUSE", { job_id: j.job_id });
+      if (out.outcome === "applied") paused.push(j.job_id);
+    } else if (paused.length && supply > 0 && supply >= demand) {
+      const id = paused.pop();
+      $("#state").textContent = `power back: resuming ${id}`;
+      await run(host, "RESUME", { job_id: id });
+    } else $("#state").textContent = paused.length ? `holding ${paused.join(", ")}` : "all well";
+  } finally {
+    busy = false;
+  }
+}
+host = await connect({ name: "Sample operator", version: "1" }, ["read", "operate"], { reset: check, gap: check });
+await host.subscribe({}, (events) => {
+  for (const e of events) if (e.kind === "COMMAND") log(describeCommand(e));
+  check();
+});
+await check();
+window.ldcp = host;
+</script>
+</body>
+</html>

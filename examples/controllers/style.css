@@ -1,0 +1,12 @@
+:root { color-scheme: light dark; --bg: #f6f5f1; --fg: #1d1d1b; --line: #d6d3c9; --ok: #2f7d4a; --bad: #b3261e; }
+@media (prefers-color-scheme: dark) { :root { --bg: #17171a; --fg: #e9e7e1; --line: #3a3a40; --ok: #6fc28b; --bad: #f2867e; } }
+body { margin: 0; padding: 16px; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, sans-serif; }
+h1 { font-size: 1.2rem; margin: 0 0 8px; }
+#status { margin: 0 0 12px; }
+#status[data-tone="ok"] { color: var(--ok); }
+#status[data-tone="bad"] { color: var(--bad); }
+table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+th, td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--line); }
+td.n { text-align: right; font-variant-numeric: tabular-nums; }
+#log { font: 12px/1.4 ui-monospace, monospace; padding-left: 18px; max-height: 240px; overflow: auto; }
+button { font: inherit; }
