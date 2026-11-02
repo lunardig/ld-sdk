@@ -18,7 +18,7 @@ Sunlight (`irradiance`) is on from 0 to 1,275,721,438,500 µs (dusk, 14.77 days)
 | `beneficiator` | `beneficiator-kit` | 2 work/s | feed (in), ice (out), ilmenite (out), tailings (out), power (in, power) | `beneficiate` | minimum 20 % of rated |
 | `electrolyzer` | `electrolyzer-kit` | 1,000 work/s | water (in), h2 (out), o2 (out), power (in, power) | `electrolyze-water` | minimum 10 % of rated |
 | `electrolyzer-fragile` | `fragile-electrolyzer-kit` | 1,000 work/s | water (in), h2 (out), o2 (out), power (in, power) | `electrolyze-water` |  |
-| `excavator` | `excavator-kit` | 0.02 work/s | face (in), out (out), power (in, power) | `excavate` | minimum 30 % of rated |
+| `excavator` | `excavator-kit` | 0.02 work/s | face (in), out (out), power (in, power) | `excavate` | minimum 5 % of rated |
 | `fabricator` | `fabricator-kit` | 0.00166667 work/s | iron (in), scrap (out), power (in, power) | `fabricate-hopper` | minimum 60 % of rated |
 | `fission-reactor` | `fission-reactor-kit` | 0.0133333 work/s | fuel (in), spent (out), power (out, power) | `fission` | core `fission-reactor-core` on fuel, spent; minimum 30 % of rated |
 | `fission-reactor-small` | `small-reactor-kit` | 0.00533333 work/s | fuel (in), spent (out), power (out, power) | `fission` | core `fission-reactor-small-core` on fuel, spent; minimum 30 % of rated |
@@ -41,7 +41,7 @@ Sunlight (`irradiance`) is on from 0 to 1,275,721,438,500 µs (dusk, 14.77 days)
 | `melt-ice` | FLOW | mmol | ice: h2o-s | water: h2o-l | MUST_RUN |
 | `reduce-ilmenite` | BATCH | rxn-mmol | ilmenite: fetio3-s, h2: h2-g | iron: fe-s, rutile: tio2-s/fe-s, water: h2o-l, unreacted: fetio3-s | MUST_RUN |
 
-Restart thresholds: a starved job waits until its input holds this much: `beneficiate` feed 50 kg-reg; `electrolyze-water` water 3700000 mmol; `melt-ice` ice 1600000 mmol.
+Restart thresholds: a starved job waits until its input holds this much: `beneficiate` feed 50 kg-reg; `electrolyze-water` water 3700000 mmol; `excavate` out 3000 kg-reg; `melt-ice` ice 1600000 mmol.
 
 ## Stores
 

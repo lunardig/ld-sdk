@@ -12,16 +12,17 @@
   },
   "lanes": "1",
   "min_stable_rate": {
-    "n": "3",
-    "d": "500000000"
+    "n": "1",
+    "d": "1000000000"
   },
   "idle_power": {
     "amount": {
-      "n": "0",
+      "n": "20",
       "d": "1"
     },
     "unit": "w"
   },
+  "idle_heat_sink": "waste-heat",
   "ports": [
     {
       "port": "face",

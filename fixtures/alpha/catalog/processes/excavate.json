@@ -121,6 +121,11 @@
   "failure_disposition": {
     "excavate": "RETAIN"
   },
-  "restart_thresholds": {},
+  "restart_thresholds": {
+    "out": {
+      "restart_at": "3000",
+      "unit": "kg-reg"
+    }
+  },
   "constants": {}
 }

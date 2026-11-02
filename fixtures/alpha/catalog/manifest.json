@@ -136,7 +136,7 @@
     {
       "kind": "machine",
       "id": "excavator",
-      "hash": "941dd1307b662795df7fde9c15c83452428137c7d67c301dc106777d5ed5b3eb"
+      "hash": "90d98b81de4f031cd37428ffdc3c470325740fd64ad725b11ccd58fbc25b1df1"
     },
     {
       "kind": "machine",
@@ -186,7 +186,7 @@
     {
       "kind": "process",
       "id": "excavate",
-      "hash": "910834ff04327c62f0da926899f8673df01b95419fd65c1ff800bde232d3246c"
+      "hash": "380aeec33fde9bc1b4e6392a1ee6ca25b1c4f13ad24948ee31bc23a02a50613e"
     },
     {
       "kind": "process",

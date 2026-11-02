@@ -246,6 +246,13 @@ def build_alpha() -> None:
     # wear PEM stacks. Engineering estimates. Each stop and restart is also an event: a
     # 20 mol band cycled every 20 s and cost 10,000 events per simulated day.
     melt["restart_thresholds"] = {"ice": {"restart_at": "1600000", "unit": "mmol"}}
+    # The excavator works its hopper on a level switch (Nov 2 review, estimate): blocked when
+    # the hopper is full, it restarts when the hopper is down to 40 %, that is with 3,000 of
+    # its 5,000 kg free. The review's 80 % stop level needs a stop threshold the engine does
+    # not have yet; the excavator stops at full. Thresholds are absolute, so connected to a
+    # smaller buffer than the hopper it would never restart; the hopper is the only buffer
+    # that takes regolith.
+    excavate["restart_thresholds"] = {"out": {"restart_at": "3000", "unit": "kg-reg"}}
     electrolyze["restart_thresholds"] = {"water": {"restart_at": "3700000", "unit": "mmol"}}
     # The fuel cell sells 286 J of the 571.66 J a mmol of reaction releases; fission sells
     # 25 % of its fuel's energy (Stirling or Brayton conversion). Both follow load.
@@ -300,11 +307,18 @@ def build_alpha() -> None:
         write(cat / f"machines/{bid}.json", {
             "blueprint_id": bid, "capabilities": caps, "processes": procs, "rated_work": rated, "lanes": "1",
             # Turndown, the slowest a unit runs at its feed's rate (LD-PEC-004 A3-1; LD-PEC-006
-            # §2.5, Q-23 and Q-26 reviews, estimates): excavator 30 %, beneficiator 20 %, melter
-            # 20 % of rated. The reactors' 30 % is their converter floor.
+            # §2.5, Q-23 and Q-26 reviews, estimates): beneficiator 20 %, melter 20 % of rated,
+            # the melter's as an estimated minimum efficient continuous feed, not a physical
+            # limit. The excavator has none: it lowers its average output by digging fewer
+            # cycles, not by digging slower (LD-PEC-008 §2.2, Nov 2 review). The reactors' 30 %
+            # is their converter floor.
             "min_stable_rate": {"fission-reactor": R(1, 250_000_000), "fission-reactor-small": R(1, 625_000_000),
-                                "excavator": R(3, 500_000_000), "beneficiator": R(1, 2_500_000), "ice-melter": R(6, 5000)}.get(bid, R(1, 1_000_000_000)),
-            "idle_power": {"amount": R(0), "unit": "w"}, "ports": ports,
+                                "beneficiator": R(1, 2_500_000), "ice-melter": R(6, 5000)}.get(bid, R(1, 1_000_000_000)),
+            # A parked excavator stands by at 2 % of its rated 1 kW (Nov 2 review, illustrative):
+            # its 20 % fixed loss applies only while it digs.
+            "idle_power": {"amount": R(20) if bid == "excavator" else R(0), "unit": "w"},
+            **({"idle_heat_sink": "waste-heat"} if bid == "excavator" else {}),
+            "ports": ports,
             "condition_table": [{"wear_at": "0", "capacity_factor": R(1)}, {"wear_at": "1000000", "capacity_factor": R(1, 2)}], "embodied": {},
             # 100 kWh, 400 kW in, 600 kW out: enough to carry the electrolyzer a few
             # minutes past dusk. Placeholders (LD-PEC-005 Q-06).
