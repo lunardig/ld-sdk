@@ -121,12 +121,12 @@
     {
       "kind": "machine",
       "id": "beneficiator",
-      "hash": "2bd7700d9a6b162086a3083f04f739f73c0d38070a1804dd8538e62c289e1f22"
+      "hash": "5f0a0b1f58f3cb38d9fb6c461d0fa6fb31cce6141b40747c1dd7bdfd83607b45"
     },
     {
       "kind": "machine",
       "id": "electrolyzer",
-      "hash": "862be1f56a5de33d888e5b8ee2e179f68932b4c6b78656a0cbc9f2f88ea1f055"
+      "hash": "557bef65746f3ca702ad53c94df08dc1db4f8121879b5938708ddcc83d28ae80"
     },
     {
       "kind": "machine",
@@ -136,7 +136,7 @@
     {
       "kind": "machine",
       "id": "excavator",
-      "hash": "620ead5d14d1a2a0458e984664ea1108552e13a05e50207d4dc86af140684078"
+      "hash": "941dd1307b662795df7fde9c15c83452428137c7d67c301dc106777d5ed5b3eb"
     },
     {
       "kind": "machine",
@@ -161,7 +161,7 @@
     {
       "kind": "machine",
       "id": "ice-melter",
-      "hash": "05f7ec5de69fd75150726daf9b3fe15608263851e77903b7e92922b3c3bdae88"
+      "hash": "c47efd53486d79353fd21728b0887d8c0e0829cb71a79625fd8188ab99ff10a9"
     },
     {
       "kind": "machine",
@@ -176,17 +176,17 @@
     {
       "kind": "process",
       "id": "beneficiate",
-      "hash": "58a0a931bbaa247104e2d8828acaf7a16e019c279463d82dbea7cc1e7d1feb4b"
+      "hash": "32fc15a467247ccbfbeec2ffa65443a697bcddcf448a9a2231afcf23c5c59b52"
     },
     {
       "kind": "process",
       "id": "electrolyze-water",
-      "hash": "b398166f8d6b757f16add1e003c6f084cc9f2b0b344dc9a15eb5f384d4ac3f2b"
+      "hash": "6459c09d00b83878e9a59cfc397679a0159b92efcc1d0bd3a4685b83075e6eac"
     },
     {
       "kind": "process",
       "id": "excavate",
-      "hash": "d72d2e89bcd4e638b0ce7e6841960f4315014a36b9d6699918ed82e538e3f1c8"
+      "hash": "910834ff04327c62f0da926899f8673df01b95419fd65c1ff800bde232d3246c"
     },
     {
       "kind": "process",
@@ -211,7 +211,7 @@
     {
       "kind": "process",
       "id": "melt-ice",
-      "hash": "f6e408eab16b35cf79526c4a8b67148a7ee893c267f471897c498b854f767e97"
+      "hash": "06c0dcc41abaee7f90a4ba0eeab7c4596d943e988ea141cebf5852b4d2ed1c19"
     },
     {
       "kind": "process",

@@ -13,7 +13,7 @@
   "lanes": "1",
   "min_stable_rate": {
     "n": "1",
-    "d": "1000000000"
+    "d": "2500000"
   },
   "idle_power": {
     "amount": {

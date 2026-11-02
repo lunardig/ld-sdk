@@ -250,6 +250,23 @@ def build_alpha() -> None:
     # The fuel cell sells 286 J of the 571.66 J a mmol of reaction releases; fission sells
     # 25 % of its fuel's energy (Stirling or Brayton conversion). Both follow load.
     fuel_cell, fission = m3b.fuel_cell(286), m3b.fission(75_000_000)
+    # Part-load energy (LD-PEC-004 A3-4; LD-PEC-006 §2.5, Q-26 review, estimates). A fixed
+    # fraction f of rated power while running is the curve (0, f), (1, 1): excavator 20 %,
+    # electrostatic beneficiator 15 %, melter 10 %. The PEM electrolyzer follows its system
+    # energy against load, 62.0, 54.5, 53.0, 53.8 and 55.1 kWh/kg H2 at 10, 25, 50, 75 and
+    # 100 %: its per-work draw is set near the best point, 770 J per mmol of reaction
+    # (53.0 kWh/kg), and the curve's power is load x E(load) / 53.0 to three places, so
+    # rated draws 770 x 1.039 = 800 J as before. Three places keep the rationals small.
+    def part_load(proc, points):
+        op = next(o for o in proc["stages"][0]["ops"] if o["op"] == "ENERGY" and o["mode"] == "PER_WORK" and o["dir"] == "DRAW")
+        op["part_load"] = [{"load": R(*x), "power": R(*y)} for x, y in points]
+        return op
+
+    part_load(excavate, [((0, 1), (1, 5)), ((1, 1), (1, 1))])
+    part_load(beneficiate, [((0, 1), (3, 20)), ((1, 1), (1, 1))])
+    part_load(melt, [((0, 1), (1, 10)), ((1, 1), (1, 1))])
+    pem = part_load(electrolyze, [((1, 10), (117, 1000)), ((1, 4), (257, 1000)), ((1, 2), (1, 2)), ((3, 4), (761, 1000)), ((1, 1), (1039, 1000))])
+    pem["amount"] = R(770)
     for proc in (excavate, beneficiate, melt, reduce, fabricate, electrolyze, fuel_cell, fission):
         write(cat / f"processes/{proc['process_id']}.json", proc)
     power = {"port": "power", "type": "ELECTRICAL", "direction": "IN"}
@@ -282,7 +299,11 @@ def build_alpha() -> None:
     ]:
         write(cat / f"machines/{bid}.json", {
             "blueprint_id": bid, "capabilities": caps, "processes": procs, "rated_work": rated, "lanes": "1",
-            "min_stable_rate": {"fission-reactor": R(1, 250_000_000), "fission-reactor-small": R(1, 625_000_000)}.get(bid, R(1, 1_000_000_000)),
+            # Turndown, the slowest a unit runs at its feed's rate (LD-PEC-004 A3-1; LD-PEC-006
+            # §2.5, Q-23 and Q-26 reviews, estimates): excavator 30 %, beneficiator 20 %, melter
+            # 20 % of rated. The reactors' 30 % is their converter floor.
+            "min_stable_rate": {"fission-reactor": R(1, 250_000_000), "fission-reactor-small": R(1, 625_000_000),
+                                "excavator": R(3, 500_000_000), "beneficiator": R(1, 2_500_000), "ice-melter": R(6, 5000)}.get(bid, R(1, 1_000_000_000)),
             "idle_power": {"amount": R(0), "unit": "w"}, "ports": ports,
             "condition_table": [{"wear_at": "0", "capacity_factor": R(1)}, {"wear_at": "1000000", "capacity_factor": R(1, 2)}], "embodied": {},
             # 100 kWh, 400 kW in, 600 kW out: enough to carry the electrolyzer a few
@@ -294,6 +315,10 @@ def build_alpha() -> None:
             # LD-PEC-006 §3.7): fission draws fresh fuel from it and returns spent fuel to it.
             **({"core": {"buffer": f"{bid}-core", "connection": "core-link", "ports": ["fuel", "spent"]}}
                if bid.startswith("fission-reactor") else {})})
+    # The PEM electrolyzer turns down to 10 % (Accelera HyLYZER 500: 7-100 %; LD-PEC-006 §2.5).
+    pem_machine = ld.load_json(cat / "machines/electrolyzer.json")
+    pem_machine["min_stable_rate"] = R(1, 10_000)
+    write(cat / "machines/electrolyzer.json", pem_machine)
     # The link between a reactor and its core: internal, fast enough never to limit it.
     write(cat / "connections/core-link.json", {"template_id": "core-link", "kind": "FEED", "throughput": R(1000), "unit": "mmol", "delay_us": "0"})
     for tid, accepts, amount, unit in [("hopper", ["regolith"], "5000", "kg-reg"), ("ice-bin", ["h2o-s"], "2000000", "mmol"),

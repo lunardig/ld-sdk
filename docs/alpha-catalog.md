@@ -15,15 +15,15 @@ Sunlight (`irradiance`) is on from 0 to 1,275,721,438,500 µs (dusk, 14.77 days)
 | Blueprint | Kit | Rated work | Ports | Processes | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `battery` | `battery-kit` | 1 work/s | power (in, power) | — | stores 3.6e+08 j |
-| `beneficiator` | `beneficiator-kit` | 2 work/s | feed (in), ice (out), ilmenite (out), tailings (out), power (in, power) | `beneficiate` |  |
-| `electrolyzer` | `electrolyzer-kit` | 1,000 work/s | water (in), h2 (out), o2 (out), power (in, power) | `electrolyze-water` |  |
+| `beneficiator` | `beneficiator-kit` | 2 work/s | feed (in), ice (out), ilmenite (out), tailings (out), power (in, power) | `beneficiate` | minimum 20 % of rated |
+| `electrolyzer` | `electrolyzer-kit` | 1,000 work/s | water (in), h2 (out), o2 (out), power (in, power) | `electrolyze-water` | minimum 10 % of rated |
 | `electrolyzer-fragile` | `fragile-electrolyzer-kit` | 1,000 work/s | water (in), h2 (out), o2 (out), power (in, power) | `electrolyze-water` |  |
-| `excavator` | `excavator-kit` | 0.02 work/s | face (in), out (out), power (in, power) | `excavate` | minimum 5 % of rated |
+| `excavator` | `excavator-kit` | 0.02 work/s | face (in), out (out), power (in, power) | `excavate` | minimum 30 % of rated |
 | `fabricator` | `fabricator-kit` | 0.00166667 work/s | iron (in), scrap (out), power (in, power) | `fabricate-hopper` | minimum 60 % of rated |
 | `fission-reactor` | `fission-reactor-kit` | 0.0133333 work/s | fuel (in), spent (out), power (out, power) | `fission` | core `fission-reactor-core` on fuel, spent; minimum 30 % of rated |
 | `fission-reactor-small` | `small-reactor-kit` | 0.00533333 work/s | fuel (in), spent (out), power (out, power) | `fission` | core `fission-reactor-small-core` on fuel, spent; minimum 30 % of rated |
 | `fuel-cell` | `fuel-cell-kit` | 1,400 work/s | h2 (in), o2 (in), water (out), power (out, power) | `fuel-cell` |  |
-| `ice-melter` | `melter-kit` | 6,000 work/s | ice (in), water (out), power (in, power) | `melt-ice` |  |
+| `ice-melter` | `melter-kit` | 6,000 work/s | ice (in), water (out), power (in, power) | `melt-ice` | minimum 20 % of rated |
 | `reactor` | `reactor-kit` | 500 work/s | ilmenite (in), h2 (in), iron (out), rutile (out), water (out), unreacted (out), power (in, power) | `reduce-ilmenite` |  |
 | `solar-array` | `solar-kit` | 1 work/s | power (out, power) | `generate-solar` |  |
 

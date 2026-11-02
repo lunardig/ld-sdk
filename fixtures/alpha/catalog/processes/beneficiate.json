@@ -101,7 +101,29 @@
             "d": "1"
           },
           "unit": "j",
-          "heat_sink": "waste-heat"
+          "heat_sink": "waste-heat",
+          "part_load": [
+            {
+              "load": {
+                "n": "0",
+                "d": "1"
+              },
+              "power": {
+                "n": "3",
+                "d": "20"
+              }
+            },
+            {
+              "load": {
+                "n": "1",
+                "d": "1"
+              },
+              "power": {
+                "n": "1",
+                "d": "1"
+              }
+            }
+          ]
         }
       ]
     }

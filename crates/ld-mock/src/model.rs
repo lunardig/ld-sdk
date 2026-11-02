@@ -196,6 +196,8 @@ fn reason_marker(job_id: &str, reason: &Reason, info: &ProcInfo) -> (String, Str
         Reason::StarvedPower => ("starved-power", job_id.to_string()),
         Reason::Dwelling => ("dwelling", job_id.to_string()),
         Reason::Maintenance => ("maintenance", job_id.to_string()),
+        // The mock never runs a job at its feed's rate (LD-PEC-004 A3, after M1).
+        Reason::Fed { .. } | Reason::FeedUnsettled { .. } => ("fed", job_id.to_string()),
         Reason::StarvedRequire { predicate } => {
             let want = serde_json::to_value(predicate).unwrap();
             let i = info.require.iter().position(|p| serde_json::to_value(p).unwrap() == want).unwrap_or(0);
@@ -899,6 +901,7 @@ impl MockEngine {
                 held_lot_ids: vec![],
                 created_at_us: time(j.created_us),
                 last_advanced_us: time(j.last_us),
+                rate: None,
             }).collect(),
             in_transit: vec![],
             sinks: vec![SinkRecord { sink_id: id("waste-heat"), kind: SinkRecordKind::Heat, totals: SpeciesAmounts(BTreeMap::new()), energy: uint(self.heat_j) }],
