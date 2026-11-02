@@ -82,8 +82,12 @@ def main() -> int:
     # The engine's FSL clock starts on the date a version is made available: this release.
     released = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     info = json.loads(a.engine_info.read_text())
+    # SHA-256 of each engine binary: the engine's first-availability record (ld-engine
+    # AVAILABILITY.md) identifies versions by commit and content.
+    hashes = {str(f.relative_to(top / "engine")): hashlib.sha256(f.read_bytes()).hexdigest()
+              for f in sorted((top / "engine").rglob("*")) if f.is_file() and (f.name.startswith("ld-engine-cli") or f.suffix == ".wasm")}
     info |= {"platforms": platforms, "wasm": bool(a.wasm), "license": "FSL-1.1-ALv2 with the Additional Permission in NOTICE.md",
-             "made_available": released}
+             "made_available": released, "sha256": hashes}
     (top / "engine/ENGINE.json").write_text(json.dumps(info, indent=2) + "\n")
     shutil.copy2(a.engine_license, top / "engine/LICENSE.md")
     shutil.copy2(a.engine_notice, top / "engine/NOTICE.md")
