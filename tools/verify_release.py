@@ -2,15 +2,20 @@
 and runs everything a player would, using only what is inside. Exits non-zero on the
 first failure.
 
-    python tools/verify_release.py dist/ld-sdk-0.1.0-alpha.1.tar.gz [--platform linux-x86_64] [--wasm]
+    python tools/verify_release.py ld-sdk-0.1.0-alpha.3.tar.gz --sums SHA256SUMS [--platform linux-x86_64] [--wasm]
 
-Checks: the client's tests; the guide's walkthrough; the loop controller through a lunar
+Provenance first: with --sums (the release's SHA256SUMS asset) or --sha256, the archive's
+digest must match before anything runs. Without either, it says that it has checked
+behaviour only, not that this is the published file.
+
+Then behaviour: the client's tests; the guide's walkthrough; the loop controller through a lunar
 night; the conformance vectors and fixtures; with --wasm, the walkthrough and vectors on
 the browser build too, which must agree with the native engine.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import os
 import platform as plat
 import subprocess
@@ -42,7 +47,25 @@ def main() -> int:
     ap.add_argument("archive", type=Path)
     ap.add_argument("--platform", default=default_platform())
     ap.add_argument("--wasm", action="store_true", help="also check the WebAssembly engine (needs Node)")
+    ap.add_argument("--sha256", help="the archive's published SHA-256")
+    ap.add_argument("--sums", type=Path, help="the release's SHA256SUMS file")
     a = ap.parse_args()
+    digest = hashlib.sha256(a.archive.read_bytes()).hexdigest()
+    expected = a.sha256
+    if a.sums:
+        for line in a.sums.read_text().splitlines():
+            parts = line.split()
+            if len(parts) == 2 and parts[1].lstrip("*") == a.archive.name:
+                expected = parts[0]
+        if expected is None:
+            raise SystemExit(f"FAILED: {a.sums} lists no {a.archive.name}; check the file name (the published assets are .tar.gz and .zip)")
+    if expected:
+        if digest != expected.lower():
+            raise SystemExit(f"FAILED: SHA-256 of {a.archive.name} is {digest}, not the published {expected}")
+        print(f"provenance: {a.archive.name} matches the published SHA-256 {digest}")
+    else:
+        print(f"provenance NOT checked: {a.archive.name} has SHA-256 {digest}; pass --sums SHA256SUMS or --sha256 to compare it "
+              "with the published digest. What follows checks behaviour only.")
     work = Path(tempfile.mkdtemp(prefix="ld-sdk-verify-"))
     if a.archive.suffix == ".zip":
         zipfile.ZipFile(a.archive).extractall(work)

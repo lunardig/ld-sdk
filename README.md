@@ -24,7 +24,7 @@ and follow [`docs/guide.md`](docs/guide.md). In short:
 
 ```sh
 python examples/first_controller.py --engine engine/linux-x86_64/ld-engine-cli
-python tools/verify_release.py ld-sdk-<version>.tar.gz     # checks a release works on its own
+python tools/verify_release.py ld-sdk-<version>.tar.gz --sums SHA256SUMS   # the published file, and that it works on its own
 ```
 
 `RELEASE.json` and `engine/ENGINE.json` say exactly which commits a release was built from.

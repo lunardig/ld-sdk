@@ -82,7 +82,11 @@ class Engine:
         return self.request("snapshot")
 
     def restore(self, snapshot: dict, catalog: dict) -> None:
+        """Replaces the claim with a snapshot's, in this same engine process. The engine's
+        event log starts again from the restore, so `events()` starts again from its first
+        event: nothing accepted after the restore is missed."""
         self.request("restore", {"snapshot": snapshot, "catalog": catalog})
+        self.cursor = "0"
         self.now = int(snapshot["state"]["time_us"])
         self._seq = int(snapshot["state"].get("id_counters", {}).get("command-seq", "0"))
 

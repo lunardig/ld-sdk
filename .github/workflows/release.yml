@@ -161,9 +161,12 @@ jobs:
             echo "Engines: $(ls artifacts/engines | paste -sd, - | sed 's/,/, /g'), and WebAssembly."
             echo "Built from: ld-sdk ${GITHUB_SHA}, ld-engine $(python -c 'import json;print(json.load(open("artifacts/meta/ENGINE.json"))["commit"])'), ld-interfaces $(git -C vendor/ld-interfaces rev-parse HEAD)."
             echo
+            echo "Check the download first: \`sha256sum -c SHA256SUMS --ignore-missing\` beside it, or \`python tools/verify_release.py <archive> --sums SHA256SUMS\`, which checks the digest before it runs anything."
+            echo
             echo '```'
             cat dist-sha256.txt
             echo '```'
           } > notes.md
-          gh release create "v$v" dist/*.tar.gz dist/*.zip --title "ld-sdk $v" --notes-file notes.md --prerelease --target "$GITHUB_SHA" \
-            || gh release upload "v$v" dist/*.tar.gz dist/*.zip --clobber
+          cp dist-sha256.txt dist/SHA256SUMS
+          gh release create "v$v" dist/*.tar.gz dist/*.zip dist/SHA256SUMS --title "ld-sdk $v" --notes-file notes.md --prerelease --target "$GITHUB_SHA" \
+            || gh release upload "v$v" dist/*.tar.gz dist/*.zip dist/SHA256SUMS --clobber

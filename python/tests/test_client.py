@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from ld_client import DAY, MIN, Engine, Rejected, alpha, lunar_day  # noqa: E402
+from ld_client import DAY, MIN, Engine, Rejected, alpha, alpha_loop, loop_setup, lunar_day, recipe  # noqa: E402
 
 ENGINE = os.environ.get("LD_ENGINE", "ld-engine-cli")
 
@@ -70,6 +70,42 @@ class ClientTest(unittest.TestCase):
             other.submit("PAUSE", job_id="sun")  # numbering continues after restore
         finally:
             other.close()
+
+    def test_events_after_restore_in_the_same_engine_are_not_missed(self):
+        # SDK-001 (external acceptance, Nov 2): restore restarts the engine's event log,
+        # and the client's cursor must restart with it.
+        e = self.e
+        e.submit("INSTALL", lot_id="starter-kit", product="solar-kit", location="pad-a", as_id="sun")
+        list(e.events())
+        saved = e.snapshot()
+        e.submit("INSTALL", lot_id="starter-kit", product="excavator-kit", location="pad-a", as_id="temporary-digger")
+        list(e.events())
+        e.restore(saved, self.c["catalog"])
+        e.submit("INSTALL", lot_id="starter-kit", product="excavator-kit", location="pad-a", as_id="restored-digger")
+        received = list(e.events())
+        direct = e.request("events_since", {"cursor": "0", "limit": "100"})["events"]
+        self.assertTrue(direct)
+        self.assertEqual(received, direct)
+        self.assertEqual(list(e.events()), [])
+
+
+class RecipeTest(unittest.TestCase):
+    def test_reduction_and_hopper_recipes(self):
+        c = alpha()
+        red = recipe(c, "reduce-ilmenite", 400_000)
+        self.assertEqual(red.inputs, {"ilmenite": {"fetio3-s": 800_000}, "h2": {"h2-g": 400_000}})
+        self.assertEqual(red.outputs["iron"], {"fe-s": 340_000})
+        self.assertEqual(red.outputs["unreacted"], {"fetio3-s": 400_000})
+        fab = recipe(c, "fabricate-hopper", 1)
+        self.assertEqual(fab.inputs, {"iron": {"fe-s": 1_900_000}})
+        self.assertEqual(fab.products, {"hopper-kit": 1})
+
+    def test_the_loop_scenario_starts_as_documented(self):
+        c = alpha_loop()
+        kits = c["genesis"]["starting_lots"][0]["products"]
+        self.assertEqual(kits["fabricator-kit"], "1")
+        self.assertEqual(loop_setup()[0][1]["as_id"], "water-store")
+        self.assertTrue(any(l.get("core") for l in c["genesis"]["starting_lots"]))
 
 
 if __name__ == "__main__":

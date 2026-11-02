@@ -1,0 +1,92 @@
+{
+  "description": "The loop (LD-PEC-006 \u00a73.1): the alpha MVP's end-to-end scenario. Create with this genesis and create.json's catalog, submit setup at time 0, and play one lunar day, dawn to dawn.",
+  "genesis": {
+    "schema": "ld.genesis.v0",
+    "world_id": "alpha-world",
+    "claim_id": "claim-0001",
+    "catalog_hash": "0ac43c907399612dd17605e1a6484cd59fb519757287cc1343549561370de1a6",
+    "start_us": "0",
+    "deposits": [
+      {
+        "deposit_id": "icy-crater",
+        "remaining": {
+          "regolith-bank": "1000000000"
+        },
+        "extracted": {}
+      }
+    ],
+    "environment": [
+      "irradiance"
+    ],
+    "starting_lots": [
+      {
+        "lot_id": "kits",
+        "location": "inventory",
+        "state": "AVAILABLE",
+        "composition": {},
+        "products": {
+          "solar-kit": "1",
+          "battery-kit": "1",
+          "excavator-kit": "1",
+          "hopper-kit": "1",
+          "beneficiator-kit": "1",
+          "ice-bin-kit": "1",
+          "ilmenite-bin-kit": "1",
+          "tailings-pile-kit": "1",
+          "melter-kit": "1",
+          "electrolyzer-kit": "1",
+          "bulk-tank-kit": "3",
+          "reactor-kit": "1",
+          "iron-bin-kit": "1",
+          "rutile-bin-kit": "1",
+          "fabricator-kit": "1",
+          "scrap-bin-kit": "1",
+          "fuel-cell-kit": "1"
+        }
+      },
+      {
+        "lot_id": "lander-water",
+        "location": "water-store",
+        "state": "AVAILABLE",
+        "composition": {
+          "h2o-l": "50000"
+        },
+        "products": {}
+      },
+      {
+        "lot_id": "reactor-1mwe",
+        "location": "inventory",
+        "state": "AVAILABLE",
+        "composition": {},
+        "products": {
+          "fission-reactor-kit": "1"
+        },
+        "core": {
+          "fuel-fresh": "4200000"
+        }
+      },
+      {
+        "lot_id": "reactor-400kwe",
+        "location": "inventory",
+        "state": "AVAILABLE",
+        "composition": {},
+        "products": {
+          "small-reactor-kit": "1"
+        },
+        "core": {
+          "fuel-fresh": "1700000"
+        }
+      }
+    ]
+  },
+  "setup": [
+    {
+      "op": "INSTALL",
+      "lot_id": "kits",
+      "product": "bulk-tank-kit",
+      "location": "pad-a",
+      "as_id": "water-store"
+    }
+  ],
+  "goal": "Install a hopper fabricated from the claim's own iron, then keep a consumer (any job that is not generate-solar, fuel-cell or fission) RUNNING through the lunar night, observed in its last day strictly before dawn."
+}

@@ -7,10 +7,13 @@ it after fixtures/build.py so the reference cannot drift from the catalog.
 from __future__ import annotations
 
 import json
+import sys
 from fractions import Fraction
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "python"))
+from ld_client.recipe import recipe  # noqa: E402
 
 
 def q(x) -> Fraction:
@@ -18,6 +21,8 @@ def q(x) -> Fraction:
 
 
 def num(x: Fraction) -> str:
+    if Fraction(x).denominator == 1:
+        return f"{int(x):,}"
     return f"{float(x):,.6g}"
 
 
@@ -64,6 +69,33 @@ def main() -> None:
     if thr:
         out += ["", "Restart thresholds: a starved job waits until its input holds this much: "
                 + "; ".join(f"`{pid}` {port} {t['restart_at']} {t['unit']}" for pid, port, t in sorted(thr)) + "."]
+
+    def flows(d: dict) -> str:
+        return "; ".join(f"{port}: " + ", ".join(f"{num(v)} {sp}" for sp, v in sorted(m.items())) for port, m in sorted(d.items())) or "—"
+
+    out += ["", "## Recipes", "",
+            "Per unit of extent, from `ld_client.recipe(create, process, extent)`, which reads the process's operations "
+            "(REACT, PHASE, PARTITION, ASSEMBLE, LOSS) in exact rationals. Work divided by the machine's rated work is the "
+            "run time at full rate. Energy is the plain per-work draw, before part-load losses. A FLOW job delivers "
+            "fractional outputs as running floors, so whole quantities differ from these by less than one unit.", "",
+            "| Process | Draws | Delivers | Makes / loses | Work | Energy |", "| --- | --- | --- | --- | --- | --- |"]
+    for pid in sorted(procs):
+        r = recipe(c, pid, 1)
+        made = ", ".join([f"{num(n)} × {k}" for k, n in r.products.items()]
+                         + [f"{num(v)} {sp} to {sink}" for sink, m in r.losses.items() for sp, v in m.items()]) or "—"
+        energy = (f"{num(r.energy_drawn_j)} J drawn" if r.energy_drawn_j else "") + \
+                 (f"{num(r.energy_produced_j)} J produced" if r.energy_produced_j else "")
+        out.append(f"| `{pid}` | {flows(r.inputs)} | {flows(r.outputs)} | {made} | {num(r.work)} | {energy or '—'} |")
+    red, fab = recipe(c, "reduce-ilmenite", 400_000), recipe(c, "fabricate-hopper", 1)
+    out += ["", "**Sizing a batch, worked.** A reduction batch of extent 400,000 needs "
+            f"{num(red.inputs['ilmenite']['fetio3-s'])} mmol of ilmenite and {num(red.inputs['h2']['h2-g'])} mmol of hydrogen in its "
+            "input buffers when it starts: a batch captures all its inputs at once; until they are there it is accepted but waits STARVED. Half the ilmenite reacts; the other half comes back through `unreacted`. It delivers "
+            f"{num(red.outputs['iron']['fe-s'])} mmol of iron (17/20 of the reduced iron is magnetic), "
+            f"{num(red.outputs['water']['h2o-l'])} mmol of water, and rutile carrying the other "
+            f"{num(red.outputs['rutile']['fe-s'])} mmol of iron. It dwells {num(red.dwell_us / 1_000_000)} s after its work. "
+            f"A hopper kit takes {num(fab.inputs['iron']['fe-s'])} mmol of iron and returns {num(fab.outputs['scrap']['fe-s'])} as scrap, "
+            f"so {num(fab.inputs['iron']['fe-s'] / red.outputs['iron']['fe-s'])} such batches make one hopper. "
+            "A controller can pull the next batch once its buffers hold `recipe(...).inputs`."]
 
     out += ["", "## Stores", "", "| Template | Kit | Accepts | Capacity |", "| --- | --- | --- | --- |"]
     for b in sorted(cat["buffers"], key=lambda b: b["template_id"]):

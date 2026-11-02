@@ -40,3 +40,40 @@ def lunar_day(create: dict) -> tuple[int, int]:
     fn = next(f for f in create["catalog"]["environment"] if f["function_id"] == "irradiance")
     dark = next(s for s in fn["segments"] if q(s["value"]) == 0)
     return int(dark["start_us"]), int(fn["period_us"])
+
+
+# The loop scenario (LD-PEC-006 §3.1): the alpha MVP's end-to-end test, as a named start.
+LOOP_KITS = {"solar-kit": 1, "battery-kit": 1, "excavator-kit": 1, "hopper-kit": 1, "beneficiator-kit": 1, "ice-bin-kit": 1,
+             "ilmenite-bin-kit": 1, "tailings-pile-kit": 1, "melter-kit": 1, "electrolyzer-kit": 1, "bulk-tank-kit": 3,
+             "reactor-kit": 1, "iron-bin-kit": 1, "rutile-bin-kit": 1, "fabricator-kit": 1, "scrap-bin-kit": 1,
+             "fuel-cell-kit": 1}
+
+LOOP_GOAL = ("Install a hopper fabricated from the claim's own iron, then keep a consumer (any job that is not "
+             "generate-solar, fuel-cell or fission) RUNNING through the lunar night, observed in its last day "
+             "strictly before dawn.")
+
+
+def loop_lots() -> list[dict]:
+    """The loop's starting lots: one of every alpha kit the loop needs, 50 mol of water in a
+    bulk tank, and two reactor kits whose fuel is in their cores (ten years at rated power,
+    LD-PEC-006 §3.7). ld-web's "The loop" challenge starts the same way."""
+    reactors = [("reactor-1mwe", "fission-reactor-kit", "4200000"), ("reactor-400kwe", "small-reactor-kit", "1700000")]
+    return [
+        {"lot_id": "kits", "location": "inventory", "state": "AVAILABLE", "composition": {},
+         "products": {k: str(n) for k, n in LOOP_KITS.items()}},
+        {"lot_id": "lander-water", "location": "water-store", "state": "AVAILABLE", "composition": {"h2o-l": "50000"}, "products": {}},
+    ] + [{"lot_id": lid, "location": "inventory", "state": "AVAILABLE", "composition": {}, "products": {kit: "1"},
+          "core": {"fuel-fresh": fuel}} for lid, kit, fuel in reactors]
+
+
+def loop_setup() -> list[tuple[str, dict]]:
+    """Commands to submit at time 0, before playing: install the tank the water came in."""
+    return [("INSTALL", {"lot_id": "kits", "product": "bulk-tank-kit", "location": "pad-a", "as_id": "water-store"})]
+
+
+def alpha_loop(claim_id: str | None = None) -> dict:
+    """Create params for the loop scenario: the alpha catalog with `loop_lots()`. Submit
+    `loop_setup()` after create. The goal is `LOOP_GOAL`; the scenario runs one lunar
+    day, dawn to dawn (`lunar_day`)."""
+    return alpha(lots=loop_lots(), claim_id=claim_id)
+

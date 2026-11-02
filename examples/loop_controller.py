@@ -23,32 +23,12 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "python"))
-from ld_client import DAY, HOUR, MIN, Engine, View, alpha, lunar_day  # noqa: E402
+from ld_client import DAY, HOUR, MIN, Engine, View, alpha_loop, loop_setup, lunar_day  # noqa: E402
 
 HOPPER_IRON = 1_900_000  # mmol of iron one hopper takes: 1 800 embodied plus 100 scrap
 BATCH = 400_000  # rxn-mmol per reduction batch: 800 mol of ilmenite fed, half reacted
 HOPPERS_WANTED = 2  # hopper kits to fabricate: one to install and one spare
 GENERATORS = {"generate-solar", "fuel-cell", "fission"}
-
-
-def loop_genesis() -> list[dict]:
-    """The scenario's starting lots; ld-web's src/game/campaign.ts ("the-loop") has the same."""
-    kits = {"solar-kit": 1, "battery-kit": 1, "excavator-kit": 1, "hopper-kit": 1, "beneficiator-kit": 1, "ice-bin-kit": 1,
-            "ilmenite-bin-kit": 1, "tailings-pile-kit": 1, "melter-kit": 1, "electrolyzer-kit": 1, "bulk-tank-kit": 3,
-            "reactor-kit": 1, "iron-bin-kit": 1, "rutile-bin-kit": 1, "fabricator-kit": 1, "scrap-bin-kit": 1,
-            "fuel-cell-kit": 1}
-    # Each reactor ships with a full core: ten years at rated power (LD-PEC-006 §3.7).
-    reactors = [("reactor-1mwe", "fission-reactor-kit", "4200000"), ("reactor-400kwe", "small-reactor-kit", "1700000")]
-    return [
-        {"lot_id": "kits", "location": "inventory", "state": "AVAILABLE", "composition": {}, "products": {k: str(n) for k, n in kits.items()}},
-        {"lot_id": "lander-water", "location": "water-store", "state": "AVAILABLE", "composition": {"h2o-l": "50000"}, "products": {}},
-    ] + [{"lot_id": lid, "location": "inventory", "state": "AVAILABLE", "composition": {}, "products": {kit: "1"}, "core": {"fuel-fresh": fuel}}
-         for lid, kit, fuel in reactors]
-
-
-def loop_setup() -> list[tuple[str, dict]]:
-    """What the scenario installs before the player arrives: the tank the water came in."""
-    return [("INSTALL", {"lot_id": "kits", "product": "bulk-tank-kit", "location": "pad-a", "as_id": "water-store"})]
 
 
 class Controller:
@@ -171,7 +151,7 @@ def main() -> int:
     ap.add_argument("--night", choices=["fission", "small-fission", "fuel-cell"], default="fission")
     ap.add_argument("--report", action="store_true", help="print events and bytes per simulated day")
     a = ap.parse_args()
-    create = alpha(lots=loop_genesis())
+    create = alpha_loop()
     dusk, period = lunar_day(create)
     e = Engine(a.engine)
     e.create(**create)

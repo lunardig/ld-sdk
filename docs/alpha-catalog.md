@@ -14,7 +14,7 @@ Sunlight (`irradiance`) is on from 0 to 1,275,721,438,500 µs (dusk, 14.77 days)
 
 | Blueprint | Kit | Rated work | Ports | Processes | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `battery` | `battery-kit` | 1 work/s | power (in, power) | — | stores 3.6e+08 j |
+| `battery` | `battery-kit` | 1 work/s | power (in, power) | — | stores 360,000,000 j |
 | `beneficiator` | `beneficiator-kit` | 2 work/s | feed (in), ice (out), ilmenite (out), tailings (out), power (in, power) | `beneficiate` | minimum 20 % of rated |
 | `electrolyzer` | `electrolyzer-kit` | 1,000 work/s | water (in), h2 (out), o2 (out), power (in, power) | `electrolyze-water` | minimum 10 % of rated |
 | `electrolyzer-fragile` | `fragile-electrolyzer-kit` | 1,000 work/s | water (in), h2 (out), o2 (out), power (in, power) | `electrolyze-water` |  |
@@ -43,6 +43,24 @@ Sunlight (`irradiance`) is on from 0 to 1,275,721,438,500 µs (dusk, 14.77 days)
 
 Restart thresholds: a starved job waits until its input holds this much: `beneficiate` feed 50 kg-reg; `electrolyze-water` water 3700000 mmol; `excavate` out 3000 kg-reg; `melt-ice` ice 1600000 mmol.
 
+## Recipes
+
+Per unit of extent, from `ld_client.recipe(create, process, extent)`, which reads the process's operations (REACT, PHASE, PARTITION, ASSEMBLE, LOSS) in exact rationals. Work divided by the machine's rated work is the run time at full rate. Energy is the plain per-work draw, before part-load losses. A FLOW job delivers fractional outputs as running floors, so whole quantities differ from these by less than one unit.
+
+| Process | Draws | Delivers | Makes / loses | Work | Energy |
+| --- | --- | --- | --- | --- | --- |
+| `beneficiate` | feed: 1 regolith | ice: 1,803.75 h2o-s; ilmenite: 329.5 fetio3-s; tailings: 329.5 fetio3-s, 971.25 h2o-s, 14,148 sio2-s | — | 1 | 20,000 J drawn |
+| `electrolyze-water` | water: 2 h2o-l | h2: 2 h2-g; o2: 1 o2-g | — | 1 | 770 J drawn |
+| `excavate` | face: 100 regolith-bank | out: 99 regolith | 1 regolith to dust | 1 | 50,000 J drawn |
+| `fabricate-hopper` | iron: 1,900,000 fe-s | scrap: 100,000 fe-s | 1 × hopper-kit | 1 | 200,000,000 J drawn |
+| `fission` | fuel: 1 fuel-fresh | spent: 1 fuel-spent | — | 1 | 75,000,000 J produced |
+| `fuel-cell` | h2: 2 h2-g; o2: 1 o2-g | water: 2 h2o-l | — | 1 | 286 J produced |
+| `generate-solar` | — | — | — | 1 | 1,000,000 J produced |
+| `melt-ice` | ice: 1 h2o-s | water: 1 h2o-l | — | 1 | 8 J drawn |
+| `reduce-ilmenite` | h2: 1 h2-g; ilmenite: 2 fetio3-s | iron: 0.85 fe-s; rutile: 0.15 fe-s, 1 tio2-s; unreacted: 1 fetio3-s; water: 1 h2o-l | — | 1 | 500 J drawn |
+
+**Sizing a batch, worked.** A reduction batch of extent 400,000 needs 800,000 mmol of ilmenite and 400,000 mmol of hydrogen in its input buffers when it starts: a batch captures all its inputs at once; until they are there it is accepted but waits STARVED. Half the ilmenite reacts; the other half comes back through `unreacted`. It delivers 340,000 mmol of iron (17/20 of the reduced iron is magnetic), 400,000 mmol of water, and rutile carrying the other 60,000 mmol of iron. It dwells 600 s after its work. A hopper kit takes 1,900,000 mmol of iron and returns 100,000 as scrap, so 5.58824 such batches make one hopper. A controller can pull the next batch once its buffers hold `recipe(...).inputs`.
+
 ## Stores
 
 | Template | Kit | Accepts | Capacity |
@@ -65,7 +83,7 @@ Restart thresholds: a starved job waits until its input holds this much: `benefi
 | Template | Kind | Throughput | Delay |
 | --- | --- | --- | --- |
 | `conveyor` | CONVEYOR | 1,000 mmol/s | 2 s |
-| `core-link` | FEED | 1e+09 mmol/s | 0 s |
+| `core-link` | FEED | 1,000,000,000 mmol/s | 0 s |
 | `pipe` | FEED | 10,000 mmol/s | 0 s |
 
 ## Substances

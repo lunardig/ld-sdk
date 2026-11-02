@@ -29,6 +29,12 @@ and the TypeScript client.
 
 ## 2. Getting started
 
+**Check the download.** Each release publishes `SHA256SUMS` beside its archives. With both
+files in one folder, `sha256sum -c SHA256SUMS --ignore-missing` (on macOS
+`shasum -a 256 -c`) confirms you have the published file. `tools/verify_release.py` does the
+same with `--sums SHA256SUMS` before its functional checks; without it, it checks only that
+the release works, not that it is the published file, and says so.
+
 Check that the engine runs. The engine speaks I-1 over standard input and output: one JSON
 request per line in, one JSON response per line out.
 
@@ -49,6 +55,19 @@ Then run the walkthrough and the full example:
 python examples/first_controller.py --engine engine/linux-x86_64/ld-engine-cli
 python examples/loop_controller.py  --engine engine/linux-x86_64/ld-engine-cli --night fuel-cell
 ```
+
+**The loop scenario.** The alpha MVP's end-to-end test is a named start:
+`alpha_loop()` gives create params with one of every kit the loop needs, 50 mol of water and
+two reactor kits fuelled in their cores; submit `loop_setup()` at time 0, and the goal is
+`LOOP_GOAL` (a hopper made from the claim's own iron, then a consumer running through the
+night). The same is in `fixtures/alpha/loop.json` for other languages. `examples/loop_controller.py`
+is one way to play it; you need not read it to start.
+
+**Recipes.** `recipe(create, process, extent)` says what a run takes and makes, from the
+catalog's operations in exact rationals: inputs and outputs by port, products, work and
+energy. `docs/alpha-catalog.md` tabulates every process per unit and works through sizing a
+reduction batch and a hopper. A controller can pull a batch once its buffers hold
+`recipe(...).inputs`.
 
 To use the client from your own code, install it (`pip install ./python`) or put `python/`
 on `PYTHONPATH`:
@@ -143,7 +162,7 @@ Numbers are decimal strings; rationals are `{"n": "...", "d": "..."}`. The schem
 | `observe` | — | the ClaimView | `view()` |
 | `events_since` | `cursor`, `limit` | `{events, next_cursor}` | `events()` drains from the last cursor |
 | `snapshot` | — | the full state with its hashes | `snapshot()` |
-| `restore` | `snapshot`, `catalog` | empty | `restore(snapshot, catalog)` |
+| `restore` | `snapshot`, `catalog` | empty | `restore(snapshot, catalog)`: into a new engine or the same one. The event log restarts from the restore, and so does `events()` |
 | `state_hash` | — | `{hash}` | `state_hash()` |
 | `history_head` | — | `{hash}` | `history_head()` |
 

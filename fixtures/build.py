@@ -374,6 +374,17 @@ def build_alpha() -> None:
                            "products": {"solar-kit": "1", "excavator-kit": "1", "hopper-kit": "1"}}],
     }
     write(ALPHA / "create.json", {"genesis": genesis, "catalog": ld.bundle_for(cat)})
+    # The loop scenario as data (SDK-002): its genesis lots, setup commands and goal, the same
+    # as ld_client.alpha_loop(), loop_setup() and LOOP_GOAL. Use it with create.json's catalog.
+    sys.path.insert(0, str(ROOT / "python"))
+    from ld_client.catalog import LOOP_GOAL, loop_lots, loop_setup
+    loop_genesis = dict(genesis, starting_lots=loop_lots())
+    write(ALPHA / "loop.json", {
+        "description": "The loop (LD-PEC-006 §3.1): the alpha MVP's end-to-end scenario. Create with this genesis and "
+                       "create.json's catalog, submit setup at time 0, and play one lunar day, dawn to dawn.",
+        "genesis": loop_genesis,
+        "setup": [{"op": op, **args} for op, args in loop_setup()],
+        "goal": LOOP_GOAL})
     print(f"alpha: catalog {ld.catalog_hash(ld.load_json(cat / 'manifest.json'))[:12]}")
 
 
