@@ -13,7 +13,7 @@ need something that is not here, that is a defect in the SDK; please report it.
 | `ts/` | `@lunardig/ld-sdk`, the TypeScript client the web game uses: Web Worker, in-process WebAssembly and child-process transports |
 | `fixtures/alpha/` | The alpha catalog and genesis, ready to pass to the engine (`create.json`); `docs/alpha-catalog.md` describes it |
 | `vendor/ld-interfaces/` | The interface contract: JSON Schemas for the protocol (I-1), catalogs (I-2), state and history (I-3) and conformance vectors (I-4), generated Rust and TypeScript types, and the vectors themselves |
-| `examples/` | `first_controller.py` (this guide's walkthrough), `loop_controller.py` (plays the final campaign challenge end to end), `bench_50.py` (the 50-machine benchmark) |
+| `examples/` | `first_controller.py` (this guide's walkthrough), `loop_controller.py` (plays the final campaign challenge end to end), `bench_50.py` (the 50-machine benchmark), `make_scenario.py` (a challenge for the web game) |
 | `tools/` | `run_vectors.py` and `check_fixtures.py`: check any engine against the vectors and fixtures |
 | `crates/`, `fixtures/*` | A Rust engine trait and protocol host, and a mock engine that implements only the first milestone (M1). Use the real engine in `engine/` for everything in this guide |
 
@@ -240,7 +240,16 @@ python tools/check_fixtures.py engine/linux-x86_64/ld-engine-cli
 Both need `pip install -r vendor/ld-interfaces/requirements.txt`. They also take the
 browser build: `"node engine/wasm-cli.mjs"` works wherever an engine path does.
 
-## 7. Alpha limits
+## 7. Scenarios for the web game
+
+A claim you build with the engine can be loaded into the web game at lunardig.com:
+`save_file(e, create, challenge=...)` writes the game's save format, optionally with a
+challenge (a story, goals and a deadline) for its Goal tab, and players load it with
+**Saved games**, then **Import a file**. `examples/make_scenario.py` builds a jammed mining
+plant, writes it as a challenge, and with `--solve` proves it can be won.
+[`save-format.md`](save-format.md) is the reference for both formats.
+
+## 8. Alpha limits
 
 - Commands apply at the current time only; there are no future-dated commands yet.
 - There is one claim per engine and no multiplayer protocol yet. A player's evidence is

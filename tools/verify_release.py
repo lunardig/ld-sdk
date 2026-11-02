@@ -62,6 +62,7 @@ def main() -> int:
     print(f"verifying {top.name} with {a.platform} in {work}")
     run("client tests", [py, "-m", "unittest", "discover", "-s", "python/tests"], top, {"LD_ENGINE": engine})
     run("guide walkthrough", [py, "examples/first_controller.py", "--engine", engine], top)
+    run("scenario for the web game, solved", [py, "examples/make_scenario.py", "--engine", engine, "--out", str(work / "ice-jam.json"), "--solve"], top)
     run("loop controller, fuel-cell night", [py, "examples/loop_controller.py", "--engine", engine, "--night", "fuel-cell"], top)
     run("conformance vectors", [py, "tools/run_vectors.py", engine, "vendor/ld-interfaces/vectors"], top)
     run("fixtures", [py, "tools/check_fixtures.py", engine], top)
