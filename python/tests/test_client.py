@@ -88,6 +88,12 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(received, direct)
         self.assertEqual(list(e.events()), [])
 
+    def test_issued_by_is_recorded_on_the_command_event(self):
+        by = {"origin": "https://sheet.example", "session": "s-1"}
+        self.e.submit("INSTALL", issued_by=by, lot_id="starter-kit", product="solar-kit", location="pad-a", as_id="sun")
+        ev = [x for x in self.e.events() if x["kind"] == "COMMAND"]
+        self.assertEqual(ev[-1]["issued_by"], by)
+
 
 class RecipeTest(unittest.TestCase):
     def test_reduction_and_hopper_recipes(self):

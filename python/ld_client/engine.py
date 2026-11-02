@@ -91,11 +91,15 @@ class Engine:
         self._seq = int(snapshot["state"].get("id_counters", {}).get("command-seq", "0"))
 
     # ---------------------------------------------------------------- commands
-    def submit(self, op: str, check: bool = True, **args) -> dict:
-        """Submit a command effective now. Integer arguments become decimal strings."""
+    def submit(self, op: str, check: bool = True, issued_by: dict | None = None, **args) -> dict:
+        """Submit a command effective now. Integer arguments become decimal strings.
+        `issued_by` ({"origin", "session"?, "app_name"?}) records which application issued it,
+        in the claim's history (LD-PEC-004 A5); a claim host sets it for its controllers."""
         self._seq += 1
         cmd = {"command_id": f"cmd-{self._seq:05d}", "effective_us": str(self.now), "seq": str(self._seq), "op": op,
                "args": {k: str(v) if isinstance(v, int) and not isinstance(v, bool) else v for k, v in args.items()}}
+        if issued_by is not None:
+            cmd["issued_by"] = issued_by
         a = self.request("submit", {"command": cmd})
         if check and a.get("status") != "ACCEPTED":
             raise Rejected(op, args, a)

@@ -1113,7 +1113,7 @@ impl Engine for MockEngine {
             },
         };
         let status = admission.status;
-        self.emit(|seq, t| Event::Command { command_id, seq, status, time_us: t });
+        self.emit(|seq, t| Event::Command { command_id, issued_by: None, seq, status, time_us: t });
         admission
     }
 
