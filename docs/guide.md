@@ -44,8 +44,8 @@ engine/linux-x86_64/ld-engine-cli < fixtures/running-loop/requests.jsonl | head 
 
 On macOS use `engine/macos-arm64/`; on Windows, `engine\windows-x86_64\ld-engine-cli.exe`.
 
-**macOS and Windows will warn about the engine.** The engine binaries are not yet signed
-or notarized, so macOS refuses to run a downloaded one ("Apple could not verify
+**macOS and Windows may warn about the engine.** A release's notes say whether its macOS
+engine is signed and notarized; if it is, skip the macOS step below. Otherwise macOS refuses to run a downloaded one ("Apple could not verify
 ld-engine-cli…"), and Windows SmartScreen may warn. After checking the download against
 `SHA256SUMS`, clear macOS's quarantine flag on the unpacked folder:
 

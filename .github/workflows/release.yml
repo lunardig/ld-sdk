@@ -11,6 +11,15 @@ name: release
 #   LD_INTERFACES_TOKEN  Contents: read on lunardig/ld-interfaces (the CI one)
 #   LD_ENGINE_TOKEN      Contents: read on lunardig/ld-engine, ld-sdk and ld-interfaces
 #                        (ld-engine's own submodules are fetched with it)
+#
+# Optional, for a signed and notarized macOS engine (all five, or none: without them the
+# macOS engine ships unsigned and users clear its quarantine flag, docs/guide.md §2):
+#   APPLE_CERTIFICATE_P12       the "Developer ID Application" certificate with its private
+#                               key, exported as .p12, base64-encoded (base64 -i cert.p12)
+#   APPLE_CERTIFICATE_PASSWORD  the .p12's export password
+#   APPLE_API_KEY_P8            an App Store Connect API key (.p8), its text or base64
+#   APPLE_API_KEY_ID            that key's ID
+#   APPLE_API_ISSUER_ID         the issuer ID shown with App Store Connect API keys
 
 on:
   push:
@@ -43,6 +52,8 @@ jobs:
           - { os: macos-latest, platform: macos-arm64, exe: ld-engine-cli }
           - { os: windows-latest, platform: windows-x86_64, exe: ld-engine-cli.exe }
     runs-on: ${{ matrix.os }}
+    env:
+      APPLE_SIGNING: ${{ secrets.APPLE_CERTIFICATE_P12 != '' }}
     # Windows is best effort for the first release: the package job ships what built.
     continue-on-error: ${{ matrix.platform == 'windows-x86_64' }}
     steps:
@@ -67,6 +78,49 @@ jobs:
           cargo build --release --bin ld-engine-cli
           mkdir -p "$GITHUB_WORKSPACE/out/${{ matrix.platform }}"
           cp "target/release/${{ matrix.exe }}" "$GITHUB_WORKSPACE/out/${{ matrix.platform }}/"
+      - name: Sign and notarize the macOS engine (Developer ID, hardened runtime)
+        if: matrix.platform == 'macos-arm64' && env.APPLE_SIGNING == 'true'
+        shell: bash
+        env:
+          P12: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          P12_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          API_KEY: ${{ secrets.APPLE_API_KEY_P8 }}
+          API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          API_ISSUER: ${{ secrets.APPLE_API_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          for v in P12_PASSWORD API_KEY API_KEY_ID API_ISSUER; do
+            [ -n "${!v}" ] || { echo "::error::APPLE_CERTIFICATE_P12 is set but the other Apple secrets are not all set (see the header of this workflow)"; exit 1; }
+          done
+          kc="$RUNNER_TEMP/sign.keychain-db"; kp=$(openssl rand -hex 16)
+          trap 'security delete-keychain "$kc" 2>/dev/null || true; rm -f "$RUNNER_TEMP"/cert.p12 "$RUNNER_TEMP"/key.p8' EXIT
+          printf '%s' "$P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security create-keychain -p "$kp" "$kc"
+          security set-keychain-settings -lut 3600 "$kc"
+          security unlock-keychain -p "$kp" "$kc"
+          security import "$RUNNER_TEMP/cert.p12" -k "$kc" -P "$P12_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$kp" "$kc" > /dev/null
+          security list-keychains -d user -s "$kc" $(security list-keychains -d user | tr -d '"')
+          id=$(security find-identity -v -p codesigning "$kc" | awk -F'"' '/Developer ID Application/ {print $2; exit}')
+          [ -n "$id" ] || { echo "::error::APPLE_CERTIFICATE_P12 holds no Developer ID Application identity"; exit 1; }
+          bin="$GITHUB_WORKSPACE/out/macos-arm64/ld-engine-cli"
+          codesign --force --options runtime --timestamp --sign "$id" "$bin"
+          codesign --verify --strict --verbose=2 "$bin"
+          case "$API_KEY" in
+            -----BEGIN*) printf '%s\n' "$API_KEY" > "$RUNNER_TEMP/key.p8" ;;
+            *) printf '%s' "$API_KEY" | base64 --decode > "$RUNNER_TEMP/key.p8" ;;
+          esac
+          # A bare executable cannot carry a stapled ticket: Gatekeeper looks it up online.
+          ditto -c -k --keepParent "$bin" "$RUNNER_TEMP/notarize.zip"
+          xcrun notarytool submit "$RUNNER_TEMP/notarize.zip" --key "$RUNNER_TEMP/key.p8" --key-id "$API_KEY_ID" \
+            --issuer "$API_ISSUER" --wait --output-format json | tee "$RUNNER_TEMP/notary.json"
+          status=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["status"])' "$RUNNER_TEMP/notary.json")
+          if [ "$status" != "Accepted" ]; then
+            sub=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["id"])' "$RUNNER_TEMP/notary.json")
+            xcrun notarytool log "$sub" --key "$RUNNER_TEMP/key.p8" --key-id "$API_KEY_ID" --issuer "$API_ISSUER" || true
+            echo "::error::notarization $status"; exit 1
+          fi
+          echo "::notice::macOS engine signed by $id and notarized"
       - uses: actions/upload-artifact@v4
         with:
           name: engine-${{ matrix.platform }}
@@ -155,6 +209,7 @@ jobs:
       - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
+          APPLE_SIGNING: ${{ secrets.APPLE_CERTIFICATE_P12 != '' }}
         run: |
           v="${{ steps.v.outputs.version }}"
           {
@@ -163,6 +218,11 @@ jobs:
             echo "Licenses: the SDK is Apache-2.0; the engine binaries are FSL-1.1-ALv2 with the Additional Permission in engine/NOTICE.md, and become Apache-2.0 two years after today."
             echo
             echo "Engines: $(ls artifacts/engines | paste -sd, - | sed 's/,/, /g'), and WebAssembly."
+            if [ "$APPLE_SIGNING" = true ]; then
+              echo "The macOS engine is signed with ioMetics LC's Developer ID and notarized by Apple: no quarantine step is needed."
+            else
+              echo "The macOS engine is not signed: clear its quarantine flag after checking the download (docs/guide.md §2)."
+            fi"
             echo "Built from: ld-sdk ${GITHUB_SHA}, ld-engine $(python -c 'import json;print(json.load(open("artifacts/meta/ENGINE.json"))["commit"])'), ld-interfaces $(git -C vendor/ld-interfaces rev-parse HEAD)."
             echo
             echo "Check the download first: \`sha256sum -c SHA256SUMS --ignore-missing\` beside it, or \`python tools/verify_release.py <archive> --sums SHA256SUMS\`, which checks the digest before it runs anything."

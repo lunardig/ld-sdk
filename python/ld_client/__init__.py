@@ -12,4 +12,4 @@ from .savefile import (save_file, challenge, goal_stored, goal_stored_kg, goal_g
 
 __all__ = ["Engine", "EngineError", "Rejected", "View", "q", "alpha", "alpha_loop", "loop_lots", "loop_setup", "LOOP_GOAL", "load_create", "lunar_day", "Recipe", "recipe", "S", "MIN", "HOUR", "DAY",
            "save_file", "challenge", "goal_stored", "goal_stored_kg", "goal_gain", "goal_installed", "goal_running_between"]
-__version__ = "0.1.0a4"
+__version__ = "0.1.0a5"
