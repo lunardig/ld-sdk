@@ -222,7 +222,7 @@ jobs:
               echo "The macOS engine is signed with ioMetics LC's Developer ID and notarized by Apple: no quarantine step is needed."
             else
               echo "The macOS engine is not signed: clear its quarantine flag after checking the download (docs/guide.md §2)."
-            fi"
+            fi
             echo "Built from: ld-sdk ${GITHUB_SHA}, ld-engine $(python -c 'import json;print(json.load(open("artifacts/meta/ENGINE.json"))["commit"])'), ld-interfaces $(git -C vendor/ld-interfaces rev-parse HEAD)."
             echo
             echo "Check the download first: \`sha256sum -c SHA256SUMS --ignore-missing\` beside it, or \`python tools/verify_release.py <archive> --sums SHA256SUMS\`, which checks the digest before it runs anything."
