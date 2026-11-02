@@ -102,6 +102,14 @@ first) and either gives a job a constant rate or stops it with a **reason**:
 waiting for its input to refill to a level), `BLOCKED_OUTPUT` (an output buffer is full),
 `STARVED_POWER`, `STARVED_REQUIRE` (an environment condition, such as sunlight), `DWELLING`
 (a timed stage) or `FAILED`. Stopped jobs restart by themselves when their reason clears.
+A running job may also carry a reason: `FED` when it is held to the rate a buffer it alone
+draws from is being filled, rather than stopping and restarting (down to its machine's
+minimum stable rate), and `FEED_UNSETTLED` when that happens in a loop whose rates did
+not settle, so it runs just under its feed (LD-PEC-004 Amendment 3).
+
+**Part load.** Some machines draw more energy per unit of work at low load: a fixed share
+of rated power while running, or, for the PEM electrolyzer, an efficiency curve that is
+best near half load. `docs/alpha-catalog.md` lists each machine's minimum stable rate.
 
 **Power.** Generators produce onto the bus; consumers draw from it in priority order. Some
 generators follow the load (fuel cells, fission reactors) down to a minimum; surplus
