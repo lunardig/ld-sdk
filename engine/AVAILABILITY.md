@@ -18,6 +18,7 @@ ld-sdk, which ships the engine binaries, became public on Nov 2, 2026.
 | `535227e` | 2026-11-02 06:29 | ld-sdk 0.1.0-alpha.2 (also 0.1.0-alpha.3) | 2028-11-02 | see the release notes |
 | `5f53654` | 2026-11-02 15:28 | lunardig.com build (web `d80eaee`) | 2028-11-02 | not recorded |
 | `43b740a` | 2026-11-02 15:50 | lunardig.com build (web `ea33754`) | 2028-11-02 | not recorded |
+| `e7eca80` | 2026-11-02 17:44 | ld-sdk 0.1.0-alpha.4 | 2028-11-02 | in the release's `engine/ENGINE.json`: linux `a0d302c3…`, macos `49368213…`, windows `c93b5f6c…`, wasm `047f153b…` |
 
 **How the rows were established.** ld-sdk rows come from the GitHub releases (publication
 time and the engine commit in their notes). lunardig.com rows are the successful deploys
@@ -29,3 +30,6 @@ releases record the SHA-256 of each engine binary in `engine/ENGINE.json`; later
 carry those hashes.
 
 Builds delivered by lunardig.com before web `346f484` were not offered under this license.
+
+A release's own copy of this file lists the versions before it; the copy in the repository
+is complete.
