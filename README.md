@@ -6,16 +6,20 @@ Windows and WebAssembly), the interface contract (schemas, generated types, conf
 vectors), the alpha catalog, a Python client, the TypeScript client the web game uses,
 and a developer guide. Start with [`docs/guide.md`](docs/guide.md).
 
-Interfaces per LD-PEC-002; workstream W2 of the [Alpha MVP](https://github.com/lunardig/architecture).
-
 ## Licenses
 
 The SDK, the interfaces, the alpha catalog, the clients and the examples are Apache-2.0.
 The engine binaries in a release are under the Functional Source License 1.1 with the
 Apache 2.0 future license, plus an Additional Permission from ioMetics LC that allows
 playing, player tools (free or sold), verification, private worlds and clients of
-official worlds; see `engine/NOTICE.md` in a release. "Lunar Dig" is a trademark of
-ioMetics LC and is not licensed.
+official worlds; see `engine/NOTICE.md` in a release. When each engine version was first
+made available, and so when it becomes Apache-2.0, is recorded in
+[`engine/AVAILABILITY.md`](engine/AVAILABILITY.md). "Lunar Dig" is a trademark of ioMetics
+LC and is not licensed.
+
+Comments in the code cite internal design documents (LD-PEC-00n). Those are not published;
+the guide, the schemas and the conformance vectors are the public description of the
+interfaces.
 
 ## Using a release
 

@@ -16,9 +16,9 @@ agreement, a [Harmony Contributor Agreement](https://www.harmonyagreements.org/)
   because the engine is under the Functional Source License, whose versions become
   Apache-2.0 after two years, and because ioMetics LC offers commercial licenses.
 
-The agreements are in `legal/` of the architecture repository. To sign, send the
-completed agreement to the Software Licensing Administrator, ioMetics LC,
-licensing@iometics.com, before your first pull request is merged. You sign once; it
+To get the agreement and sign it, write to the Software Licensing Administrator,
+ioMetics LC, licensing@iometics.com, and return the completed agreement before your first
+pull request is merged. You sign once; it
 covers all Lunar Dig repositories.
 
 ## This repository's license

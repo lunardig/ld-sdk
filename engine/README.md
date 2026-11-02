@@ -11,11 +11,13 @@ In a release, this folder holds ld-engine, the Lunar Dig alpha engine, as binari
 | `LICENSE.md` | The engine's license: the Functional Source License 1.1 with the Apache 2.0 future license (FSL-1.1-ALv2) |
 | `NOTICE.md` | A plain summary, and ioMetics LC's Additional Permission: playing, player tools (free or sold), verification, private worlds and clients of official worlds are all allowed |
 | `THIRD-PARTY-NOTICES.md` | Components by others compiled into the binaries, with their licenses |
+| `AVAILABILITY.md` | When each engine version was first made available, and so when it becomes Apache-2.0 (also in a clone) |
 
 The engine's source is not part of the SDK. You may run, modify and redistribute these
-binaries for any purpose except a competing use, as `NOTICE.md` explains; each version
-also becomes Apache-2.0 two years after it was made available. Every build of every platform must give
+binaries for any purpose except a competing use, and for the uses `NOTICE.md` permits
+expressly, such as selling player tools and verification; each version also becomes
+Apache-2.0 two years after it was first made available (`AVAILABILITY.md`). Every build of every platform must give
 byte-identical results for identical inputs; the conformance vectors in
 `vendor/ld-interfaces/vectors` check that (`tools/run_vectors.py`).
 
-In a clone of the repository, this folder holds only `wasm-cli.mjs` and this file.
+In a clone of the repository, this folder holds only `wasm-cli.mjs`, `AVAILABILITY.md`, `ENGINE_REF` and this file.

@@ -4,5 +4,10 @@ Copyright 2026 ioMetics LC
 This product is the Lunar Dig SDK: the Engine trait, protocol host, mock engine and client bindings.
 It is licensed under the Apache License, Version 2.0 (see LICENSE).
 
+The engine binaries included in SDK releases (the engine/ folder of a release) are not
+covered by that license: they are licensed under FSL-1.1-ALv2 with an Additional
+Permission from ioMetics LC, in engine/LICENSE.md and engine/NOTICE.md of the release.
+engine/AVAILABILITY.md records when each engine version was first made available.
+
 "Lunar Dig" and the Lunar Dig name are not licensed under the Apache License;
 see section 6 of the License.
