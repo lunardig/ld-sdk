@@ -45,7 +45,9 @@ engine/linux-x86_64/ld-engine-cli < fixtures/running-loop/requests.jsonl | head 
 On macOS use `engine/macos-arm64/`; on Windows, `engine\windows-x86_64\ld-engine-cli.exe`.
 
 **macOS and Windows may warn about the engine.** A release's notes say whether its macOS
-engine is signed and notarized; if it is, skip the macOS step below. Otherwise macOS refuses to run a downloaded one ("Apple could not verify
+engine is signed and notarized; if it is, skip the macOS step below. A signed engine names its signer as
+"Developer ID Application: ioMetics LLC (6X2GGHJ464)": Apple lists ioMetics LC, the
+licensor, as ioMetics LLC, a form Texas also allows (`codesign -dv engine/macos-arm64/ld-engine-cli`). Otherwise macOS refuses to run a downloaded one ("Apple could not verify
 ld-engine-cli…"), and Windows SmartScreen may warn. After checking the download against
 `SHA256SUMS`, clear macOS's quarantine flag on the unpacked folder:
 

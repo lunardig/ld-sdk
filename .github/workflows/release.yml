@@ -219,7 +219,7 @@ jobs:
             echo
             echo "Engines: $(ls artifacts/engines | paste -sd, - | sed 's/,/, /g'), and WebAssembly."
             if [ "$APPLE_SIGNING" = true ]; then
-              echo "The macOS engine is signed with ioMetics LC's Developer ID and notarized by Apple: no quarantine step is needed."
+              echo "The macOS engine is signed with ioMetics LC's Developer ID (Apple lists it as ioMetics LLC, team 6X2GGHJ464) and notarized by Apple: no quarantine step is needed."
             else
               echo "The macOS engine is not signed: clear its quarantine flag after checking the download (docs/guide.md §2)."
             fi
