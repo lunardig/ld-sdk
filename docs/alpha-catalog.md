@@ -41,7 +41,7 @@ Sunlight (`irradiance`) is on from 0 to 1,275,721,438,500 µs (dusk, 14.77 days)
 | `melt-ice` | FLOW | mmol | ice: h2o-s | water: h2o-l | MUST_RUN |
 | `reduce-ilmenite` | BATCH | rxn-mmol | ilmenite: fetio3-s, h2: h2-g | iron: fe-s, rutile: tio2-s/fe-s, water: h2o-l, unreacted: fetio3-s | MUST_RUN |
 
-Restart thresholds: a starved job waits until its input holds this much: `beneficiate` feed 50 kg-reg; `electrolyze-water` water 3700000 mmol; `excavate` out 3000 kg-reg; `melt-ice` ice 1600000 mmol.
+Level switches (LD-PEC-004 A4): a stopped job restarts once the port's level reaches its restart level; a running one stops at its stop level. An input's level is the stock in its buffer, an output's the free space in its buffer. `beneficiate` feed (stock): restart at 50 kg-reg; `electrolyze-water` water (stock): restart at 3,700,000 mmol; `excavate` out (free space): restart at 60 % of the buffer, stop at 20 % of the buffer; `melt-ice` ice (stock): restart at 1,600,000 mmol.
 
 ## Recipes
 

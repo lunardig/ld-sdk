@@ -67,8 +67,21 @@ def main() -> None:
         out.append(f"| `{pid}` | {p['mode']} | {p['extent']['unit']} | {ins} | {outs} | {p.get('dispatch', 'MUST_RUN')} |")
     thr = [(pid, port, t) for pid, p in procs.items() for port, t in p["restart_thresholds"].items()]
     if thr:
-        out += ["", "Restart thresholds: a starved job waits until its input holds this much: "
-                + "; ".join(f"`{pid}` {port} {t['restart_at']} {t['unit']}" for pid, port, t in sorted(thr)) + "."]
+        def level(t: dict, key: str) -> str | None:
+            if f"{key}_fraction" in t:
+                return f"{num(q(t[key + '_fraction']) * 100)} % of the buffer"
+            if f"{key}_at" in t:
+                return f"{int(t[key + '_at']):,} {t['unit']}"
+            return None
+
+        def switch(pid: str, port: str, t: dict) -> str:
+            p = procs[pid]
+            what = "stock" if any(i["port"] == port for i in p["ports"]["in"]) else "free space"
+            s = f"`{pid}` {port} ({what}): restart at {level(t, 'restart')}"
+            return s + (f", stop at {level(t, 'stop')}" if level(t, "stop") else "")
+        out += ["", "Level switches (LD-PEC-004 A4): a stopped job restarts once the port's level reaches its restart level; a "
+                "running one stops at its stop level. An input's level is the stock in its buffer, an output's the free space in "
+                "its buffer. " + "; ".join(switch(pid, port, t) for pid, port, t in sorted(thr)) + "."]
 
     def flows(d: dict) -> str:
         return "; ".join(f"{port}: " + ", ".join(f"{num(v)} {sp}" for sp, v in sorted(m.items())) for port, m in sorted(d.items())) or "—"

@@ -123,8 +123,14 @@
   },
   "restart_thresholds": {
     "out": {
-      "restart_at": "3000",
-      "unit": "kg-reg"
+      "restart_fraction": {
+        "n": "3",
+        "d": "5"
+      },
+      "stop_fraction": {
+        "n": "1",
+        "d": "5"
+      }
     }
   },
   "constants": {}

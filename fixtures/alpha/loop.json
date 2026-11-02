@@ -4,7 +4,7 @@
     "schema": "ld.genesis.v0",
     "world_id": "alpha-world",
     "claim_id": "claim-0001",
-    "catalog_hash": "0ac43c907399612dd17605e1a6484cd59fb519757287cc1343549561370de1a6",
+    "catalog_hash": "c552c8b05f042aee155f1529329eebbe07e62d29261eb44d41affa55ac70577f",
     "start_us": "0",
     "deposits": [
       {

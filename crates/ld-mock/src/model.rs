@@ -198,6 +198,8 @@ fn reason_marker(job_id: &str, reason: &Reason, info: &ProcInfo) -> (String, Str
         Reason::Maintenance => ("maintenance", job_id.to_string()),
         // The mock never runs a job at its feed's rate (LD-PEC-004 A3, after M1).
         Reason::Fed { .. } | Reason::FeedUnsettled { .. } => ("fed", job_id.to_string()),
+        // Nor does it model level switches' stop levels (LD-PEC-004 A4).
+        Reason::StopLevel { port } => ("stop-level", port.to_string()),
         Reason::StarvedRequire { predicate } => {
             let want = serde_json::to_value(predicate).unwrap();
             let i = info.require.iter().position(|p| serde_json::to_value(p).unwrap() == want).unwrap_or(0);
@@ -411,7 +413,7 @@ impl MockEngine {
                             if let Some(th) = process.restart_thresholds.get(&id(&port)) {
                                 // Below one unit the job is simply starved; between one unit and the
                                 // threshold it waits for the threshold (LD-PEC-004 §5).
-                                if job.restart_wait.contains(&port) && avail >= (-coeff) as u128 && avail < to_u128(&th.restart_at) {
+                                if job.restart_wait.contains(&port) && avail >= (-coeff) as u128 && th.restart_at.as_ref().is_some_and(|r| avail < to_u128(r)) {
                                     limit(&mut extent, 0, (JobStatus::Starved, Reason::BelowRestartThreshold { port: id(&port) }));
                                 }
                             }

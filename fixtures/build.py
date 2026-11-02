@@ -246,13 +246,11 @@ def build_alpha() -> None:
     # wear PEM stacks. Engineering estimates. Each stop and restart is also an event: a
     # 20 mol band cycled every 20 s and cost 10,000 events per simulated day.
     melt["restart_thresholds"] = {"ice": {"restart_at": "1600000", "unit": "mmol"}}
-    # The excavator works its hopper on a level switch (Nov 2 review, estimate): blocked when
-    # the hopper is full, it restarts when the hopper is down to 40 %, that is with 3,000 of
-    # its 5,000 kg free. The review's 80 % stop level needs a stop threshold the engine does
-    # not have yet; the excavator stops at full. Thresholds are absolute, so connected to a
-    # smaller buffer than the hopper it would never restart; the hopper is the only buffer
-    # that takes regolith.
-    excavate["restart_thresholds"] = {"out": {"restart_at": "3000", "unit": "kg-reg"}}
+    # The excavator works its hopper on a level switch (Nov 2 review, estimates): it stops
+    # initiating dig cycles at 80 % full and restarts at 40 %. An output's level is its
+    # buffer's free space, so: stop when 20 % is free, restart when 60 % is. As fractions
+    # of the connected buffer (LD-PEC-004 A4-2) the band fits any hopper size.
+    excavate["restart_thresholds"] = {"out": {"restart_fraction": R(3, 5), "stop_fraction": R(1, 5)}}
     electrolyze["restart_thresholds"] = {"water": {"restart_at": "3700000", "unit": "mmol"}}
     # The fuel cell sells 286 J of the 571.66 J a mmol of reaction releases; fission sells
     # 25 % of its fuel's energy (Stirling or Brayton conversion). Both follow load.
