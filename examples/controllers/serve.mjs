@@ -13,7 +13,7 @@ const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/cs
 
 export function serveControllers(port = 0, host = "127.0.0.1") {
   const server = createServer(async (req, res) => {
-    const path = normalize(new URL(req.url, "http://x").pathname).replace(/^\/+/, "") || "spreadsheet.html";
+    const path = normalize(new URL(req.url, "http://x").pathname).replace(/^\/+/, "") || "index.html";
     const file = path === "ldcp.js" ? client : join(here, path);
     if (!file.startsWith(here) && file !== client) return res.writeHead(404).end();
     try {

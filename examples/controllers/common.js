@@ -27,7 +27,9 @@ export function describeCommand(e) {
 
 export async function connect(app, scopes, handlers) {
   if (!window.opener) {
-    status("Open this page from the Lunar Dig host's Controllers dialog.", "bad");
+    const el = $("#status");
+    el.dataset.tone = "bad";
+    el.innerHTML = `This is a controller for a Lunar Dig claim. It runs when the game opens it: <a href="${hostOrigin}/?demo=controllers">start the demo in the game</a> and open it from <strong>Controllers</strong>.`;
     throw new Error("no host");
   }
   status(`Waiting for the player to allow ${location.origin}…`);

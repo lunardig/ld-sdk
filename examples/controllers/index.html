@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sample controllers</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<h1>Sample controllers for Lunar Dig</h1>
+<p>Each page below is an ordinary web page that watches and runs a Lunar Dig claim from its own window,
+through the claim host protocol (ldcp-0). The game opens them; the player approves what each may do;
+every command they send is recorded in the claim's history under the page's address.</p>
+<ul>
+  <li><a href="spreadsheet.html">Spreadsheet</a>: live stock and job rates; pause and resume jobs (read, operate)</li>
+  <li><a href="schematic.html">Schematic</a>: machines and connections; disconnect a connection (read, build)</li>
+  <li><a href="operator.html">Operator</a>: a script that pauses jobs that stall for want of power, and resumes them when power returns (read, operate)</li>
+</ul>
+<p id="status"></p>
+<p>Source: <a href="https://github.com/lunardig/ld-sdk/tree/main/examples/controllers">lunardig/ld-sdk, examples/controllers</a>. Guide: <a href="https://github.com/lunardig/ld-sdk/blob/main/docs/guide.md">ld-sdk guide §8</a>.</p>
+<script type="module">
+const host = new URLSearchParams(location.search).get("host") ?? "https://lunardig.com";
+document.querySelector("#status").innerHTML = `To try them, <a href="${host}/?demo=controllers">open the demo in the game</a>: it starts a claim at lunar dusk and offers all three.`;
+</script>
+</body>
+</html>
