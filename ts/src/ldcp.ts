@@ -25,6 +25,15 @@ export interface LdcpClock {
   /** Claim microseconds per real second while running. */
   us_per_s: string;
   running: boolean;
+  /** True while a controller is setting the pace (`hurry`), with the player's leave. */
+  hurried?: boolean;
+}
+
+/** A scenario the host can start from the beginning (`openScenario`). */
+export interface LdcpScenario {
+  kind: "campaign" | "scenario";
+  id: string;
+  title: string;
 }
 
 export interface LdcpOutcome {
@@ -188,6 +197,39 @@ export class LdcpClient {
   async subscribe(filter: LdcpFilter = {}, onEvents?: LdcpHandlers["events"]): Promise<{ cursor: string; gap: boolean }> {
     if (onEvents) this.handlers.events = onEvents;
     return this.#call("subscribe", filter);
+  }
+
+  /** Scenarios the host can start for this controller. */
+  scenarios(): Promise<LdcpScenario[]> {
+    return this.#call("scenarios");
+  }
+
+  /**
+   * Ask the host to start a scenario from the beginning. The player confirms in the host;
+   * the result arrives once the new claim is running, after a `reset`. Rejects with
+   * `DECLINED` if the player says no. The claim open before closes.
+   */
+  openScenario(kind: LdcpScenario["kind"], id: string): Promise<{ claim: string; cursor: string; clock: LdcpClock }> {
+    return this.#call("open_scenario", { kind, id }).then((r) => {
+      this.cursor = r.cursor;
+      if (r.clock) this.clock = r.clock;
+      return r;
+    });
+  }
+
+  /** Show a line in the host window, labelled with this application's name ("" clears it). */
+  caption(text: string): Promise<void> {
+    return this.#call("caption", { text });
+  }
+
+  /**
+   * Ask the host to run the clock at `usPerS` (claim µs per real second, at most one day
+   * per second) while this controller waits for something; `false` hands the pace back.
+   * The host follows only if the player has allowed it (`followed`), and the player's own
+   * speed control always wins.
+   */
+  hurry(on: boolean, usPerS?: bigint | string): Promise<{ followed: boolean; us_per_s?: string }> {
+    return this.#call("hurry", on ? { on, us_per_s: usPerS === undefined ? undefined : String(usPerS) } : { on });
   }
 
   unsubscribe(): Promise<void> {

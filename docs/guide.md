@@ -310,6 +310,7 @@ const outcome = await host.submit("PAUSE", { job_id: "job-electrolysis" });
 - **The clock is the host's.** A controller can read it (`clock`, and `time_us` on every batch of events) but not change it. Commands take effect at the host's current time.
 - **Cursors.** Keep the `cursor` of the last batch handled and subscribe from it after reconnecting. If the host no longer has those events you hear `gap`; if it loaded or restored a claim you hear `reset`. Either way, observe afresh.
 - **Conflicts.** Last write wins, and everyone sees both commands.
+- **Demos and tutorials.** `scenarios()` lists what the host can start, and `openScenario(kind, id)` asks it to start one from the beginning: the player confirms each time. `caption(text)` shows a line in the host window under this application's name. `hurry(true, usPerS)` asks the host to run fast while the controller waits for something (dusk, a full tank); the host follows only if the player ticked **Let controllers set the pace**, and the player's own speed control always wins. lunardig/ld-simrun is a complete example.
 
 Three working samples are in `examples/controllers/` (spreadsheet, schematic, operator). Serve them with `node examples/controllers/serve.mjs` after building `ts/`, and open `http://localhost:5174/spreadsheet.html?host=<host origin>` from the host's Controllers dialog. The host accepts `https` pages, and `http` only on localhost.
 

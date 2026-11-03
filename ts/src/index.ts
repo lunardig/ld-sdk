@@ -27,6 +27,7 @@ export {
   type LdcpHandlers,
   type LdcpPort,
   type LdcpHistoryRecord,
+  type LdcpScenario,
   type ConnectOptions,
 } from "./ldcp.js";
 export type * from "@lunardig/ld-interfaces";
