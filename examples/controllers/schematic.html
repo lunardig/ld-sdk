@@ -12,19 +12,18 @@
 <ol id="log"></ol>
 <script type="module">
 // read + build. Redraws on every batch of events; can disconnect a connection.
-import { $, connect, describeCommand, log, num, run } from "./common.js";
+import { $, connect, describeCommand, log, num, row, run } from "./common.js";
 let host;
 async function refresh() {
   const { view } = await host.observe();
   $("#machines").replaceChildren(...view.machines.map((m) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${m.machine_id}</td><td>${m.blueprint}</td><td>${m.assigned_job_ids.join(", ")}</td><td class="n">${(num(m.rate) * 1e6).toFixed(3)}</td>`;
+    const tr = row([m.machine_id, m.blueprint, m.assigned_job_ids.join(", "), (num(m.rate) * 1e6).toFixed(3)]);
+    tr.lastChild.className = "n";
     return tr;
   }));
   const rows = view.connections.map((c) => {
-    const tr = document.createElement("tr");
+    const tr = row([c.connection_id, c.from_port, c.to_port], true);
     tr.dataset.conn = c.connection_id;
-    tr.innerHTML = `<td>${c.connection_id}</td><td>${c.from_port}</td><td>${c.to_port}</td><td></td>`;
     const b = document.createElement("button");
     b.textContent = "Disconnect";
     b.dataset.action = "disconnect";

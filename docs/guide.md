@@ -314,6 +314,8 @@ const outcome = await host.submit("PAUSE", { job_id: "job-electrolysis" });
 
 Three working samples are in `examples/controllers/` (spreadsheet, schematic, operator). Serve them with `node examples/controllers/serve.mjs` after building `ts/`, and open `http://localhost:5174/spreadsheet.html?host=<host origin>` from the host's Controllers dialog. The host accepts `https` pages, and `http` only on localhost.
 
+A controller page is opened by whoever holds a reference to it, and anyone can link to it, so treat its URL and everything the host sends as untrusted: pass `?host=` through `hostOriginFrom` (an `https` origin, or `http` on localhost, else the default), and put ids, names and figures from the view into the page as text, never as markup. The samples do both.
+
 ## 9. Alpha limits
 
 - Commands apply at the current time only; there are no future-dated commands yet.

@@ -13,14 +13,15 @@
 <script type="module">
 // read + operate. Live inventories and job rates from a filtered subscription: it hears only
 // job and command events, and re-reads the view when one arrives.
-import { $, connect, describeCommand, log, num, run } from "./common.js";
+import { $, connect, describeCommand, log, num, row, run } from "./common.js";
 let host;
 async function refresh() {
   const { view } = await host.observe();
   $("#jobs").replaceChildren(...view.jobs.map((j) => {
-    const tr = document.createElement("tr");
+    const tr = row([j.job_id, j.machine_id, j.status, (num(j.rate) * 1e6).toFixed(3), `${j.completed_work}/${j.required_work}`], true);
     tr.dataset.job = j.job_id;
-    tr.innerHTML = `<td>${j.job_id}</td><td>${j.machine_id}</td><td data-status>${j.status}</td><td class="n">${(num(j.rate) * 1e6).toFixed(3)}</td><td class="n">${j.completed_work}/${j.required_work}</td><td></td>`;
+    tr.children[2].dataset.status = "";
+    tr.children[3].className = tr.children[4].className = "n";
     const b = document.createElement("button");
     const paused = j.status === "PAUSED";
     b.textContent = paused ? "Resume" : "Pause";
@@ -30,8 +31,8 @@ async function refresh() {
     return tr;
   }));
   $("#stock").replaceChildren(...view.buffers.flatMap((b) => Object.entries(b.contents).map(([sp, q]) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${b.buffer_id}</td><td>${sp}</td><td class="n">${q}</td>`;
+    const tr = row([b.buffer_id, sp, q]);
+    tr.lastChild.className = "n";
     return tr;
   })));
 }

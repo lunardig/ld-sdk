@@ -80,6 +80,27 @@ export interface LdcpPort {
   listen(fn: (msg: Record<string, any>) => void): () => void;
 }
 
+/**
+ * The host origin a page was told to talk to (its `?host=` query, say), or `fallback` when
+ * the value is missing or is not an origin a host can have: `https:` anywhere, `http:` on
+ * localhost only, no path, credentials or anything else. Use it on anything taken from the
+ * URL or from another page, so a crafted value can neither pick a host that is not one nor
+ * reach the page as markup (SECURITY-REVIEW-ldcp F-01).
+ */
+export function hostOriginFrom(value: string | null | undefined, fallback = LUNARDIG_ORIGIN): string {
+  if (typeof value !== "string" || !value) return fallback;
+  let u: URL;
+  try {
+    u = new URL(value);
+  } catch {
+    return fallback;
+  }
+  const local = u.hostname === "localhost" || u.hostname === "127.0.0.1" || u.hostname === "[::1]";
+  if (u.protocol !== "https:" && !(u.protocol === "http:" && local)) return fallback;
+  if (u.username || u.password || (u.pathname !== "/" && u.pathname !== "") || u.search || u.hash) return fallback;
+  return u.origin;
+}
+
 /** The opener window, with every message checked to come from it and from `hostOrigin`. */
 export function windowPort(hostOrigin = LUNARDIG_ORIGIN, opener: Window | null = typeof window === "undefined" ? null : window.opener): LdcpPort {
   if (!opener) throw new LdcpError("NO_HOST", "this page was not opened by a Lunar Dig host: open it from the host's Controllers dialog");

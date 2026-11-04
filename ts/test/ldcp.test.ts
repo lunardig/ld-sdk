@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { LdcpClient, type LdcpPort } from "../src/index.js";
+import { LdcpClient, hostOriginFrom, type LdcpPort } from "../src/index.js";
 
 /** A scripted host on the other end of a port: answers each request with `reply`. */
 function fakeHost(reply: (m: Record<string, any>, send: (x: object) => void) => void) {
@@ -58,4 +58,29 @@ test("a refused connection rejects; messages for other sessions are ignored", as
   const c = await LdcpClient.connect({ app: { name: "t" }, port: other.port });
   const r = await Promise.race([c.catalog(), new Promise((res) => setTimeout(() => res("no answer"), 20))]);
   assert.equal(r, "no answer");
+});
+
+test("hostOriginFrom keeps only origins a host can have (SECURITY-REVIEW-ldcp F-01)", () => {
+  assert.equal(hostOriginFrom("https://lunardig.com"), "https://lunardig.com");
+  assert.equal(hostOriginFrom("https://lunardig.com/"), "https://lunardig.com");
+  assert.equal(hostOriginFrom("http://127.0.0.1:4173"), "http://127.0.0.1:4173");
+  assert.equal(hostOriginFrom("http://localhost:5173/"), "http://localhost:5173");
+  for (const bad of [
+    null,
+    undefined,
+    "",
+    "not a url",
+    "http://sheet.example",
+    "javascript:alert(1)",
+    '"><img src=x onerror=alert(1)>',
+    "https://lunardig.com/path",
+    "https://lunardig.com/?demo=1",
+    "https://user:pw@lunardig.com",
+    "https://lunardig.com#x",
+    "http://localhost.evil.example",
+    "data:text/html,hi",
+  ]) {
+    assert.equal(hostOriginFrom(bad), "https://lunardig.com", String(bad));
+    assert.equal(hostOriginFrom(bad, "http://127.0.0.1:1"), "http://127.0.0.1:1", String(bad));
+  }
 });

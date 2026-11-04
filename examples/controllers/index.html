@@ -14,8 +14,12 @@ every command they send is recorded in the claim's history under the page's addr
 <p id="status"></p>
 <p>Source: <a href="https://github.com/lunardig/ld-sdk/tree/main/examples/controllers">lunardig/ld-sdk, examples/controllers</a>. Guide: <a href="https://github.com/lunardig/ld-sdk/blob/main/docs/guide.md">ld-sdk guide §8</a>.</p>
 <script type="module">
-const host = new URLSearchParams(location.search).get("host") ?? "https://lunardig.com";
-document.querySelector("#status").innerHTML = `To try them, <a href="${host}/?demo=controllers">open the demo in the game</a>: it starts a claim at lunar dusk and offers all three.`;
+import { hostOriginFrom } from "./ldcp.js";
+const host = hostOriginFrom(new URLSearchParams(location.search).get("host"));
+const a = document.createElement("a");
+a.href = `${host}/?demo=controllers`;
+a.textContent = "open the demo in the game";
+document.querySelector("#status").replaceChildren("To try them, ", a, ": it starts a claim at lunar dusk and offers all three.");
 </script>
 </body>
 </html>

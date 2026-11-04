@@ -18,6 +18,7 @@ export {
   LdcpClient,
   LdcpError,
   windowPort,
+  hostOriginFrom,
   LDCP_PROTOCOL,
   LUNARDIG_ORIGIN,
   type LdcpScope,
