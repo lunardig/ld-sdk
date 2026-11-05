@@ -784,6 +784,10 @@ impl MockEngine {
                 Ok(())
             }
             Command::Checkpoint { .. } => Ok(()),
+            // Trade worlds (LD-PEC-004 A6) are the real engine's; the mock plays solo claims.
+            Command::MoveLot { .. } | Command::Export { .. } | Command::AcceptImport { .. } => {
+                Err(state_err("not-a-trade-world", "the mock engine plays solo claims only"))
+            }
         }
     }
 
@@ -850,6 +854,8 @@ impl MockEngine {
         counters.insert(id("lot"), uint(self.lot_counter));
         PhysicalState {
             schema: json!("ld.physical-state.v0"),
+            shipments: vec![],
+            trade: None,
             claim_id: id(&self.claim_id),
             time_us: time(self.time),
             catalog_hash: self.cat.hash.clone(),
@@ -1155,6 +1161,8 @@ impl Engine for MockEngine {
         ClaimView {
             deposits: vec![],
             sinks: vec![],
+            shipments: vec![],
+            trade: None,
             time_us: time(self.time),
             state_hash: self.state_hash(),
             environment: self.env_last.iter().map(|(k, v)| (id(k), v.to_rational())).collect(),
