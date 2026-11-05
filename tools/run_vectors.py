@@ -13,7 +13,8 @@ reference evaluator) through each vector:
 
 It records admissions, the drained event log, the state hash and history head after
 every step, and the final PhysicalState. Without --write it compares them byte for
-byte with expected/ (ADR-16: no tolerance). With --write it (re)writes expected/.
+byte with expected/ (ADR-16: no tolerance), except a rejection's message, whose wording
+no specification fixes: admissions match on command, status and code. With --write it (re)writes expected/.
 """
 from __future__ import annotations
 
@@ -113,6 +114,22 @@ def files(result: dict) -> dict[str, str]:
     }
 
 
+def without_messages(text: str) -> list:
+    """Admissions with each rejection's message removed. The status and code are
+    normative; no specification fixes a message's wording, and the history commits to
+    neither (LD-PEC-004 §8, F-42)."""
+    rows = [json.loads(line) for line in text.splitlines() if line.strip()]
+    for r in rows:
+        (r.get("detail") or {}).pop("message", None)
+    return rows
+
+
+def same(name: str, expected: str, got: str) -> bool:
+    if name == "admissions.jsonl":
+        return without_messages(expected) == without_messages(got)
+    return expected == got
+
+
 def main() -> int:
     a = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     a.add_argument("engine")
@@ -138,8 +155,10 @@ def main() -> int:
                 (exp / name).write_text(text)
             print(f"wrote {manifest['id']} ({vdir.name})")
             continue
-        bad = [name for name, text in out.items() if not (exp / name).exists() or (exp / name).read_text() != text]
-        print(("ok   " if not bad else "FAIL ") + f"{manifest['id']} ({manifest['status']})" + (f": {', '.join(bad)} differ" if bad else ""))
+        bad = [name for name, text in out.items() if not (exp / name).exists() or not same(name, (exp / name).read_text(), text)]
+        worded = "admissions.jsonl" not in bad and (exp / "admissions.jsonl").read_text() != out["admissions.jsonl"]
+        print(("ok   " if not bad else "FAIL ") + f"{manifest['id']} ({manifest['status']})" + (f": {', '.join(bad)} differ" if bad else "")
+              + (" (rejection messages worded differently)" if worded and not bad else ""))
         failures += bool(bad)
     print(f"\n{failures} failure(s)")
     return 1 if failures else 0
