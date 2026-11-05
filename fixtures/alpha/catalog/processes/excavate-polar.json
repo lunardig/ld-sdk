@@ -1,0 +1,137 @@
+{
+  "process_id": "excavate-polar",
+  "pset_version": "0",
+  "mode": "FLOW",
+  "extent": {
+    "unit": "kg-reg",
+    "min": "0",
+    "max": "1000000000000"
+  },
+  "ports": {
+    "in": [
+      {
+        "port": "face",
+        "accepts": [
+          "regolith-bank-polar"
+        ]
+      }
+    ],
+    "out": [
+      {
+        "port": "out",
+        "accepts": [
+          "regolith-polar"
+        ]
+      }
+    ]
+  },
+  "stages": [
+    {
+      "stage_id": "excavate",
+      "ops": [
+        {
+          "op": "REACT",
+          "vector": {
+            "regolith-bank-polar": "-100",
+            "regolith-polar": "100"
+          },
+          "extent": {
+            "kind": "ref",
+            "name": "extent"
+          }
+        },
+        {
+          "op": "LOSS",
+          "species": "regolith-polar",
+          "quantity": {
+            "kind": "ref",
+            "name": "extent"
+          },
+          "sink": "dust",
+          "sink_kind": "TERMINAL"
+        },
+        {
+          "op": "WORK",
+          "a": {
+            "n": "1",
+            "d": "1"
+          },
+          "b": {
+            "n": "0",
+            "d": "1"
+          }
+        },
+        {
+          "op": "ENERGY",
+          "mode": "PER_WORK",
+          "dir": "DRAW",
+          "amount": {
+            "n": "50000",
+            "d": "1"
+          },
+          "unit": "j",
+          "heat_sink": "waste-heat",
+          "part_load": [
+            {
+              "load": {
+                "n": "0",
+                "d": "1"
+              },
+              "power": {
+                "n": "1",
+                "d": "5"
+              }
+            },
+            {
+              "load": {
+                "n": "1",
+                "d": "1"
+              },
+              "power": {
+                "n": "1",
+                "d": "1"
+              }
+            }
+          ]
+        },
+        {
+          "op": "WEAR",
+          "per": "WORK",
+          "amount": {
+            "n": "1",
+            "d": "1000"
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "port:face",
+      "to": "stage:excavate"
+    },
+    {
+      "from": "stage:excavate",
+      "to": "port:out",
+      "species": [
+        "regolith-polar"
+      ]
+    }
+  ],
+  "failure_disposition": {
+    "excavate": "RETAIN"
+  },
+  "restart_thresholds": {
+    "out": {
+      "restart_fraction": {
+        "n": "3",
+        "d": "5"
+      },
+      "stop_fraction": {
+        "n": "1",
+        "d": "5"
+      }
+    }
+  },
+  "constants": {}
+}

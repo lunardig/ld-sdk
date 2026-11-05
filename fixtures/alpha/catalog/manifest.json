@@ -21,7 +21,7 @@
     {
       "kind": "buffer",
       "id": "hopper",
-      "hash": "f8128295df4b650b475b00df10a446a0dcdb7ec1e11a541ceca49d1eb3609b0e"
+      "hash": "51af511aae99b228f408ed6a1c428af46c863e59d3231b77836ef5bac0d60b31"
     },
     {
       "kind": "buffer",
@@ -114,6 +114,11 @@
       "hash": "d2d190deb705cde7db51af55dcd5d1170910449ffadba15bffd59e691c70b496"
     },
     {
+      "kind": "environment",
+      "id": "irradiance-polar",
+      "hash": "e8b84dddae8413573601a147fcc21e4d11f1398601284bb2c238103c523a8edb"
+    },
+    {
       "kind": "machine",
       "id": "battery",
       "hash": "6defaaee9a4b095666f2dab91c47bd82a1df12f602a2061cd1337d8c063dfaec"
@@ -121,7 +126,7 @@
     {
       "kind": "machine",
       "id": "beneficiator",
-      "hash": "5f0a0b1f58f3cb38d9fb6c461d0fa6fb31cce6141b40747c1dd7bdfd83607b45"
+      "hash": "1031e012e16bb1af5d80b029c85dd32443aa4548ac5b4388bb1dbe9384da5d76"
     },
     {
       "kind": "machine",
@@ -136,7 +141,7 @@
     {
       "kind": "machine",
       "id": "excavator",
-      "hash": "90d98b81de4f031cd37428ffdc3c470325740fd64ad725b11ccd58fbc25b1df1"
+      "hash": "a56944b6688fa8dc36d784dd538b73ef73b0b2b4ce769c76c170d488427a4e75"
     },
     {
       "kind": "machine",
@@ -171,12 +176,22 @@
     {
       "kind": "machine",
       "id": "solar-array",
-      "hash": "a0b5c0407074ef76e02f86ad81a7f5076c4e55cd28765942d8e007234c83741e"
+      "hash": "c7c28696e290b67a13a58086a25b6eb86b65eae60a05f40f61b5be0ec5333897"
     },
     {
       "kind": "process",
       "id": "beneficiate",
       "hash": "32fc15a467247ccbfbeec2ffa65443a697bcddcf448a9a2231afcf23c5c59b52"
+    },
+    {
+      "kind": "process",
+      "id": "beneficiate-mare",
+      "hash": "e24e89b1f3cb74da10f0185f48c16ca0cb12aae6b83cb03e74ff4f0338e964dd"
+    },
+    {
+      "kind": "process",
+      "id": "beneficiate-polar",
+      "hash": "41bcb666f2fe268236bca8746e8e54571e28e0ed274abf0b3b2a44354855d1c6"
     },
     {
       "kind": "process",
@@ -187,6 +202,16 @@
       "kind": "process",
       "id": "excavate",
       "hash": "c36f809625d26cecca96aebb28a09818ee7c573d17b55e214ca2289044c026f3"
+    },
+    {
+      "kind": "process",
+      "id": "excavate-mare",
+      "hash": "fdd47775c45e6a0333657753c10b0497378857710f5ead2e20e859d530b1c734"
+    },
+    {
+      "kind": "process",
+      "id": "excavate-polar",
+      "hash": "0ad2ab2ddf7d96931e8b3605bfec606c5b861f837ffd241277eaa2139abc4cbf"
     },
     {
       "kind": "process",
@@ -207,6 +232,11 @@
       "kind": "process",
       "id": "generate-solar",
       "hash": "34509acaab798a9148a2cac794815268b10caaab0180333fc60fb0904b83a889"
+    },
+    {
+      "kind": "process",
+      "id": "generate-solar-polar",
+      "hash": "f90e600f5eafbaf9caf3bc781afa524947fd2b8d3f45fed8d01cf334db435023"
     },
     {
       "kind": "process",
@@ -377,6 +407,26 @@
       "kind": "substance",
       "id": "regolith-bank",
       "hash": "bdcd02aab7296b2db51887ba0d1b8bf3bd2c1a45fa904ef7afdff36b42d5c863"
+    },
+    {
+      "kind": "substance",
+      "id": "regolith-bank-mare",
+      "hash": "a8cc6023c4b135b7cc6fb7676b0bf68998bcf174e2e88bb08bb77d3cd55aa122"
+    },
+    {
+      "kind": "substance",
+      "id": "regolith-bank-polar",
+      "hash": "5b326b37c2a6855072da40f498ee564827a40eb2316340d0c2f645fedc05bbfa"
+    },
+    {
+      "kind": "substance",
+      "id": "regolith-mare",
+      "hash": "9ea5e63fa876116db4ac6093a597037a29c768de7067f1728176a223a9dbfa95"
+    },
+    {
+      "kind": "substance",
+      "id": "regolith-polar",
+      "hash": "89b5552ecfe2b2dc20da1968b6f315229c5009882696f9b3d25a686817dcbad0"
     },
     {
       "kind": "substance",

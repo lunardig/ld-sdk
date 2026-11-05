@@ -18,13 +18,54 @@ def load_create(path: str | Path) -> dict:
     return json.loads(Path(path).read_text())
 
 
-def alpha(lots: list[dict] | None = None, start_us: int | None = None, claim_id: str | None = None) -> dict:
-    """The alpha catalog with its genesis: the icy crater deposit and, unless `lots` replaces
-    them, a starter kit (solar array, excavator, hopper). Pass the result to Engine.create."""
+# The sites (LD-PEC-011): where a claim is, which fixes its deposit and its light. A site is
+# a choice made at genesis; the catalog holds every site, so all claims in a world can pin one
+# catalog hash (LD-PEC-010 Q-07). `processes` names what a controller runs there. Yields are
+# mmol per kg of regolith: ice from 5 wt%, ilmenite from 10 or 1 wt%, the rest silicate.
+SITES = {
+    "training": {
+        "name": "Proving Ground", "fictional": True,
+        "summary": "The alpha's mixed deposit, for learning the loop: ice and ilmenite together, which no real site "
+                   "has, under an equatorial day and night.",
+        "deposit": "icy-crater", "regolith": "regolith", "bank": "regolith-bank", "environment": "irradiance",
+        "processes": {"solar": "generate-solar", "excavate": "excavate", "beneficiate": "beneficiate"},
+        "yield": {"ice": 2775, "ilmenite": 659, "silicate": 14148},
+    },
+    "polar": {
+        "name": "Polar cold trap", "fictional": False,
+        "summary": "Ice-bearing highland regolith in permanent shadow, with arrays on a nearly always lit ridge: "
+                   "5 wt% ice, 1 wt% ilmenite, four dark days a lunar month.",
+        "deposit": "polar-cold-trap", "regolith": "regolith-polar", "bank": "regolith-bank-polar", "environment": "irradiance-polar",
+        "processes": {"solar": "generate-solar-polar", "excavate": "excavate-polar", "beneficiate": "beneficiate-polar"},
+        "yield": {"ice": 2775, "ilmenite": 66, "silicate": 15646},
+    },
+    "mare": {
+        "name": "High-Ti mare", "fictional": False,
+        "summary": "Dry equatorial mare regolith: 10 wt% ilmenite, no ice, and a 354-hour night.",
+        "deposit": "mare-basin", "regolith": "regolith-mare", "bank": "regolith-bank-mare", "environment": "irradiance",
+        "processes": {"solar": "generate-solar", "excavate": "excavate-mare", "beneficiate": "beneficiate-mare"},
+        "yield": {"ice": 0, "ilmenite": 659, "silicate": 14981},
+    },
+}
+DEPOSIT_KG = "1000000000"
+
+
+def site_genesis(site: str) -> dict:
+    """The genesis fields a site sets: its deposit and its environment."""
+    s = SITES[site]
+    return {"deposits": [{"deposit_id": s["deposit"], "remaining": {s["bank"]: DEPOSIT_KG}, "extracted": {}}],
+            "environment": [s["environment"]]}
+
+
+def alpha(lots: list[dict] | None = None, start_us: int | None = None, claim_id: str | None = None, site: str = "training") -> dict:
+    """The alpha catalog with its genesis: a site's deposit and light (`SITES`; the training
+    site by default) and, unless `lots` replaces them, a starter kit (solar array, excavator,
+    hopper). Pass the result to Engine.create."""
     path = next((p for p in _CANDIDATES if p.exists()), None)
     if path is None:
         raise FileNotFoundError("alpha catalog not found: expected " + " or ".join(str(p) for p in _CANDIDATES))
     c = copy.deepcopy(load_create(path))
+    c["genesis"].update(site_genesis(site))
     if lots is not None:
         c["genesis"]["starting_lots"] = lots
     if start_us is not None:
@@ -35,9 +76,10 @@ def alpha(lots: list[dict] | None = None, start_us: int | None = None, claim_id:
 
 
 def lunar_day(create: dict) -> tuple[int, int]:
-    """(dusk, period) in world microseconds, from the catalog's irradiance function: the
-    sun shines from 0 to dusk, and the cycle repeats every period."""
-    fn = next(f for f in create["catalog"]["environment"] if f["function_id"] == "irradiance")
+    """(dusk, period) in world microseconds, from the claim's light function: the sun
+    shines from 0 to dusk, and the cycle repeats every period."""
+    light = create["genesis"]["environment"][0]
+    fn = next(f for f in create["catalog"]["environment"] if f["function_id"] == light)
     dark = next(s for s in fn["segments"] if q(s["value"]) == 0)
     return int(dark["start_us"]), int(fn["period_us"])
 

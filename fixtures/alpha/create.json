@@ -3,7 +3,7 @@
     "schema": "ld.genesis.v0",
     "world_id": "alpha-world",
     "claim_id": "claim-0001",
-    "catalog_hash": "c552c8b05f042aee155f1529329eebbe07e62d29261eb44d41affa55ac70577f",
+    "catalog_hash": "aa3ffe747592a13d43ac33795194c472b63ab8f2c66aa07a9e3715b8e8481c24",
     "start_us": "0",
     "deposits": [
       {
@@ -55,7 +55,7 @@
         {
           "kind": "buffer",
           "id": "hopper",
-          "hash": "f8128295df4b650b475b00df10a446a0dcdb7ec1e11a541ceca49d1eb3609b0e"
+          "hash": "51af511aae99b228f408ed6a1c428af46c863e59d3231b77836ef5bac0d60b31"
         },
         {
           "kind": "buffer",
@@ -148,6 +148,11 @@
           "hash": "d2d190deb705cde7db51af55dcd5d1170910449ffadba15bffd59e691c70b496"
         },
         {
+          "kind": "environment",
+          "id": "irradiance-polar",
+          "hash": "e8b84dddae8413573601a147fcc21e4d11f1398601284bb2c238103c523a8edb"
+        },
+        {
           "kind": "machine",
           "id": "battery",
           "hash": "6defaaee9a4b095666f2dab91c47bd82a1df12f602a2061cd1337d8c063dfaec"
@@ -155,7 +160,7 @@
         {
           "kind": "machine",
           "id": "beneficiator",
-          "hash": "5f0a0b1f58f3cb38d9fb6c461d0fa6fb31cce6141b40747c1dd7bdfd83607b45"
+          "hash": "1031e012e16bb1af5d80b029c85dd32443aa4548ac5b4388bb1dbe9384da5d76"
         },
         {
           "kind": "machine",
@@ -170,7 +175,7 @@
         {
           "kind": "machine",
           "id": "excavator",
-          "hash": "90d98b81de4f031cd37428ffdc3c470325740fd64ad725b11ccd58fbc25b1df1"
+          "hash": "a56944b6688fa8dc36d784dd538b73ef73b0b2b4ce769c76c170d488427a4e75"
         },
         {
           "kind": "machine",
@@ -205,12 +210,22 @@
         {
           "kind": "machine",
           "id": "solar-array",
-          "hash": "a0b5c0407074ef76e02f86ad81a7f5076c4e55cd28765942d8e007234c83741e"
+          "hash": "c7c28696e290b67a13a58086a25b6eb86b65eae60a05f40f61b5be0ec5333897"
         },
         {
           "kind": "process",
           "id": "beneficiate",
           "hash": "32fc15a467247ccbfbeec2ffa65443a697bcddcf448a9a2231afcf23c5c59b52"
+        },
+        {
+          "kind": "process",
+          "id": "beneficiate-mare",
+          "hash": "e24e89b1f3cb74da10f0185f48c16ca0cb12aae6b83cb03e74ff4f0338e964dd"
+        },
+        {
+          "kind": "process",
+          "id": "beneficiate-polar",
+          "hash": "41bcb666f2fe268236bca8746e8e54571e28e0ed274abf0b3b2a44354855d1c6"
         },
         {
           "kind": "process",
@@ -221,6 +236,16 @@
           "kind": "process",
           "id": "excavate",
           "hash": "c36f809625d26cecca96aebb28a09818ee7c573d17b55e214ca2289044c026f3"
+        },
+        {
+          "kind": "process",
+          "id": "excavate-mare",
+          "hash": "fdd47775c45e6a0333657753c10b0497378857710f5ead2e20e859d530b1c734"
+        },
+        {
+          "kind": "process",
+          "id": "excavate-polar",
+          "hash": "0ad2ab2ddf7d96931e8b3605bfec606c5b861f837ffd241277eaa2139abc4cbf"
         },
         {
           "kind": "process",
@@ -241,6 +266,11 @@
           "kind": "process",
           "id": "generate-solar",
           "hash": "34509acaab798a9148a2cac794815268b10caaab0180333fc60fb0904b83a889"
+        },
+        {
+          "kind": "process",
+          "id": "generate-solar-polar",
+          "hash": "f90e600f5eafbaf9caf3bc781afa524947fd2b8d3f45fed8d01cf334db435023"
         },
         {
           "kind": "process",
@@ -411,6 +441,26 @@
           "kind": "substance",
           "id": "regolith-bank",
           "hash": "bdcd02aab7296b2db51887ba0d1b8bf3bd2c1a45fa904ef7afdff36b42d5c863"
+        },
+        {
+          "kind": "substance",
+          "id": "regolith-bank-mare",
+          "hash": "a8cc6023c4b135b7cc6fb7676b0bf68998bcf174e2e88bb08bb77d3cd55aa122"
+        },
+        {
+          "kind": "substance",
+          "id": "regolith-bank-polar",
+          "hash": "5b326b37c2a6855072da40f498ee564827a40eb2316340d0c2f645fedc05bbfa"
+        },
+        {
+          "kind": "substance",
+          "id": "regolith-mare",
+          "hash": "9ea5e63fa876116db4ac6093a597037a29c768de7067f1728176a223a9dbfa95"
+        },
+        {
+          "kind": "substance",
+          "id": "regolith-polar",
+          "hash": "89b5552ecfe2b2dc20da1968b6f315229c5009882696f9b3d25a686817dcbad0"
         },
         {
           "kind": "substance",
@@ -723,6 +773,37 @@
         }
       },
       {
+        "substance_id": "regolith-bank-mare",
+        "formula": {
+          "o": "31939",
+          "si": "14981",
+          "fe": "659",
+          "ti": "659"
+        },
+        "phase": "solid",
+        "quantity_unit": "kg-reg",
+        "enthalpy": {
+          "n": "-144550847",
+          "d": "10"
+        }
+      },
+      {
+        "substance_id": "regolith-bank-polar",
+        "formula": {
+          "o": "34265",
+          "si": "15646",
+          "fe": "66",
+          "ti": "66",
+          "h": "5550"
+        },
+        "phase": "solid",
+        "quantity_unit": "kg-reg",
+        "enthalpy": {
+          "n": "-605696111",
+          "d": "40"
+        }
+      },
+      {
         "substance_id": "regolith-bank",
         "formula": {
           "h": "5550",
@@ -735,6 +816,37 @@
         "quantity_unit": "kg-reg",
         "enthalpy": {
           "n": "-580350007",
+          "d": "40"
+        }
+      },
+      {
+        "substance_id": "regolith-mare",
+        "formula": {
+          "o": "31939",
+          "si": "14981",
+          "fe": "659",
+          "ti": "659"
+        },
+        "phase": "solid",
+        "quantity_unit": "kg-reg",
+        "enthalpy": {
+          "n": "-144550847",
+          "d": "10"
+        }
+      },
+      {
+        "substance_id": "regolith-polar",
+        "formula": {
+          "o": "34265",
+          "si": "15646",
+          "fe": "66",
+          "ti": "66",
+          "h": "5550"
+        },
+        "phase": "solid",
+        "quantity_unit": "kg-reg",
+        "enthalpy": {
+          "n": "-605696111",
           "d": "40"
         }
       },
@@ -790,6 +902,304 @@
       }
     ],
     "processes": [
+      {
+        "process_id": "beneficiate-mare",
+        "pset_version": "0",
+        "mode": "FLOW",
+        "extent": {
+          "unit": "kg-reg",
+          "min": "0",
+          "max": "1000000000000"
+        },
+        "ports": {
+          "in": [
+            {
+              "port": "feed",
+              "accepts": [
+                "regolith-mare"
+              ]
+            }
+          ],
+          "out": [
+            {
+              "port": "ilmenite",
+              "accepts": [
+                "fetio3-s"
+              ]
+            },
+            {
+              "port": "tailings",
+              "accepts": [
+                "sio2-s",
+                "h2o-s",
+                "fetio3-s"
+              ]
+            }
+          ]
+        },
+        "stages": [
+          {
+            "stage_id": "beneficiate",
+            "ops": [
+              {
+                "op": "REACT",
+                "vector": {
+                  "regolith-mare": "-1",
+                  "fetio3-s": "659",
+                  "sio2-s": "14981"
+                },
+                "extent": {
+                  "kind": "ref",
+                  "name": "extent"
+                }
+              },
+              {
+                "op": "PARTITION",
+                "input": "pool",
+                "residue": "rest",
+                "outputs": [
+                  {
+                    "stream": "concentrate",
+                    "fractions": {
+                      "fetio3-s": {
+                        "n": "1",
+                        "d": "2"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "op": "WORK",
+                "a": {
+                  "n": "1",
+                  "d": "1"
+                },
+                "b": {
+                  "n": "0",
+                  "d": "1"
+                }
+              },
+              {
+                "op": "ENERGY",
+                "mode": "PER_WORK",
+                "dir": "DRAW",
+                "amount": {
+                  "n": "20000",
+                  "d": "1"
+                },
+                "unit": "j",
+                "heat_sink": "waste-heat",
+                "part_load": [
+                  {
+                    "load": {
+                      "n": "0",
+                      "d": "1"
+                    },
+                    "power": {
+                      "n": "3",
+                      "d": "20"
+                    }
+                  },
+                  {
+                    "load": {
+                      "n": "1",
+                      "d": "1"
+                    },
+                    "power": {
+                      "n": "1",
+                      "d": "1"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "from": "port:feed",
+            "to": "stage:beneficiate"
+          },
+          {
+            "from": "stage:beneficiate.concentrate",
+            "to": "port:ilmenite"
+          },
+          {
+            "from": "stage:beneficiate.rest",
+            "to": "port:tailings"
+          }
+        ],
+        "failure_disposition": {
+          "beneficiate": "RETAIN"
+        },
+        "restart_thresholds": {
+          "feed": {
+            "restart_at": "50",
+            "unit": "kg-reg"
+          }
+        },
+        "constants": {}
+      },
+      {
+        "process_id": "beneficiate-polar",
+        "pset_version": "0",
+        "mode": "FLOW",
+        "extent": {
+          "unit": "kg-reg",
+          "min": "0",
+          "max": "1000000000000"
+        },
+        "ports": {
+          "in": [
+            {
+              "port": "feed",
+              "accepts": [
+                "regolith-polar"
+              ]
+            }
+          ],
+          "out": [
+            {
+              "port": "ice",
+              "accepts": [
+                "h2o-s"
+              ]
+            },
+            {
+              "port": "ilmenite",
+              "accepts": [
+                "fetio3-s"
+              ]
+            },
+            {
+              "port": "tailings",
+              "accepts": [
+                "sio2-s",
+                "h2o-s",
+                "fetio3-s"
+              ]
+            }
+          ]
+        },
+        "stages": [
+          {
+            "stage_id": "beneficiate",
+            "ops": [
+              {
+                "op": "REACT",
+                "vector": {
+                  "regolith-polar": "-1",
+                  "h2o-s": "2775",
+                  "fetio3-s": "66",
+                  "sio2-s": "15646"
+                },
+                "extent": {
+                  "kind": "ref",
+                  "name": "extent"
+                }
+              },
+              {
+                "op": "PARTITION",
+                "input": "pool",
+                "residue": "rest",
+                "outputs": [
+                  {
+                    "stream": "icy",
+                    "fractions": {
+                      "h2o-s": {
+                        "n": "13",
+                        "d": "20"
+                      }
+                    }
+                  },
+                  {
+                    "stream": "concentrate",
+                    "fractions": {
+                      "fetio3-s": {
+                        "n": "1",
+                        "d": "2"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "op": "WORK",
+                "a": {
+                  "n": "1",
+                  "d": "1"
+                },
+                "b": {
+                  "n": "0",
+                  "d": "1"
+                }
+              },
+              {
+                "op": "ENERGY",
+                "mode": "PER_WORK",
+                "dir": "DRAW",
+                "amount": {
+                  "n": "20000",
+                  "d": "1"
+                },
+                "unit": "j",
+                "heat_sink": "waste-heat",
+                "part_load": [
+                  {
+                    "load": {
+                      "n": "0",
+                      "d": "1"
+                    },
+                    "power": {
+                      "n": "3",
+                      "d": "20"
+                    }
+                  },
+                  {
+                    "load": {
+                      "n": "1",
+                      "d": "1"
+                    },
+                    "power": {
+                      "n": "1",
+                      "d": "1"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "from": "port:feed",
+            "to": "stage:beneficiate"
+          },
+          {
+            "from": "stage:beneficiate.icy",
+            "to": "port:ice"
+          },
+          {
+            "from": "stage:beneficiate.concentrate",
+            "to": "port:ilmenite"
+          },
+          {
+            "from": "stage:beneficiate.rest",
+            "to": "port:tailings"
+          }
+        ],
+        "failure_disposition": {
+          "beneficiate": "RETAIN"
+        },
+        "restart_thresholds": {
+          "feed": {
+            "restart_at": "50",
+            "unit": "kg-reg"
+          }
+        },
+        "constants": {}
+      },
       {
         "process_id": "beneficiate",
         "pset_version": "0",
@@ -1110,6 +1520,280 @@
           "water": {
             "restart_at": "3700000",
             "unit": "mmol"
+          }
+        },
+        "constants": {}
+      },
+      {
+        "process_id": "excavate-mare",
+        "pset_version": "0",
+        "mode": "FLOW",
+        "extent": {
+          "unit": "kg-reg",
+          "min": "0",
+          "max": "1000000000000"
+        },
+        "ports": {
+          "in": [
+            {
+              "port": "face",
+              "accepts": [
+                "regolith-bank-mare"
+              ]
+            }
+          ],
+          "out": [
+            {
+              "port": "out",
+              "accepts": [
+                "regolith-mare"
+              ]
+            }
+          ]
+        },
+        "stages": [
+          {
+            "stage_id": "excavate",
+            "ops": [
+              {
+                "op": "REACT",
+                "vector": {
+                  "regolith-bank-mare": "-100",
+                  "regolith-mare": "100"
+                },
+                "extent": {
+                  "kind": "ref",
+                  "name": "extent"
+                }
+              },
+              {
+                "op": "LOSS",
+                "species": "regolith-mare",
+                "quantity": {
+                  "kind": "ref",
+                  "name": "extent"
+                },
+                "sink": "dust",
+                "sink_kind": "TERMINAL"
+              },
+              {
+                "op": "WORK",
+                "a": {
+                  "n": "1",
+                  "d": "1"
+                },
+                "b": {
+                  "n": "0",
+                  "d": "1"
+                }
+              },
+              {
+                "op": "ENERGY",
+                "mode": "PER_WORK",
+                "dir": "DRAW",
+                "amount": {
+                  "n": "50000",
+                  "d": "1"
+                },
+                "unit": "j",
+                "heat_sink": "waste-heat",
+                "part_load": [
+                  {
+                    "load": {
+                      "n": "0",
+                      "d": "1"
+                    },
+                    "power": {
+                      "n": "1",
+                      "d": "5"
+                    }
+                  },
+                  {
+                    "load": {
+                      "n": "1",
+                      "d": "1"
+                    },
+                    "power": {
+                      "n": "1",
+                      "d": "1"
+                    }
+                  }
+                ]
+              },
+              {
+                "op": "WEAR",
+                "per": "WORK",
+                "amount": {
+                  "n": "1",
+                  "d": "1000"
+                }
+              }
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "from": "port:face",
+            "to": "stage:excavate"
+          },
+          {
+            "from": "stage:excavate",
+            "to": "port:out",
+            "species": [
+              "regolith-mare"
+            ]
+          }
+        ],
+        "failure_disposition": {
+          "excavate": "RETAIN"
+        },
+        "restart_thresholds": {
+          "out": {
+            "restart_fraction": {
+              "n": "3",
+              "d": "5"
+            },
+            "stop_fraction": {
+              "n": "1",
+              "d": "5"
+            }
+          }
+        },
+        "constants": {}
+      },
+      {
+        "process_id": "excavate-polar",
+        "pset_version": "0",
+        "mode": "FLOW",
+        "extent": {
+          "unit": "kg-reg",
+          "min": "0",
+          "max": "1000000000000"
+        },
+        "ports": {
+          "in": [
+            {
+              "port": "face",
+              "accepts": [
+                "regolith-bank-polar"
+              ]
+            }
+          ],
+          "out": [
+            {
+              "port": "out",
+              "accepts": [
+                "regolith-polar"
+              ]
+            }
+          ]
+        },
+        "stages": [
+          {
+            "stage_id": "excavate",
+            "ops": [
+              {
+                "op": "REACT",
+                "vector": {
+                  "regolith-bank-polar": "-100",
+                  "regolith-polar": "100"
+                },
+                "extent": {
+                  "kind": "ref",
+                  "name": "extent"
+                }
+              },
+              {
+                "op": "LOSS",
+                "species": "regolith-polar",
+                "quantity": {
+                  "kind": "ref",
+                  "name": "extent"
+                },
+                "sink": "dust",
+                "sink_kind": "TERMINAL"
+              },
+              {
+                "op": "WORK",
+                "a": {
+                  "n": "1",
+                  "d": "1"
+                },
+                "b": {
+                  "n": "0",
+                  "d": "1"
+                }
+              },
+              {
+                "op": "ENERGY",
+                "mode": "PER_WORK",
+                "dir": "DRAW",
+                "amount": {
+                  "n": "50000",
+                  "d": "1"
+                },
+                "unit": "j",
+                "heat_sink": "waste-heat",
+                "part_load": [
+                  {
+                    "load": {
+                      "n": "0",
+                      "d": "1"
+                    },
+                    "power": {
+                      "n": "1",
+                      "d": "5"
+                    }
+                  },
+                  {
+                    "load": {
+                      "n": "1",
+                      "d": "1"
+                    },
+                    "power": {
+                      "n": "1",
+                      "d": "1"
+                    }
+                  }
+                ]
+              },
+              {
+                "op": "WEAR",
+                "per": "WORK",
+                "amount": {
+                  "n": "1",
+                  "d": "1000"
+                }
+              }
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "from": "port:face",
+            "to": "stage:excavate"
+          },
+          {
+            "from": "stage:excavate",
+            "to": "port:out",
+            "species": [
+              "regolith-polar"
+            ]
+          }
+        ],
+        "failure_disposition": {
+          "excavate": "RETAIN"
+        },
+        "restart_thresholds": {
+          "out": {
+            "restart_fraction": {
+              "n": "3",
+              "d": "5"
+            },
+            "stop_fraction": {
+              "n": "1",
+              "d": "5"
+            }
           }
         },
         "constants": {}
@@ -1513,6 +2197,70 @@
         ],
         "failure_disposition": {
           "cell": "RETAIN"
+        },
+        "restart_thresholds": {},
+        "constants": {}
+      },
+      {
+        "process_id": "generate-solar-polar",
+        "pset_version": "0",
+        "mode": "FLOW",
+        "extent": {
+          "unit": "s",
+          "min": "0",
+          "max": "1000000000000"
+        },
+        "ports": {
+          "in": [],
+          "out": []
+        },
+        "stages": [
+          {
+            "stage_id": "generate",
+            "ops": [
+              {
+                "op": "REQUIRE",
+                "predicate": {
+                  "kind": "environment",
+                  "function_id": "irradiance-polar",
+                  "min": {
+                    "n": "100",
+                    "d": "1"
+                  },
+                  "max": {
+                    "n": "2000",
+                    "d": "1"
+                  }
+                }
+              },
+              {
+                "op": "WORK",
+                "a": {
+                  "n": "1",
+                  "d": "1"
+                },
+                "b": {
+                  "n": "0",
+                  "d": "1"
+                }
+              },
+              {
+                "op": "ENERGY",
+                "mode": "PER_WORK",
+                "dir": "PRODUCE",
+                "amount": {
+                  "n": "1000000",
+                  "d": "1"
+                },
+                "unit": "j",
+                "heat_sink": "waste-heat"
+              }
+            ]
+          }
+        ],
+        "edges": [],
+        "failure_disposition": {
+          "generate": "RETAIN"
         },
         "restart_thresholds": {},
         "constants": {}
@@ -1978,7 +2726,9 @@
           "beneficiation"
         ],
         "processes": [
-          "beneficiate"
+          "beneficiate",
+          "beneficiate-polar",
+          "beneficiate-mare"
         ],
         "rated_work": {
           "n": "1",
@@ -2175,7 +2925,9 @@
           "excavation"
         ],
         "processes": [
-          "excavate"
+          "excavate",
+          "excavate-polar",
+          "excavate-mare"
         ],
         "rated_work": {
           "n": "1",
@@ -2630,7 +3382,8 @@
           "solar"
         ],
         "processes": [
-          "generate-solar"
+          "generate-solar",
+          "generate-solar-polar"
         ],
         "rated_work": {
           "n": "1",
@@ -2885,7 +3638,9 @@
       {
         "template_id": "hopper",
         "accepts": [
-          "regolith"
+          "regolith",
+          "regolith-polar",
+          "regolith-mare"
         ],
         "capacity": {
           "amount": "5000",
@@ -3013,6 +3768,27 @@
       }
     ],
     "environment": [
+      {
+        "function_id": "irradiance-polar",
+        "unit": "w-m2",
+        "period_us": "2551442877000",
+        "segments": [
+          {
+            "start_us": "0",
+            "value": {
+              "n": "1361",
+              "d": "1"
+            }
+          },
+          {
+            "start_us": "2205842877000",
+            "value": {
+              "n": "0",
+              "d": "1"
+            }
+          }
+        ]
+      },
       {
         "function_id": "irradiance",
         "unit": "w-m2",

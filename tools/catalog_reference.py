@@ -44,6 +44,17 @@ def main() -> None:
     out += ["", f"Sunlight (`irradiance`) is on from 0 to {int(dark['start_us']):,} µs (dusk, {int(dark['start_us']) / 86_400e6:.2f} days) "
             f"and the cycle repeats every {int(fn['period_us']):,} µs ({int(fn['period_us']) / 86_400e6:.2f} days).", ""]
 
+    sites = json.loads((ROOT / "fixtures/alpha/sites.json").read_text())
+    out += ["## Sites", "", "A site is a claim's place: it fixes the deposit and the light, and which processes run there (LD-PEC-011). "
+            "Choose one at genesis with `alpha(site=...)`, or take the genesis fields from `fixtures/alpha/sites.json`. "
+            "Every site is in the one catalog.", "",
+            "| Site | Deposit | Light | Solar, dig and sort processes | Ice, ilmenite, silicate (mmol per kg) |", "| --- | --- | --- | --- | --- |"]
+    for sid, s in sites.items():
+        y, pr = s["yield"], s["processes"]
+        out.append(f"| `{sid}`{' (fictional)' if s['fictional'] else ''} | `{s['deposit']}` | `{s['environment']}` | "
+                   f"`{pr['solar']}`, `{pr['excavate']}`, `{pr['beneficiate']}` | {y['ice']:,}, {y['ilmenite']:,}, {y['silicate']:,} |")
+    out += [""] + [f"- `{sid}`, {s['name']}: {s['summary']}" for sid, s in sites.items()] + [""]
+
     out += ["## Machines", "", "| Blueprint | Kit | Rated work | Ports | Processes | Notes |", "| --- | --- | --- | --- | --- | --- |"]
     kit_for = {p["installs_as"]["template"]: p["product_id"] for p in cat["products"] if p.get("installs_as")}
     for m in sorted(cat["machines"], key=lambda m: m["blueprint_id"]):

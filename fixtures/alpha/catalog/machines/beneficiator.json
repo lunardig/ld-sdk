@@ -4,7 +4,9 @@
     "beneficiation"
   ],
   "processes": [
-    "beneficiate"
+    "beneficiate",
+    "beneficiate-polar",
+    "beneficiate-mare"
   ],
   "rated_work": {
     "n": "1",

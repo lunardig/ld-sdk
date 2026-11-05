@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from ld_client import DAY, MIN, Engine, Rejected, alpha, alpha_loop, loop_setup, lunar_day, recipe  # noqa: E402
+from ld_client import DAY, HOUR, MIN, SITES, Engine, Rejected, alpha, alpha_loop, loop_setup, lunar_day, recipe  # noqa: E402
 
 ENGINE = os.environ.get("LD_ENGINE", "ld-engine-cli")
 
@@ -112,6 +112,95 @@ class RecipeTest(unittest.TestCase):
         self.assertEqual(kits["fabricator-kit"], "1")
         self.assertEqual(loop_setup()[0][1]["as_id"], "water-store")
         self.assertTrue(any(l.get("core") for l in c["genesis"]["starting_lots"]))
+
+
+class SiteTest(unittest.TestCase):
+    """The sites (LD-PEC-011): each digs and sorts its own ground under its own light."""
+
+    KITS = {"solar-kit": "1", "excavator-kit": "1", "hopper-kit": "1", "beneficiator-kit": "1", "ice-bin-kit": "1",
+            "ilmenite-bin-kit": "1", "tailings-pile-kit": "1"}
+
+    def start(self, site):
+        self.addCleanup(lambda: self.e.close())
+        self.c = alpha(site=site, lots=[{"lot_id": "kits", "location": "inventory", "state": "AVAILABLE", "composition": {}, "products": self.KITS}])
+        self.e = Engine(ENGINE)
+        self.e.create(**self.c)
+
+    def plant(self, site):
+        """The mining chain, running from dawn. A mare claim leaves the sorter's ice port open."""
+        e, s = self.e, SITES[site]
+        for kit, as_id in [("solar-kit", "solar-1"), ("excavator-kit", "dig-1"), ("hopper-kit", "hopper-1"), ("beneficiator-kit", "sort-1"),
+                           ("ice-bin-kit", "ice-1"), ("ilmenite-bin-kit", "ilmenite-1"), ("tailings-pile-kit", "tailings-1")]:
+            e.submit("INSTALL", lot_id="kits", product=kit, location="pad-a", as_id=as_id)
+        links = [("c-face", f"{s['deposit']}.face", "dig-1.face"), ("c-dig", "dig-1.out", "hopper-1.io"), ("c-feed", "hopper-1.io", "sort-1.feed"),
+                 ("c-ilm", "sort-1.ilmenite", "ilmenite-1.io"), ("c-tail", "sort-1.tailings", "tailings-1.io")]
+        if s["yield"]["ice"]:
+            links.append(("c-ice", "sort-1.ice", "ice-1.io"))
+        for cid, a, b in links:
+            e.submit("CONNECT", connection_id=cid, template="pipe", from_port=a, to_port=b)
+        for jid, process, machine, priority in [("sun", s["processes"]["solar"], "solar-1", 100), ("dig", s["processes"]["excavate"], "dig-1", 10),
+                                                ("sort", s["processes"]["beneficiate"], "sort-1", 10)]:
+            e.submit("CREATE_JOB", job_id=jid, process=process, machine_id=machine, target_extent=10**12, priority=priority)
+            e.submit("START", job_id=jid)
+
+    def test_every_site_digs_and_sorts_its_own_ground(self):
+        for site, s in SITES.items():
+            with self.subTest(site=site):
+                self.start(site)
+                self.plant(site)
+                self.e.advance_by(HOUR)
+                v, y = self.e.view(), s["yield"]
+                self.assertEqual(v.job("sun")["status"], "RUNNING")
+                # Sorted so far: the hopper's regolith went somewhere, in the site's proportions.
+                ilmenite, ice = v.amount("ilmenite-1", "fetio3-s"), v.amount("ice-1", "h2o-s")
+                kg = ilmenite * 2 / y["ilmenite"]
+                self.assertGreater(kg, 1000)
+                self.assertAlmostEqual(float(ice), float(kg * y["ice"] * 13 / 20), delta=y["ice"] + 1)
+                self.e.close()
+
+    def test_a_kilogram_of_each_site_weighs_a_kilogram(self):
+        for site, s in SITES.items():
+            y = s["yield"]
+            grams = (y["ice"] * 18.015 + y["ilmenite"] * 151.71 + y["silicate"] * 60.08) / 1000
+            self.assertAlmostEqual(grams, 1000, delta=1, msg=site)
+
+    def test_the_polar_night_is_four_days(self):
+        self.start("polar")
+        self.plant("polar")
+        dusk, period = lunar_day(self.c)
+        self.assertEqual(period - dusk, 4 * DAY)
+        self.e.advance_to(dusk + MIN)
+        self.assertEqual(self.e.view().job("sun")["status"], "STARVED")
+        self.e.advance_to(period + MIN)
+        self.assertEqual(self.e.view().job("sun")["status"], "RUNNING")
+
+    def test_the_mare_night_is_a_half_month(self):
+        self.start("mare")
+        dusk, period = lunar_day(self.c)
+        self.assertEqual(dusk, period // 2)
+
+    def test_a_site_has_only_its_own_light_and_ground(self):
+        self.start("mare")
+        e = self.e
+        e.submit("INSTALL", lot_id="kits", product="solar-kit", location="pad-a", as_id="solar-1")
+        e.submit("CREATE_JOB", job_id="sun", process="generate-solar-polar", machine_id="solar-1", target_extent=10**12, priority=100)
+        e.submit("START", job_id="sun")
+        e.advance_by(MIN)
+        job = e.view().job("sun")
+        self.assertEqual((job["status"], job["reason"]["code"]), ("STARVED", "STARVED_REQUIRE"))
+        e.submit("INSTALL", lot_id="kits", product="excavator-kit", location="pad-a", as_id="dig-1")
+        e.submit("INSTALL", lot_id="kits", product="hopper-kit", location="pad-a", as_id="hopper-1")
+        e.submit("CONNECT", connection_id="c-face", template="pipe", from_port="mare-basin.face", to_port="dig-1.face")
+        e.submit("CONNECT", connection_id="c-dig", template="pipe", from_port="dig-1.out", to_port="hopper-1.io")
+        e.submit("CREATE_JOB", job_id="dig", process="excavate-polar", machine_id="dig-1", target_extent=10**12, priority=10)
+        e.submit("START", job_id="dig")
+        e.advance_by(MIN)
+        self.assertEqual(e.view().amount("hopper-1", "regolith-polar"), 0)
+
+    def test_the_default_is_the_training_site(self):
+        self.assertEqual(alpha()["genesis"]["deposits"], alpha(site="training")["genesis"]["deposits"])
+        self.assertEqual(alpha()["genesis"]["environment"], ["irradiance"])
+        self.assertTrue(SITES["training"]["fictional"])
 
 
 if __name__ == "__main__":
