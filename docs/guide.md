@@ -110,7 +110,10 @@ so advancing one day in one call or in a thousand gives the same result.
 blueprints, store templates, connection templates and products. The alpha catalog is in
 `fixtures/alpha/` and described in `docs/alpha-catalog.md`. **The genesis** gives the
 claim's starting time, its deposits (such as the `icy-crater` regolith deposit) and its
-starting lots.
+starting lots. **A site** is where a claim is: `alpha(site="polar")` or `alpha(site="mare")`
+gives real ground, with its own deposit, light and process names (`SITES` in `ld_client`,
+listed in `docs/alpha-catalog.md`). The default, `training`, is a fictional deposit that
+holds both ice and ilmenite, so that one claim can close the loop alone.
 
 **Lots** hold material and products. Kits are products in a lot in `inventory` (the
 cargo hold). `INSTALL` turns one kit into a **machine** or a **buffer** (a store: tank,

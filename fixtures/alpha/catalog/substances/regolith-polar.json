@@ -1,0 +1,16 @@
+{
+  "substance_id": "regolith-polar",
+  "formula": {
+    "o": "34265",
+    "si": "15646",
+    "fe": "66",
+    "ti": "66",
+    "h": "5550"
+  },
+  "phase": "solid",
+  "quantity_unit": "kg-reg",
+  "enthalpy": {
+    "n": "-605696111",
+    "d": "40"
+  }
+}

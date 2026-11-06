@@ -4,7 +4,8 @@
     "solar"
   ],
   "processes": [
-    "generate-solar"
+    "generate-solar",
+    "generate-solar-polar"
   ],
   "rated_work": {
     "n": "1",

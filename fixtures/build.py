@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import shutil
 import sys
+from fractions import Fraction
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -21,6 +22,9 @@ CAT = ROOT / "fixtures/catalog"
 S = 1_000_000  # microseconds per second
 LUNAR_DAY_US = 2_551_442_877_000  # 29.530588853 days
 DUSK_US = LUNAR_DAY_US // 2
+# A polar array on a lit ridge: four dark days a lunar month, the middle of the 3-5 days
+# that are the longest dark spells at the best sites (LD-PEC-011 §3).
+POLAR_DUSK_US = LUNAR_DAY_US - 4 * 86_400 * S
 
 
 def R(n, d=1):
@@ -221,6 +225,22 @@ def build_alpha() -> None:
                        if x["substance_id"] in ("regolith-bank", "regolith", "h2o-s", "h2o-l", "h2-g", "o2-g", "fetio3-s", "sio2-s", m2c.IRON, m2c.RUTILE)]
         + m3b.fuel_substances(300_000_000),
     }
+    sys.path.insert(0, str(ROOT / "python"))
+    from ld_client.catalog import SITES
+
+    def site_regolith(site):
+        """A site's regolith, in place and dug: its formula and enthalpy are its constituents'."""
+        y = site["yield"]
+        ice, ilmenite, silicate = y["ice"], y["ilmenite"], y["silicate"]
+        formula = {"o": str(ice + 3 * ilmenite + 2 * silicate), "si": str(silicate), "fe": str(ilmenite), "ti": str(ilmenite)}
+        if ice:
+            formula["h"] = str(2 * ice)
+        h = sum(Fraction(*m2.H[k]) * n for k, n in [("h2o-s", ice), ("fetio3-s", ilmenite), ("sio2-s", silicate)])
+        return [{"substance_id": sid, "formula": formula, "phase": "solid", "quantity_unit": "kg-reg", "enthalpy": R(h.numerator, h.denominator)}
+                for sid in (site["bank"], site["regolith"])]
+
+    new_sites = [s for s in SITES.values() if not s["fictional"]]
+    entries["substances"] += [x for site in new_sites for x in site_regolith(site)]
     for key, items in entries.items():
         for item in items:
             write(cat / key / f"{item[next(k for k in item if k.endswith('_id'))]}.json", item)
@@ -274,14 +294,47 @@ def build_alpha() -> None:
     pem["amount"] = R(770)
     for proc in (excavate, beneficiate, melt, reduce, fabricate, electrolyze, fuel_cell, fission):
         write(cat / f"processes/{proc['process_id']}.json", proc)
+
+    # Each real site digs and sorts its own regolith (LD-PEC-011 §4): the same machines at the
+    # same rates, with only the species and the yields changed. The training site keeps the
+    # original ids. A mare sorter has no ice to send anywhere, so that port goes unused.
+    def for_site(proc, pid, site):
+        text = json.dumps(proc)
+        for old, new in [("regolith-bank", site["bank"]), ("regolith", site["regolith"])]:
+            text = text.replace(f'"{old}"', f'"{new}"')
+        return dict(json.loads(text), process_id=pid)
+
+    for site in new_sites:
+        dig, sort = for_site(excavate, site["processes"]["excavate"], site), for_site(beneficiate, site["processes"]["beneficiate"], site)
+        y, react = site["yield"], next(o for o in sort["stages"][0]["ops"] if o["op"] == "REACT")
+        react["vector"].update({"fetio3-s": str(y["ilmenite"]), "sio2-s": str(y["silicate"]), "h2o-s": str(y["ice"])})
+        if not y["ice"]:
+            del react["vector"]["h2o-s"]
+            split = next(o for o in sort["stages"][0]["ops"] if o["op"] == "PARTITION")
+            split["outputs"] = [o for o in split["outputs"] if o["stream"] != "icy"]
+            sort["ports"]["out"] = [o for o in sort["ports"]["out"] if o["port"] != "ice"]
+            sort["edges"] = [e for e in sort["edges"] if e["to"] != "port:ice"]
+        for proc in (dig, sort):
+            write(cat / f"processes/{proc['process_id']}.json", proc)
+    # The ridge array is the same array under a different sky: its own light function, so a
+    # claim's genesis picks one by listing it (a process names one function, LD-PEC-011 §4).
+    polar_solar = json.loads(json.dumps(ld.load_json(cat / "processes/generate-solar.json")).replace('"irradiance"', '"irradiance-polar"'))
+    polar_solar["process_id"] = "generate-solar-polar"
+    write(cat / "processes/generate-solar-polar.json", polar_solar)
+    write(cat / "environment/irradiance-polar.json", {
+        "function_id": "irradiance-polar", "unit": "w-m2", "period_us": str(LUNAR_DAY_US),
+        "segments": [{"start_us": "0", "value": R(1361)}, {"start_us": str(POLAR_DUSK_US), "value": R(0)}]})
+    array = ld.load_json(cat / "machines/solar-array.json")
+    array["processes"] = array["processes"] + ["generate-solar-polar"]
+    write(cat / "machines/solar-array.json", array)
     power = {"port": "power", "type": "ELECTRICAL", "direction": "IN"}
 
     def mport(name, direction):
         return {"port": name, "type": "MATERIAL", "direction": direction}
 
     for bid, procs, rated, ports, caps in [
-        ("excavator", ["excavate"], R(1, 50_000_000), [mport("face", "IN"), mport("out", "OUT"), power], ["excavation"]),
-        ("beneficiator", ["beneficiate"], R(1, 500_000), [mport("feed", "IN"), mport("ice", "OUT"), mport("ilmenite", "OUT"), mport("tailings", "OUT"), power],
+        ("excavator", ["excavate", "excavate-polar", "excavate-mare"], R(1, 50_000_000), [mport("face", "IN"), mport("out", "OUT"), power], ["excavation"]),
+        ("beneficiator", ["beneficiate", "beneficiate-polar", "beneficiate-mare"], R(1, 500_000), [mport("feed", "IN"), mport("ice", "OUT"), mport("ilmenite", "OUT"), mport("tailings", "OUT"), power],
          ["beneficiation"]),
         ("ice-melter", ["melt-ice"], R(6, 1000), [mport("ice", "IN"), mport("water", "OUT"), power], ["melting"]),
         # Feeds 1 mol/s of ilmenite and reacts half of it (LD-PEC-006 §3.3).
@@ -333,7 +386,7 @@ def build_alpha() -> None:
     write(cat / "machines/electrolyzer.json", pem_machine)
     # The link between a reactor and its core: internal, fast enough never to limit it.
     write(cat / "connections/core-link.json", {"template_id": "core-link", "kind": "FEED", "throughput": R(1000), "unit": "mmol", "delay_us": "0"})
-    for tid, accepts, amount, unit in [("hopper", ["regolith"], "5000", "kg-reg"), ("ice-bin", ["h2o-s"], "2000000", "mmol"),
+    for tid, accepts, amount, unit in [("hopper", [s["regolith"] for s in SITES.values()], "5000", "kg-reg"), ("ice-bin", ["h2o-s"], "2000000", "mmol"),
                                        ("ilmenite-bin", ["fetio3-s"], "2000000", "mmol"), ("iron-bin", [m2c.IRON], "5000000", "mmol"),
                                        ("rutile-bin", [m2c.RUTILE, m2c.IRON], "1000000000", "mmol"), ("scrap-bin", [m2c.IRON], "1000000", "mmol"),
                                        # Everything the plant does not recover, mostly silicate: about 14 mol per kg dug.
@@ -374,8 +427,7 @@ def build_alpha() -> None:
     write(ALPHA / "create.json", {"genesis": genesis, "catalog": ld.bundle_for(cat)})
     # The loop scenario as data (SDK-002): its genesis lots, setup commands and goal, the same
     # as ld_client.alpha_loop(), loop_setup() and LOOP_GOAL. Use it with create.json's catalog.
-    sys.path.insert(0, str(ROOT / "python"))
-    from ld_client.catalog import LOOP_GOAL, loop_lots, loop_setup
+    from ld_client.catalog import LOOP_GOAL, loop_lots, loop_setup, site_genesis
     loop_genesis = dict(genesis, starting_lots=loop_lots())
     write(ALPHA / "loop.json", {
         "description": "The loop (LD-PEC-006 §3.1): the alpha MVP's end-to-end scenario. Create with this genesis and "
@@ -383,6 +435,8 @@ def build_alpha() -> None:
         "genesis": loop_genesis,
         "setup": [{"op": op, **args} for op, args in loop_setup()],
         "goal": LOOP_GOAL})
+    # The sites as data, for clients in other languages: what ld_client.SITES holds.
+    write(ALPHA / "sites.json", {sid: {**site, "genesis": site_genesis(sid)} for sid, site in SITES.items()})
     print(f"alpha: catalog {ld.catalog_hash(ld.load_json(cat / 'manifest.json'))[:12]}")
 
 

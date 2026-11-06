@@ -4,7 +4,9 @@
     "excavation"
   ],
   "processes": [
-    "excavate"
+    "excavate",
+    "excavate-polar",
+    "excavate-mare"
   ],
   "rated_work": {
     "n": "1",

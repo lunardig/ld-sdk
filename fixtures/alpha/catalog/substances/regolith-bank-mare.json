@@ -1,0 +1,15 @@
+{
+  "substance_id": "regolith-bank-mare",
+  "formula": {
+    "o": "31939",
+    "si": "14981",
+    "fe": "659",
+    "ti": "659"
+  },
+  "phase": "solid",
+  "quantity_unit": "kg-reg",
+  "enthalpy": {
+    "n": "-144550847",
+    "d": "10"
+  }
+}

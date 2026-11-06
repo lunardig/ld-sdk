@@ -10,38 +10,57 @@ Claim `claim-0001` starts at 0 µs with the deposit `icy-crater` (1000000000 reg
 
 Sunlight (`irradiance`) is on from 0 to 1,275,721,438,500 µs (dusk, 14.77 days) and the cycle repeats every 2,551,442,877,000 µs (29.53 days).
 
+## Sites
+
+A site is a claim's place: it fixes the deposit and the light, and which processes run there (LD-PEC-011). Choose one at genesis with `alpha(site=...)`, or take the genesis fields from `fixtures/alpha/sites.json`. Every site is in the one catalog.
+
+| Site | Deposit | Light | Solar, dig and sort processes | Ice, ilmenite, silicate (mmol per kg) |
+| --- | --- | --- | --- | --- |
+| `training` (fictional) | `icy-crater` | `irradiance` | `generate-solar`, `excavate`, `beneficiate` | 2,775, 659, 14,148 |
+| `polar` | `polar-cold-trap` | `irradiance-polar` | `generate-solar-polar`, `excavate-polar`, `beneficiate-polar` | 2,775, 66, 15,646 |
+| `mare` | `mare-basin` | `irradiance` | `generate-solar`, `excavate-mare`, `beneficiate-mare` | 0, 659, 14,981 |
+
+- `training`, Proving Ground: The alpha's mixed deposit, for learning the loop: ice and ilmenite together, which no real site has, under an equatorial day and night.
+- `polar`, Polar cold trap: Ice-bearing highland regolith in permanent shadow, with arrays on a nearly always lit ridge: 5 wt% ice, 1 wt% ilmenite, four dark days a lunar month.
+- `mare`, High-Ti mare: Dry equatorial mare regolith: 10 wt% ilmenite, no ice, and a 354-hour night.
+
 ## Machines
 
 | Blueprint | Kit | Rated work | Ports | Processes | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `battery` | `battery-kit` | 1 work/s | power (in, power) | — | stores 360,000,000 j |
-| `beneficiator` | `beneficiator-kit` | 2 work/s | feed (in), ice (out), ilmenite (out), tailings (out), power (in, power) | `beneficiate` | minimum 20 % of rated |
+| `beneficiator` | `beneficiator-kit` | 2 work/s | feed (in), ice (out), ilmenite (out), tailings (out), power (in, power) | `beneficiate`, `beneficiate-polar`, `beneficiate-mare` | minimum 20 % of rated |
 | `electrolyzer` | `electrolyzer-kit` | 1,000 work/s | water (in), h2 (out), o2 (out), power (in, power) | `electrolyze-water` | minimum 10 % of rated |
 | `electrolyzer-fragile` | `fragile-electrolyzer-kit` | 1,000 work/s | water (in), h2 (out), o2 (out), power (in, power) | `electrolyze-water` |  |
-| `excavator` | `excavator-kit` | 0.02 work/s | face (in), out (out), power (in, power) | `excavate` | minimum 5 % of rated |
+| `excavator` | `excavator-kit` | 0.02 work/s | face (in), out (out), power (in, power) | `excavate`, `excavate-polar`, `excavate-mare` | minimum 5 % of rated |
 | `fabricator` | `fabricator-kit` | 0.00166667 work/s | iron (in), scrap (out), power (in, power) | `fabricate-hopper` | minimum 60 % of rated |
 | `fission-reactor` | `fission-reactor-kit` | 0.0133333 work/s | fuel (in), spent (out), power (out, power) | `fission` | core `fission-reactor-core` on fuel, spent; minimum 30 % of rated |
 | `fission-reactor-small` | `small-reactor-kit` | 0.00533333 work/s | fuel (in), spent (out), power (out, power) | `fission` | core `fission-reactor-small-core` on fuel, spent; minimum 30 % of rated |
 | `fuel-cell` | `fuel-cell-kit` | 1,400 work/s | h2 (in), o2 (in), water (out), power (out, power) | `fuel-cell` |  |
 | `ice-melter` | `melter-kit` | 6,000 work/s | ice (in), water (out), power (in, power) | `melt-ice` | minimum 20 % of rated |
 | `reactor` | `reactor-kit` | 500 work/s | ilmenite (in), h2 (in), iron (out), rutile (out), water (out), unreacted (out), power (in, power) | `reduce-ilmenite` |  |
-| `solar-array` | `solar-kit` | 1 work/s | power (out, power) | `generate-solar` |  |
+| `solar-array` | `solar-kit` | 1 work/s | power (out, power) | `generate-solar`, `generate-solar-polar` |  |
 
 ## Processes
 
 | Process | Mode | Extent unit | Inputs | Outputs | Dispatch |
 | --- | --- | --- | --- | --- | --- |
 | `beneficiate` | FLOW | kg-reg | feed: regolith | ice: h2o-s, ilmenite: fetio3-s, tailings: sio2-s/h2o-s/fetio3-s | MUST_RUN |
+| `beneficiate-mare` | FLOW | kg-reg | feed: regolith-mare | ilmenite: fetio3-s, tailings: sio2-s/h2o-s/fetio3-s | MUST_RUN |
+| `beneficiate-polar` | FLOW | kg-reg | feed: regolith-polar | ice: h2o-s, ilmenite: fetio3-s, tailings: sio2-s/h2o-s/fetio3-s | MUST_RUN |
 | `electrolyze-water` | FLOW | rxn-mmol | water: h2o-l | h2: h2-g, o2: o2-g | MUST_RUN |
 | `excavate` | FLOW | kg-reg | face: regolith-bank | out: regolith | MUST_RUN |
+| `excavate-mare` | FLOW | kg-reg | face: regolith-bank-mare | out: regolith-mare | MUST_RUN |
+| `excavate-polar` | FLOW | kg-reg | face: regolith-bank-polar | out: regolith-polar | MUST_RUN |
 | `fabricate-hopper` | BATCH | count | iron: fe-s | scrap: fe-s | MUST_RUN |
 | `fission` | FLOW | mmol | fuel: fuel-fresh | spent: fuel-spent | FOLLOW_LOAD |
 | `fuel-cell` | FLOW | rxn-mmol | h2: h2-g, o2: o2-g | water: h2o-l | FOLLOW_LOAD |
 | `generate-solar` | FLOW | s | — | — | MUST_RUN |
+| `generate-solar-polar` | FLOW | s | — | — | MUST_RUN |
 | `melt-ice` | FLOW | mmol | ice: h2o-s | water: h2o-l | MUST_RUN |
 | `reduce-ilmenite` | BATCH | rxn-mmol | ilmenite: fetio3-s, h2: h2-g | iron: fe-s, rutile: tio2-s/fe-s, water: h2o-l, unreacted: fetio3-s | MUST_RUN |
 
-Level switches (LD-PEC-004 A4): a stopped job restarts once the port's level reaches its restart level; a running one stops at its stop level. An input's level is the stock in its buffer, an output's the free space in its buffer. `beneficiate` feed (stock): restart at 50 kg-reg; `electrolyze-water` water (stock): restart at 3,700,000 mmol; `excavate` out (free space): restart at 60 % of the buffer, stop at 20 % of the buffer; `melt-ice` ice (stock): restart at 1,600,000 mmol.
+Level switches (LD-PEC-004 A4): a stopped job restarts once the port's level reaches its restart level; a running one stops at its stop level. An input's level is the stock in its buffer, an output's the free space in its buffer. `beneficiate` feed (stock): restart at 50 kg-reg; `beneficiate-mare` feed (stock): restart at 50 kg-reg; `beneficiate-polar` feed (stock): restart at 50 kg-reg; `electrolyze-water` water (stock): restart at 3,700,000 mmol; `excavate` out (free space): restart at 60 % of the buffer, stop at 20 % of the buffer; `excavate-mare` out (free space): restart at 60 % of the buffer, stop at 20 % of the buffer; `excavate-polar` out (free space): restart at 60 % of the buffer, stop at 20 % of the buffer; `melt-ice` ice (stock): restart at 1,600,000 mmol.
 
 ## Recipes
 
@@ -50,12 +69,17 @@ Per unit of extent, from `ld_client.recipe(create, process, extent)`, which read
 | Process | Draws | Delivers | Makes / loses | Work | Energy |
 | --- | --- | --- | --- | --- | --- |
 | `beneficiate` | feed: 1 regolith | ice: 1,803.75 h2o-s; ilmenite: 329.5 fetio3-s; tailings: 329.5 fetio3-s, 971.25 h2o-s, 14,148 sio2-s | — | 1 | 20,000 J drawn |
+| `beneficiate-mare` | feed: 1 regolith-mare | ilmenite: 329.5 fetio3-s; tailings: 329.5 fetio3-s, 14,981 sio2-s | — | 1 | 20,000 J drawn |
+| `beneficiate-polar` | feed: 1 regolith-polar | ice: 1,803.75 h2o-s; ilmenite: 33 fetio3-s; tailings: 33 fetio3-s, 971.25 h2o-s, 15,646 sio2-s | — | 1 | 20,000 J drawn |
 | `electrolyze-water` | water: 2 h2o-l | h2: 2 h2-g; o2: 1 o2-g | — | 1 | 770 J drawn |
 | `excavate` | face: 100 regolith-bank | out: 99 regolith | 1 regolith to dust | 1 | 50,000 J drawn |
+| `excavate-mare` | face: 100 regolith-bank-mare | out: 99 regolith-mare | 1 regolith-mare to dust | 1 | 50,000 J drawn |
+| `excavate-polar` | face: 100 regolith-bank-polar | out: 99 regolith-polar | 1 regolith-polar to dust | 1 | 50,000 J drawn |
 | `fabricate-hopper` | iron: 1,900,000 fe-s | scrap: 100,000 fe-s | 1 × hopper-kit | 1 | 200,000,000 J drawn |
 | `fission` | fuel: 1 fuel-fresh | spent: 1 fuel-spent | — | 1 | 75,000,000 J produced |
 | `fuel-cell` | h2: 2 h2-g; o2: 1 o2-g | water: 2 h2o-l | — | 1 | 286 J produced |
 | `generate-solar` | — | — | — | 1 | 1,000,000 J produced |
+| `generate-solar-polar` | — | — | — | 1 | 1,000,000 J produced |
 | `melt-ice` | ice: 1 h2o-s | water: 1 h2o-l | — | 1 | 8 J drawn |
 | `reduce-ilmenite` | h2: 1 h2-g; ilmenite: 2 fetio3-s | iron: 0.85 fe-s; rutile: 0.15 fe-s, 1 tio2-s; unreacted: 1 fetio3-s; water: 1 h2o-l | — | 1 | 500 J drawn |
 
@@ -68,7 +92,7 @@ Per unit of extent, from `ld_client.recipe(create, process, extent)`, which read
 | `bulk-tank` | `bulk-tank-kit` | h2-g, o2-g, h2o-l | 5,000,000,000 mmol |
 | `fission-reactor-core` | `— (part of a machine)` | fuel-fresh, fuel-spent | 4,242,000 mmol |
 | `fission-reactor-small-core` | `— (part of a machine)` | fuel-fresh, fuel-spent | 1,717,000 mmol |
-| `hopper` | `hopper-kit` | regolith | 5,000 kg-reg |
+| `hopper` | `hopper-kit` | regolith, regolith-polar, regolith-mare | 5,000 kg-reg |
 | `ice-bin` | `ice-bin-kit` | h2o-s | 2,000,000 mmol |
 | `ilmenite-bin` | `ilmenite-bin-kit` | fetio3-s | 2,000,000 mmol |
 | `iron-bin` | `iron-bin-kit` | fe-s | 5,000,000 mmol |
@@ -100,5 +124,9 @@ Per unit of extent, from `ld_client.recipe(create, process, extent)`, which read
 | `o2-g` | o2 | gas | mmol |
 | `regolith` | h5550 o33048 si14148 fe659 ti659 | solid | kg-reg |
 | `regolith-bank` | h5550 o33048 si14148 fe659 ti659 | solid | kg-reg |
+| `regolith-bank-mare` | o31939 si14981 fe659 ti659 | solid | kg-reg |
+| `regolith-bank-polar` | o34265 si15646 fe66 ti66 h5550 | solid | kg-reg |
+| `regolith-mare` | o31939 si14981 fe659 ti659 | solid | kg-reg |
+| `regolith-polar` | o34265 si15646 fe66 ti66 h5550 | solid | kg-reg |
 | `sio2-s` | si1 o2 | solid | mmol |
 | `tio2-s` | ti1 o2 | solid | mmol |

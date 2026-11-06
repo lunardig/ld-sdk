@@ -1,0 +1,101 @@
+{
+  "training": {
+    "name": "Proving Ground",
+    "fictional": true,
+    "summary": "The alpha's mixed deposit, for learning the loop: ice and ilmenite together, which no real site has, under an equatorial day and night.",
+    "deposit": "icy-crater",
+    "regolith": "regolith",
+    "bank": "regolith-bank",
+    "environment": "irradiance",
+    "processes": {
+      "solar": "generate-solar",
+      "excavate": "excavate",
+      "beneficiate": "beneficiate"
+    },
+    "yield": {
+      "ice": 2775,
+      "ilmenite": 659,
+      "silicate": 14148
+    },
+    "genesis": {
+      "deposits": [
+        {
+          "deposit_id": "icy-crater",
+          "remaining": {
+            "regolith-bank": "1000000000"
+          },
+          "extracted": {}
+        }
+      ],
+      "environment": [
+        "irradiance"
+      ]
+    }
+  },
+  "polar": {
+    "name": "Polar cold trap",
+    "fictional": false,
+    "summary": "Ice-bearing highland regolith in permanent shadow, with arrays on a nearly always lit ridge: 5 wt% ice, 1 wt% ilmenite, four dark days a lunar month.",
+    "deposit": "polar-cold-trap",
+    "regolith": "regolith-polar",
+    "bank": "regolith-bank-polar",
+    "environment": "irradiance-polar",
+    "processes": {
+      "solar": "generate-solar-polar",
+      "excavate": "excavate-polar",
+      "beneficiate": "beneficiate-polar"
+    },
+    "yield": {
+      "ice": 2775,
+      "ilmenite": 66,
+      "silicate": 15646
+    },
+    "genesis": {
+      "deposits": [
+        {
+          "deposit_id": "polar-cold-trap",
+          "remaining": {
+            "regolith-bank-polar": "1000000000"
+          },
+          "extracted": {}
+        }
+      ],
+      "environment": [
+        "irradiance-polar"
+      ]
+    }
+  },
+  "mare": {
+    "name": "High-Ti mare",
+    "fictional": false,
+    "summary": "Dry equatorial mare regolith: 10 wt% ilmenite, no ice, and a 354-hour night.",
+    "deposit": "mare-basin",
+    "regolith": "regolith-mare",
+    "bank": "regolith-bank-mare",
+    "environment": "irradiance",
+    "processes": {
+      "solar": "generate-solar",
+      "excavate": "excavate-mare",
+      "beneficiate": "beneficiate-mare"
+    },
+    "yield": {
+      "ice": 0,
+      "ilmenite": 659,
+      "silicate": 14981
+    },
+    "genesis": {
+      "deposits": [
+        {
+          "deposit_id": "mare-basin",
+          "remaining": {
+            "regolith-bank-mare": "1000000000"
+          },
+          "extracted": {}
+        }
+      ],
+      "environment": [
+        "irradiance"
+      ]
+    }
+  }
+}

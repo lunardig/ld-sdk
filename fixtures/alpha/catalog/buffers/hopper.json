@@ -1,7 +1,9 @@
 {
   "template_id": "hopper",
   "accepts": [
-    "regolith"
+    "regolith",
+    "regolith-polar",
+    "regolith-mare"
   ],
   "capacity": {
     "amount": "5000",
