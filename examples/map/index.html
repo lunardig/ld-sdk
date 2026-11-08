@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lunar Dig · Public Site Field</title>
+<style>
+:root{color-scheme:light dark;font:15px system-ui,sans-serif;--blue:#416da3}
+body{max-width:1180px;margin:auto;padding:1rem;line-height:1.5}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid #8886}
+main{display:grid;grid-template-columns:minmax(280px,1.3fr) minmax(260px,1fr);gap:1.2rem}
+label{display:block;margin:.5rem 0}select,input{font:inherit;width:100%;padding:.35rem;box-sizing:border-box}
+canvas{width:100%;max-width:650px;aspect-ratio:1/1;border:1px solid #888;border-radius:.3rem;touch-action:manipulation}
+fieldset{border:1px solid #8888;margin:.6rem 0;border-radius:.3rem}
+legend{font-weight:600}
+code,pre{overflow-wrap:anywhere;white-space:pre-wrap}
+small,.muted{opacity:.75}
+#error{color:#c33;font-weight:700}
+#status{font-weight:600}
+button{font:inherit;padding:.45rem .8rem;cursor:pointer}
+#details{border:1px solid #8886;padding:.8rem;border-radius:.4rem}
+dl{display:grid;grid-template-columns:1fr 1fr;gap:.3rem}dt{font-weight:600}dd{margin:0}
+@media(max-width:750px){main{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header><div><h1>Lunar Dig · Public Site Field</h1><p>Unverified survey display until tile hashes match independent roots. Expected values only, never filed endowment.</p></div></header>
+<p id="status" role="status">Not loaded</p><p id="error" role="alert"></p>
+<main><section>
+<fieldset><legend>View</legend><label>Projection view <select id="view"><option value="global">Global context</option><option value="north">North polar</option><option value="south">South polar</option></select></label>
+<label>Verified tile <select id="tile"></select></label>
+<label>Overlay <select id="layer">
+<option value="0">Elevation</option><option value="1">Slope</option><option value="2">Cold-trap fraction</option><option value="3">Best spot sunlight</option><option value="4">TiO₂ (mare estimate)</option><option value="5">TiO₂ 1σ uncertainty</option><option value="6">Usable ground</option></select></label></fieldset>
+<canvas id="grid" width="625" height="625" aria-label="Verified projected 25 by 25 parcel grid"></canvas><p class="muted">Select a parcel by clicking its grid square. Pale grey marks no-data; thick outline marks unclaimable partial squares. The contextual views are not a geographically registered lunar basemap.</p>
+</section><section><div id="details"><h2>Verified parcel detail</h2><p>Select a tile and parcel.</p></div>
+<h2>Trust anchor</h2><p>These roots must be pinned outside the field data host. A query parameter alone is only as trustworthy as whoever supplied it.</p>
+<p>Field version: <code id="version">—</code></p>
+<p>Field root: <code id="root">—</code></p>
+<p>Index hash: <code id="index">—</code></p>
+<p>Data origin: <code id="base">—</code></p>
+<p class="muted">This sample verifies index and tile membership only. It does not authenticate root-history signatures, labels, or display overviews.</p></section></main>
+<script type="module" src="./map.js"></script>
+</body></html>
