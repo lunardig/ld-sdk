@@ -11,7 +11,7 @@ const zoneName=z=>z<90?'ltm-'+(1+z%45)+'-'+(z<45?'n':'s'):(z===90?'lps-n':'lps-s
 const layers=['Elevation','Slope','Cold-trap fraction','Best-spot sunlight','TiO₂','TiO₂ uncertainty','Usable ground'];
 const units=['m','degrees','fraction','fraction','wt%','wt%','fraction'];
 const scales=[1,.01,.0001,.0001,.01,.01,.0001];
-let keys=[],loaded=null,field={},treeTotal=0;
+let keys=[],loaded=null,field={},treeTotal=0,smallTreeCache=null;
 const hex=bytes=>Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
 const unhex=str=>Uint8Array.from(str.match(/.{2}/g)||[],x=>parseInt(x,16));
 const exactHex=x=>/^[0-9a-f]{64}$/.test(x);
@@ -69,9 +69,21 @@ function decodeTile(bytes,expected){
 function levelSizes(n){const lengths=[];while(n){lengths.push(n);if(n===1)break;n=Math.ceil(n/2);}return lengths;}
 async function fetchTreeNode(absoluteIndex){
  const start=absoluteIndex*32,end=start+31;
+ if(smallTreeCache){
+  if(end>=smallTreeCache.length)throw Error('tree.bin truncated');
+  return smallTreeCache.slice(start,end+1);
+ }
  const response=await fetch(base+'/tree.bin',{headers:{Range:'bytes='+start+'-'+end},cache:'no-store'});
- if(response.status!==206)throw Error('tree.bin server must support byte-range requests (206)');
+ if(response.status!==206&&response.status!==200)throw Error('tree.bin HTTP '+response.status);
  const bytes=new Uint8Array(await response.arrayBuffer());
+ if(response.status===200){
+  // Python's SimpleHTTPServer often ignores Range. Allow tiny synthetic trees
+  // only; never download an entire large production field as a fallback.
+  if(bytes.length>65536)throw Error('production tree.bin host must support byte ranges (206)');
+  if(bytes.length!==treeTotal*32)throw Error('tree.bin wrong total size');
+  smallTreeCache=bytes;
+  return bytes.slice(start,end+1);
+ }
  if(bytes.length!==32)throw Error('tree.bin range length mismatch');
  return bytes;
 }
