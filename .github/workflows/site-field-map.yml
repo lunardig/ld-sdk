@@ -1,0 +1,24 @@
+name: Site-field map lint
+on:
+  push:
+    branches: ['feature/site-field-map-rev21']
+  pull_request:
+    paths:
+      - 'examples/map/**'
+      - '.github/workflows/site-field-map.yml'
+  workflow_dispatch:
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript module syntax
+        run: node --check examples/map/map.js
+      - name: Verify sample entry points
+        run: |
+          test -s examples/map/index.html
+          test -s examples/map/map.js
+          test -s examples/map/README.md
